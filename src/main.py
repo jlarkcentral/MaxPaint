@@ -46,11 +46,12 @@ def main():
     clock = pygame.time.Clock()
     running = True
     
-    font = pygame.font.SysFont("Arial", 16)
+    font = pygame.font.SysFont("Impact", 24)
     img = pygame.image.load("../img/xmasgirl1.png")
-    
+    background = pygame.image.load("../img/bg.png")
     
     score = 0
+    bestScore = 0
     
     ### Physics stuff
     space = pymunk.Space()   
@@ -61,6 +62,11 @@ def main():
                 , pymunk.Segment(space.static_body, (790, 10), (790, 590), 5)
                 , pymunk.Segment(space.static_body, (790, 590), (10, 590), 5)
                 , pymunk.Segment(space.static_body, (10, 590), (10, 10), 5)
+                ## side ladders
+                , pymunk.Segment(space.static_body, (10, 200), (100, 200), 5)
+                , pymunk.Segment(space.static_body, (10, 400), (100, 400), 5)
+                , pymunk.Segment(space.static_body, (790, 200), (690, 200), 5)
+                , pymunk.Segment(space.static_body, (790, 400), (690, 400), 5)
                 ]
     
     # colored out walls
@@ -102,6 +108,10 @@ def main():
                 event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]):  
                 running = False
         
+        # background
+        #screen.blit(background,(0,0))
+        
+        # player update
         player.update(space, dt, events)
     
         
@@ -120,9 +130,13 @@ def main():
                 b.isCurrentBlock = True
                 if player.landed_previous and b.color == currentColor:
                     score += 1
+                    if score > bestScore:
+                        bestScore = score
                 elif player.landed_previous and b.color != currentColor:
                     score -= 1
-        
+                    
+        if player.landed_previous and player.positionY < 25:
+            score = 0
         
         # randomly add one
         randCreate = randint(0,100)
@@ -151,7 +165,6 @@ def main():
         ### Clear screen
         screen.fill(pygame.color.THECOLORS["black"])
         
-        
         ### Draw stuff
         draw_space(screen, space)
         
@@ -168,7 +181,7 @@ def main():
             screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32, 48))
 
         # Did we land?
-        if abs(player.grounding['impulse'].y) / player.body.mass > 200 and not player.landed_previous: 
+        if abs(player.grounding['impulse'].y) / player.body.mass > 30 and not player.landed_previous: 
             player.landing = {'p':player.grounding['position'],'n':5}
             player.landed_previous = True
         else:
@@ -180,7 +193,10 @@ def main():
       
       
         # Display score
-        screen.blit(font.render("Score: " + str(score), 1, THECOLORS["white"]), (12,12))
+        screen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,12))
+        screen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (15,42))
+        
+        
         
         
         pygame.display.flip()
