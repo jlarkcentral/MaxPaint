@@ -34,7 +34,7 @@ width, height = 800,600
 fps = 60
 dt = 1./fps
 
-PLATFORM_SPEED = 1
+
 
 
 
@@ -82,7 +82,7 @@ def main():
     space.add(static + outWalls)
     
     blocks = []
-    block = Block()    
+    block = Block()
     space.add(block.segment)
     blocks.append(block)
     
@@ -95,7 +95,6 @@ def main():
     frame_number = 0
     
     while running:
-        
         events = pygame.event.get()
         for event in events:
             if event.type == QUIT or \
@@ -107,23 +106,16 @@ def main():
         
         # Move the moving platform
         for b in blocks:
-            destination = b.path[b.path_index]
-            current = Vec2d(b.body.position)
-            distance = current.get_distance(destination)
-            if distance < PLATFORM_SPEED:
-                b.path_index += 1
-                b.path_index = b.path_index % len(b.path)
-                t = 1
-            else:
-                t = PLATFORM_SPEED / distance
-            new = current.interpolate_to(destination, t)
-            b.body.position = new
-            b.body.velocity = (new - current) / dt
+            b.update(dt)
+            if(b.positionY == 0):
+                blocks.remove(b)
+                space.remove(b.segment)
+            
         
         # randomly add one
         randCreate = randint(0,100)
-        if randCreate == 5 and len(blocks) < 50:
-            block = Block()    
+        if randCreate == 5 and len(blocks) < 20:
+            block = Block()
             space.add(block.segment)
             blocks.append(block)
         
@@ -163,7 +155,7 @@ def main():
             screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32, 48))
 
         # Did we land?
-        if abs(player.grounding['impulse'].y) / player.body.mass > 200 and not player.landed_previous:
+        if abs(player.grounding['impulse'].y) / player.body.mass > 200 and not player.landed_previous: 
             player.landing = {'p':player.grounding['position'],'n':5}
             player.landed_previous = True
         else:
@@ -172,13 +164,16 @@ def main():
             pygame.draw.circle(screen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], screen), 5)
             player.landing['n'] -= 1
       
+        # Display score
         screen.blit(font.render("Score: " + str(score), 1, THECOLORS["white"]), (12,12))
-       
+        
+        
         pygame.display.flip()
         frame_number += 1
-        ### Update physics
         
+        ### Update physics
         space.step(dt)
+        
         
         clock.tick(fps)
 

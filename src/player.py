@@ -65,7 +65,7 @@ class Player(object):
         self.feet.ignore_draw = self.head.ignore_draw = self.head2.ignore_draw = True
         
         self.direction = 1
-        self.remaining_jumps = 2
+        self.remaining_jumps = 5
         self.landing = {'p':Vec2d.zero(), 'n':0}
         
         self.landed_previous = False
@@ -97,7 +97,7 @@ class Player(object):
         self.well_grounded = False
         if self.grounding['body'] != None and abs(self.grounding['normal'].x/self.grounding['normal'].y) < self.feet.friction:
             self.well_grounded = True
-            self.remaining_jumps = 2
+            self.remaining_jumps = 5
     
     
         self.ground_velocity = Vec2d.zero()

@@ -5,7 +5,10 @@ Created on 1 aout 2013
 '''
 
 import pygame
+
 import pymunk
+from pymunk.vec2d import Vec2d
+
 from random import randint
 
 class Block(object):
@@ -14,17 +17,24 @@ class Block(object):
     '''
 
 
+
+
     def __init__(self):
         '''
         Constructor
         '''
         
+        self.PLATFORM_SPEED = 1
+
+        
         randPosX = randint(10,590)
         self.path = [(randPosX,600),(randPosX,0)]
         self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
-        self.body.position = randPosX, 600
-        self.segment = pymunk.Segment(self.body, (-25, 0), (25, 0), 5)
+        self.positionX = randPosX
+        self.positionY = 600
+        self.body.position = self.positionX, self.positionY
+        self.segment = pymunk.Segment(self.body, (-50, 0), (50, 0), 10)
         self.segment.friction = 1.
         self.segment.group = 1
         randColorIndex = randint(0,3)
@@ -39,4 +49,18 @@ class Block(object):
         else:
             print 'bad color index !'
         
-        
+       
+    def update(self, dt):
+        destination = self.path[self.path_index]
+        current = Vec2d(self.body.position)
+        distance = current.get_distance(destination)
+        if distance < self.PLATFORM_SPEED:
+            self.path_index += 1
+            self.path_index = self.path_index % len(self.path)
+            t = 1
+        else:
+            t = self.PLATFORM_SPEED / distance
+        self.positionX, self.positionY = current.interpolate_to(destination, t)
+        self.body.position = self.positionX, self.positionY
+        self.body.velocity = (self.body.position - current) / dt
+            
