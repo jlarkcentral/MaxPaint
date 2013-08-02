@@ -37,7 +37,6 @@ dt = 1./fps
 
 
 
-
 def main():
 
     ### PyGame init
@@ -94,6 +93,8 @@ def main():
     
     frame_number = 0
     
+    currentColor = "black"
+    
     while running:
         events = pygame.event.get()
         for event in events:
@@ -107,10 +108,21 @@ def main():
         # Move the moving platform
         for b in blocks:
             b.update(dt)
-            if(b.positionY == 0):
+            
+            if b.positionY == 0:
                 blocks.remove(b)
                 space.remove(b.segment)
-            
+                
+            elif abs((b.positionY ) - (player.positionY - 28)) < 5 and \
+            b.positionX <= player.positionX and \
+            (b.positionX + 100) >= player.positionX:
+                print 'player on block' + b.color
+                b.isCurrentBlock = True
+                if player.landed_previous and b.color == currentColor:
+                    score += 1
+                elif player.landed_previous and b.color != currentColor:
+                    score -= 1
+        
         
         # randomly add one
         randCreate = randint(0,100)
@@ -122,17 +134,17 @@ def main():
         if player.landed_previous:
             randColorIndex = randint(0,3)
             if(randColorIndex == 0):
-                color = "blue"
+                currentColor = "blue"
             elif(randColorIndex == 1):
-                color = "red"
+                currentColor = "red"
             elif(randColorIndex == 2):
-                color = "yellow"
+                currentColor = "yellow"
             elif(randColorIndex == 3):
-                color = "green"
+                currentColor = "green"
             else:
                 print 'bad color index !'
             for w in outWalls:
-                w.color = pygame.color.THECOLORS[color]
+                w.color = pygame.color.THECOLORS[currentColor]
         
         
         
@@ -143,6 +155,7 @@ def main():
         ### Draw stuff
         draw_space(screen, space)
         
+        ### Character anim
         if player.feet.ignore_draw:
             direction_offset = 48+(1*player.direction+1)/2 * 48
             if player.grounding['body'] != None and abs(player.target_vx) > 1:
@@ -163,6 +176,8 @@ def main():
         if player.landing['n'] > 0:
             pygame.draw.circle(screen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], screen), 5)
             player.landing['n'] -= 1
+      
+      
       
         # Display score
         screen.blit(font.render("Score: " + str(score), 1, THECOLORS["white"]), (12,12))

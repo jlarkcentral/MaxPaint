@@ -34,20 +34,23 @@ class Block(object):
         self.positionX = randPosX
         self.positionY = 600
         self.body.position = self.positionX, self.positionY
-        self.segment = pymunk.Segment(self.body, (-50, 0), (50, 0), 10)
+        self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.friction = 1.
         self.segment.group = 1
         randColorIndex = randint(0,3)
         if(randColorIndex == 0):
-            self.segment.color = pygame.color.THECOLORS["blue"]
+            self.color = "blue"
         elif(randColorIndex == 1):
-            self.segment.color = pygame.color.THECOLORS["red"]
+            self.color = "red"
         elif(randColorIndex == 2):
-            self.segment.color = pygame.color.THECOLORS["yellow"]
+            self.color = "yellow"
         elif(randColorIndex == 3):
-            self.segment.color = pygame.color.THECOLORS["green"]
+            self.color = "green"
         else:
             print 'bad color index !'
+        self.segment.color = pygame.color.THECOLORS[self.color]
+        
+        self.isCurrentBlock = False
         
        
     def update(self, dt):
@@ -63,4 +66,5 @@ class Block(object):
         self.positionX, self.positionY = current.interpolate_to(destination, t)
         self.body.position = self.positionX, self.positionY
         self.body.velocity = (self.body.position - current) / dt
-            
+        
+        self.isCurrentBlock = False    

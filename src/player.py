@@ -130,13 +130,6 @@ class Player(object):
             self.target_vx += self.PLAYER_VELOCITY
         if (keys[K_DOWN]):
             self.direction = -3
-        #if (keys[K_UP]):
-        #    if self.well_grounded or self.remaining_jumps > 0:                    
-        #            jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
-        #            self.body.velocity.y = self.ground_velocity.y + jump_v;
-        #            self.remaining_jumps -=1
-        #else :                
-        #    self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
         
         
             
@@ -157,7 +150,7 @@ class Player(object):
         self.body.velocity.y = max(self.body.velocity.y, -self.FALL_VELOCITY) # clamp upwards as well?
         
         
-    
+        self.positionX, self.positionY = self.body.position
     
         
     
