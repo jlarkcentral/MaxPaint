@@ -48,7 +48,7 @@ def main():
     
     font = pygame.font.SysFont("Impact", 24)
     img = pygame.image.load("../img/robot.png")
-    background = pygame.image.load("../img/bg.png")
+    #background = pygame.image.load("../img/bg.png")
 
     
     score = 0
