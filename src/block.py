@@ -40,6 +40,8 @@ class Block(object):
         randColorIndex = randint(0,3)
         if(randColorIndex == 0):
             self.color = "blue"
+            #self.imgActive = pygame.image.load("../img/blockBlueActive.png")
+            #self.imgInactive = pygame.image.load("../img/blockBlueInactive.png")
         elif(randColorIndex == 1):
             self.color = "red"
         elif(randColorIndex == 2):
@@ -51,7 +53,7 @@ class Block(object):
         self.segment.color = pygame.color.THECOLORS[self.color]
         
         self.isCurrentBlock = False
-        
+        self.active = False
        
     def update(self, dt):
         destination = self.path[self.path_index]
