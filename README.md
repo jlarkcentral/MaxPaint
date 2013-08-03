@@ -6,9 +6,10 @@ game test with Pygame &amp; Pymunk
 
 ### todo
 
-- player on block detection : color matching ~ DONE
-- ++score w/ color matching ~ DONE
 
-- landing detection even from short jump
+- landing detection : short jump & climbing
 - block creation : random in time range, avoiding overlap 
-- new character
+- block texture : squares, active/inactive texture
+- "death" when crashed by block
+- character animation when jumping
+- passthrough side ladders

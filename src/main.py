@@ -4,8 +4,6 @@ PyGame & PyMunk game test
 
 modified code from platformer example
 
-img
-http://untamed.wild-refuge.net/rmxpresources.php?characters
 
 """
 
@@ -30,7 +28,7 @@ from player import *
 
 
 
-width, height = 800,600
+width, height = 800,640
 fps = 60
 dt = 1./fps
 
@@ -42,13 +40,18 @@ def main():
     ### PyGame init
     pygame.init()
     screen = pygame.display.set_mode((width,height)) 
+    
+    backgroundScreen = pygame.Surface(screen.get_size())
+    
 
     clock = pygame.time.Clock()
     running = True
     
     font = pygame.font.SysFont("Impact", 24)
-    img = pygame.image.load("../img/robot.png")
-    #background = pygame.image.load("../img/bg.png")
+    
+    background = pygame.image.load("../img/bg.png")
+    scoreBar = pygame.image.load("../img/scoreBar.png")
+    jumpBar = pygame.image.load("../img/jumpBar.png")
 
     
     score = 0
@@ -59,10 +62,10 @@ def main():
     space.gravity = 0,-1000
     
     # box walls 
-    static = [pymunk.Segment(space.static_body, (10, 10), (790, 10), 5)
-                , pymunk.Segment(space.static_body, (790, 10), (790, 590), 5)
-                , pymunk.Segment(space.static_body, (790, 590), (10, 590), 5)
-                , pymunk.Segment(space.static_body, (10, 590), (10, 10), 5)
+    static = [pymunk.Segment(space.static_body, (10, 40), (790, 40), 5)
+                , pymunk.Segment(space.static_body, (790, 40), (790, 630), 5)
+                , pymunk.Segment(space.static_body, (790, 630), (10, 630), 5)
+                , pymunk.Segment(space.static_body, (10, 630), (10, 40), 5)
                 ## side ladders
                 , pymunk.Segment(space.static_body, (10, 200), (100, 200), 5)
                 , pymunk.Segment(space.static_body, (10, 400), (100, 400), 5)
@@ -71,10 +74,10 @@ def main():
                 ]
     
     # colored out walls
-    outWalls = [pymunk.Segment(space.static_body, (5, 5), (795, 5), 5)
-                , pymunk.Segment(space.static_body, (795, 5), (795, 595), 5)
-                , pymunk.Segment(space.static_body, (795, 595), (5, 595), 5)
-                , pymunk.Segment(space.static_body, (5, 595), (5, 5), 5)
+    outWalls = [pymunk.Segment(space.static_body, (5, 35), (795, 35), 5)
+                , pymunk.Segment(space.static_body, (795, 35), (795, 635), 5)
+                , pymunk.Segment(space.static_body, (795, 635), (5, 635), 5)
+                , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
                 ]
     
     for w in outWalls:
@@ -108,9 +111,15 @@ def main():
             if event.type == QUIT or \
                 event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]):  
                 running = False
+            elif event.type == KEYDOWN and event.key == K_d:
+                player.feet.ignore_draw = not player.feet.ignore_draw
+                player.head.ignore_draw = not player.head.ignore_draw
+                player.head2.ignore_draw = not player.head2.ignore_draw    
         
-        # background
-        #screen.blit(background,(0,0))
+        # draw background
+        backgroundScreen.blit(background, (0,0))
+        backgroundScreen.blit(scoreBar, (0,610))
+        
         
         # player update
         player.update(space, dt, events)
@@ -120,7 +129,7 @@ def main():
         for b in blocks:
             b.update(dt)
             
-            if b.positionY == 0:
+            if b.positionY == 40:
                 blocks.remove(b)
                 space.remove(b.segment)
                 
@@ -131,13 +140,25 @@ def main():
                 b.isCurrentBlock = True
                 if player.landed_previous and b.color == currentColor:
                     score += 1
+                    b.active = True
                     if score > bestScore:
                         bestScore = score
                 elif player.landed_previous and b.color != currentColor:
                     score -= 1
-                    
-        if player.landed_previous and player.positionY < 25:
-            score = 0
+                if player.landed_previous:
+                    randColorIndex = randint(0,3)
+                    if(randColorIndex == 0):
+                        currentColor = "blue"
+                    elif(randColorIndex == 1):
+                        currentColor = "red"
+                    elif(randColorIndex == 2):
+                        currentColor = "yellow"
+                    elif(randColorIndex == 3):
+                        currentColor = "green"
+                    else:
+                        print 'bad color index !'
+                    for w in outWalls:
+                        w.color = pygame.color.THECOLORS[currentColor]
         
         # randomly add one
         randCreate = randint(0,100)
@@ -146,28 +167,12 @@ def main():
             space.add(block.segment)
             blocks.append(block)
         
-        if player.landed_previous:
-            randColorIndex = randint(0,3)
-            if(randColorIndex == 0):
-                currentColor = "blue"
-            elif(randColorIndex == 1):
-                currentColor = "red"
-            elif(randColorIndex == 2):
-                currentColor = "yellow"
-            elif(randColorIndex == 3):
-                currentColor = "green"
-            else:
-                print 'bad color index !'
-            for w in outWalls:
-                w.color = pygame.color.THECOLORS[currentColor]
         
         
         
-        ### Clear screen
-        screen.fill(pygame.color.THECOLORS["black"])
         
         ### Draw stuff
-        draw_space(screen, space)
+        draw_space(backgroundScreen, space)
         
         ### Character anim
         if player.feet.ignore_draw:
@@ -178,8 +183,14 @@ def main():
                 animation_offset = 32*1 * 2
             else:
                 animation_offset = 32*0
+
+                
+
             position = player.body.position +(-16*2,28*2 + 16)
-            screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32*2, 48*2))
+            backgroundScreen.blit(player.img, to_pygame(position, backgroundScreen), (animation_offset, direction_offset, 32*2, 48*2))
+
+        backgroundScreen.blit(jumpBar, to_pygame((300,30), backgroundScreen), (0, 150 - player.remaining_jumps*30, 150, 30))
+
 
         # Did we land?
         if abs(player.grounding['impulse'].y) / player.body.mass > 30 and not player.landed_previous: 
@@ -188,25 +199,24 @@ def main():
         else:
             player.landed_previous = False
         if player.landing['n'] > 0:
-            pygame.draw.circle(screen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], screen), 5)
+            pygame.draw.circle(backgroundScreen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], backgroundScreen), 5)
             player.landing['n'] -= 1
       
       
       
         # Display score
-        screen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,12))
-        screen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (15,42))
+        backgroundScreen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,610))
+        backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,610))
         
-        
-        
-        
+        # Display objects
+        screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()
+        
         frame_number += 1
         
         ### Update physics
         space.step(dt)
-        
-        
+
         clock.tick(fps)
 
 if __name__ == '__main__':

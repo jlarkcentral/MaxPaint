@@ -33,6 +33,9 @@ class Player(object):
         '''
         Constructor
         '''
+        
+        self.img = pygame.image.load("../img/robot.png")
+        
         self.PLAYER_VELOCITY = 100. *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
@@ -53,11 +56,11 @@ class Player(object):
         
         
         
-        self.body = pymunk.Body(50, pymunk.inf)
+        self.body = pymunk.Body(200, pymunk.inf)
         self.body.position = 100,100
         
-        self.head = pymunk.Circle(self.body, 10, (0,5))
-        self.head2 = pymunk.Circle(self.body, 10, (0,13))
+        self.head = pymunk.Circle(self.body, 20, (0,20))
+        self.head2 = pymunk.Circle(self.body, 15, (0,50))
         self.feet = pymunk.Circle(self.body, 10, (0,-5))
     
         self.head.layers = self.head2.layers = 0b1000
