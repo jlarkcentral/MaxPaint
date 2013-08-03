@@ -40,8 +40,8 @@ class Player(object):
         self.PLAYER_AIR_ACCEL_TIME = 0.25
         self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
         
-        self.JUMP_HEIGHT = 16.*3
-        self.JUMP_BOOST_HEIGHT = 24.
+        self.JUMP_HEIGHT = 16.*3*2
+        self.JUMP_BOOST_HEIGHT = 24.*2
         self.JUMP_CUTOFF_VELOCITY = 100
         self.FALL_VELOCITY = 250.
         

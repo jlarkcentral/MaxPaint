@@ -47,8 +47,9 @@ def main():
     running = True
     
     font = pygame.font.SysFont("Impact", 24)
-    img = pygame.image.load("../img/xmasgirl1.png")
+    img = pygame.image.load("../img/robot.png")
     background = pygame.image.load("../img/bg.png")
+
     
     score = 0
     bestScore = 0
@@ -170,15 +171,15 @@ def main():
         
         ### Character anim
         if player.feet.ignore_draw:
-            direction_offset = 48+(1*player.direction+1)/2 * 48
+            direction_offset = 48*2+(1*player.direction+1)/2 * 48 * 2
             if player.grounding['body'] != None and abs(player.target_vx) > 1:
-                animation_offset = 32 * (frame_number / 8 % 4)
+                animation_offset = 32 * 2 *(frame_number / 8 % 4)
             elif player.grounding['body'] is None:
-                animation_offset = 32*1
+                animation_offset = 32*1 * 2
             else:
                 animation_offset = 32*0
-            position = player.body.position +(-16,28)
-            screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32, 48))
+            position = player.body.position +(-16*2,28*2 + 16)
+            screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32*2, 48*2))
 
         # Did we land?
         if abs(player.grounding['impulse'].y) / player.body.mass > 30 and not player.landed_previous: 
