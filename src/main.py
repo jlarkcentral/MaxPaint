@@ -42,6 +42,9 @@ def main():
     ### PyGame init
     pygame.init()
     screen = pygame.display.set_mode((width,height)) 
+    
+    backgroundScreen = pygame.Surface(screen.get_size())
+    
 
     clock = pygame.time.Clock()
     running = True
@@ -108,8 +111,8 @@ def main():
                 event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]):  
                 running = False
         
-        # background
-        #screen.blit(background,(0,0))
+        # draw background
+        backgroundScreen.blit(background, (0,0))
         
         # player update
         player.update(space, dt, events)
@@ -162,11 +165,8 @@ def main():
         
         
         
-        ### Clear screen
-        screen.fill(pygame.color.THECOLORS["black"])
-        
         ### Draw stuff
-        draw_space(screen, space)
+        draw_space(backgroundScreen, space)
         
         ### Character anim
         if player.feet.ignore_draw:
@@ -178,7 +178,7 @@ def main():
             else:
                 animation_offset = 32*0
             position = player.body.position +(-16,28)
-            screen.blit(img, to_pygame(position, screen), (animation_offset, direction_offset, 32, 48))
+            backgroundScreen.blit(img, to_pygame(position, backgroundScreen), (animation_offset, direction_offset, 32, 48))
 
         # Did we land?
         if abs(player.grounding['impulse'].y) / player.body.mass > 30 and not player.landed_previous: 
@@ -187,25 +187,24 @@ def main():
         else:
             player.landed_previous = False
         if player.landing['n'] > 0:
-            pygame.draw.circle(screen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], screen), 5)
+            pygame.draw.circle(backgroundScreen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], backgroundScreen), 5)
             player.landing['n'] -= 1
       
       
       
         # Display score
-        screen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,12))
-        screen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (15,42))
+        backgroundScreen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,12))
+        backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (15,42))
         
-        
-        
-        
+        # Display objects
+        screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()
+        
         frame_number += 1
         
         ### Update physics
         space.step(dt)
-        
-        
+
         clock.tick(fps)
 
 if __name__ == '__main__':
