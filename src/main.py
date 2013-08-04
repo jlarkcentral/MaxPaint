@@ -61,14 +61,15 @@ def main():
     space = pymunk.Space()   
     space.gravity = 0,-1000
     
-    # box walls 
+    # box walls
     static = [pymunk.Segment(space.static_body, (10, 40), (790, 40), 5)
-                , pymunk.Segment(space.static_body, (790, 40), (790, 630), 5)
-                , pymunk.Segment(space.static_body, (790, 630), (10, 630), 5)
-                , pymunk.Segment(space.static_body, (10, 630), (10, 40), 5)
-                ## side ladders
-                , pymunk.Segment(space.static_body, (10, 200), (100, 200), 5)
-                , pymunk.Segment(space.static_body, (10, 400), (100, 400), 5)
+                , pymunk.Segment(space.static_body, (790, 40), (790, 630), 10)
+                , pymunk.Segment(space.static_body, (790, 630), (10, 630), 10)
+                , pymunk.Segment(space.static_body, (10, 630), (10, 40), 10)]
+    
+    ## side ladders
+    side_ladders = [pymunk.Segment(space.static_body, (10, 200), (110, 200), 5)
+                , pymunk.Segment(space.static_body, (10, 400), (110, 400), 5)
                 , pymunk.Segment(space.static_body, (790, 200), (690, 200), 5)
                 , pymunk.Segment(space.static_body, (790, 400), (690, 400), 5)
                 ]
@@ -80,22 +81,38 @@ def main():
                 , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
                 ]
     
+    for l in side_ladders:
+        l.friction = 1.
+        l.collision_type = 2
+        l.layers = l.layers ^ 0b1000
+        space.add(l)
+        
+    def passthrough_handler(space, arbiter):
+        if arbiter.shapes[0].body.velocity.y < 0:
+            return True
+        else:
+            return False
+            
+    space.add_collision_handler(1,2, begin=passthrough_handler)
+    
     for w in outWalls:
         w.color = pygame.color.THECOLORS['black']
-    
-    
     
     for s in static + outWalls:
         s.friction = 1.
         s.group = 1
     space.add(static + outWalls)
     
+    
+    previousBlockPosition = width/2
+    
     blocks = []
-    block = Block()
+    block = Block(previousBlockPosition)
     space.add(block.segment)
     blocks.append(block)
+    previousBlockPosition = block.positionX
     
-    
+    blockCreationDelay = randint(10,200)
     
     # player
     player = Player()
@@ -136,7 +153,6 @@ def main():
             elif abs((b.positionY ) - (player.positionY - 28)) < 5 and \
             b.positionX <= player.positionX and \
             (b.positionX + 100) >= player.positionX:
-                print 'player on block' + b.color
                 b.isCurrentBlock = True
                 if player.landed_previous and b.color == currentColor:
                     score += 1
@@ -161,14 +177,14 @@ def main():
                         w.color = pygame.color.THECOLORS[currentColor]
         
         # randomly add one
-        randCreate = randint(0,100)
-        if randCreate == 5 and len(blocks) < 20:
-            block = Block()
+        if blockCreationDelay == 0:
+            block = Block(previousBlockPosition)
             space.add(block.segment)
             blocks.append(block)
-        
-        
-        
+            previousBlockPosition = block.positionX
+            blockCreationDelay = randint(10,200)
+        else:
+            blockCreationDelay -= 1
         
         
         ### Draw stuff
@@ -183,8 +199,6 @@ def main():
                 animation_offset = 32*1 * 2
             else:
                 animation_offset = 32*0
-
-                
 
             position = player.body.position +(-16*2,28*2 + 16)
             backgroundScreen.blit(player.img, to_pygame(position, backgroundScreen), (animation_offset, direction_offset, 32*2, 48*2))
@@ -213,6 +227,7 @@ def main():
         pygame.display.flip()
         
         frame_number += 1
+        
         
         ### Update physics
         space.step(dt)

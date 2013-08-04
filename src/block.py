@@ -9,6 +9,7 @@ import pygame
 import pymunk
 from pymunk.vec2d import Vec2d
 
+import random
 from random import randint
 
 class Block(object):
@@ -19,20 +20,30 @@ class Block(object):
 
 
 
-    def __init__(self):
+    def __init__(self, previousBlockPosition):
         '''
         Constructor
         '''
         
-        self.PLATFORM_SPEED = 1
-
+        self.PLATFORM_SPEED = 2
         
-        randPosX = randint(10,590)
-        self.path = [(randPosX,600),(randPosX,0)]
+        randPosX = 0
+        print str(previousBlockPosition)
+        if previousBlockPosition >= 490:
+            randPosX = randint(110,previousBlockPosition - 100)
+        elif previousBlockPosition <= 210:
+            randPosX = randint(previousBlockPosition+100,590)    
+        else:    
+            randPosBool = random.choice([True, False])
+            if randPosBool:
+                randPosX = randint(110,previousBlockPosition - 100)
+            else:
+                randPosX = randint(previousBlockPosition+100,590)    
+        self.path = [(randPosX,640),(randPosX,0)]
         self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.positionX = randPosX
-        self.positionY = 600
+        self.positionY = 640
         self.body.position = self.positionX, self.positionY
         self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.friction = 1.
