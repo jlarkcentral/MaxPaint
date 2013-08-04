@@ -52,8 +52,15 @@ def main():
     background = pygame.image.load("../img/bg.png")
     scoreBar = pygame.image.load("../img/scoreBar.png")
     jumpBar = pygame.image.load("../img/jumpBar.png")
-
     
+    currentColorIcon = pygame.image.load("../img/nextColor1.png")
+    nextColorIcon = pygame.image.load("../img/nextColor23.png")
+    
+    color_dict = {'blue': 1, 'green': 2, 'yellow': 3, 'red': 4}
+    
+    def randomColor():
+        return random.choice(["blue","red","yellow","green"])
+        
     score = 0
     bestScore = 0
     
@@ -62,24 +69,26 @@ def main():
     space.gravity = 0,-1000
     
     # box walls
-    static = [pymunk.Segment(space.static_body, (10, 40), (790, 40), 5)
-                , pymunk.Segment(space.static_body, (790, 40), (790, 630), 10)
-                , pymunk.Segment(space.static_body, (790, 630), (10, 630), 10)
-                , pymunk.Segment(space.static_body, (10, 630), (10, 40), 10)]
+    static = [
+              #pymunk.Segment(space.static_body, (10, 40), (790, 40), 5)
+                pymunk.Segment(space.static_body, (800, 40), (800, 640), 10)
+                , pymunk.Segment(space.static_body, (800, 640), (0, 640), 10)
+                , pymunk.Segment(space.static_body, (0, 640), (0, 40), 10)
+                ]
     
     ## side ladders
-    side_ladders = [pymunk.Segment(space.static_body, (10, 200), (110, 200), 5)
-                , pymunk.Segment(space.static_body, (10, 400), (110, 400), 5)
-                , pymunk.Segment(space.static_body, (790, 200), (690, 200), 5)
-                , pymunk.Segment(space.static_body, (790, 400), (690, 400), 5)
+    side_ladders = [pymunk.Segment(space.static_body, (0, 200), (110, 200), 5)
+                , pymunk.Segment(space.static_body, (0, 400), (110, 400), 5)
+                , pymunk.Segment(space.static_body, (800, 200), (690, 200), 5)
+                , pymunk.Segment(space.static_body, (800, 400), (690, 400), 5)
                 ]
     
     # colored out walls
-    outWalls = [pymunk.Segment(space.static_body, (5, 35), (795, 35), 5)
-                , pymunk.Segment(space.static_body, (795, 35), (795, 635), 5)
-                , pymunk.Segment(space.static_body, (795, 635), (5, 635), 5)
-                , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
-                ]
+    #outWalls = [pymunk.Segment(space.static_body, (5, 35), (795, 35), 5)
+    #            , pymunk.Segment(space.static_body, (795, 35), (795, 635), 5)
+    #            , pymunk.Segment(space.static_body, (795, 635), (5, 635), 5)
+    #            , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
+    #            ]
     
     for l in side_ladders:
         l.friction = 1.
@@ -95,13 +104,11 @@ def main():
             
     space.add_collision_handler(1,2, begin=passthrough_handler)
     
-    for w in outWalls:
-        w.color = pygame.color.THECOLORS['black']
     
-    for s in static + outWalls:
+    for s in static :
         s.friction = 1.
         s.group = 1
-    space.add(static + outWalls)
+    space.add(static)
     
     
     previousBlockPosition = width/2
@@ -112,7 +119,7 @@ def main():
     blocks.append(block)
     previousBlockPosition = block.positionX
     
-    blockCreationDelay = randint(10,200)
+    blockCreationDelay = randint(60,150)
     
     # player
     player = Player()
@@ -120,7 +127,14 @@ def main():
     
     frame_number = 0
     
-    currentColor = "black"
+    
+    currentColor = randomColor()
+    currentColor2 = randomColor()
+    currentColor3 = randomColor()
+    
+    #for w in outWalls:
+    #    w.color = pygame.color.THECOLORS[currentColor]
+    
     
     while running:
         events = pygame.event.get()
@@ -135,7 +149,7 @@ def main():
         
         # draw background
         backgroundScreen.blit(background, (0,0))
-        backgroundScreen.blit(scoreBar, (0,610))
+       
         
         
         # player update
@@ -146,7 +160,7 @@ def main():
         for b in blocks:
             b.update(dt)
             
-            if b.positionY == 40:
+            if b.positionY <= 40:
                 blocks.remove(b)
                 space.remove(b.segment)
                 
@@ -154,38 +168,42 @@ def main():
             b.positionX <= player.positionX and \
             (b.positionX + 100) >= player.positionX:
                 b.isCurrentBlock = True
-                if player.landed_previous and b.color == currentColor:
+                if player.landed_previous and b.color == currentColor and b.active == False:
                     score += 1
                     b.active = True
                     if score > bestScore:
                         bestScore = score
-                elif player.landed_previous and b.color != currentColor:
+                    
+                    currentColor = currentColor2
+                    currentColor2 = currentColor3
+                    currentColor3 = randomColor()
+                        
+                    #for w in outWalls:
+                    #    w.color = pygame.color.THECOLORS[currentColor]
+                            
+                elif player.landed_previous and b.color != currentColor and b.active == False:
                     score -= 1
-                if player.landed_previous:
-                    randColorIndex = randint(0,3)
-                    if(randColorIndex == 0):
-                        currentColor = "blue"
-                    elif(randColorIndex == 1):
-                        currentColor = "red"
-                    elif(randColorIndex == 2):
-                        currentColor = "yellow"
-                    elif(randColorIndex == 3):
-                        currentColor = "green"
-                    else:
-                        print 'bad color index !'
-                    for w in outWalls:
-                        w.color = pygame.color.THECOLORS[currentColor]
+                    
+                    currentColor = currentColor2
+                    currentColor2 = currentColor3
+                    currentColor3 = randomColor()
+                                
+                    #for w in outWalls:
+                    #    w.color = pygame.color.THECOLORS[currentColor]
+        
+            backgroundScreen.blit(b.img, to_pygame(b.body.position + (0,10), backgroundScreen), (0, b.active*50, 100, 50))
         
         # randomly add one
-        if blockCreationDelay == 0:
+        if blockCreationDelay == 0 and len(blocks) < 5:
             block = Block(previousBlockPosition)
             space.add(block.segment)
             blocks.append(block)
             previousBlockPosition = block.positionX
-            blockCreationDelay = randint(10,200)
+            blockCreationDelay = randint(10,150)
+        elif blockCreationDelay == 0 and len(blocks) == 5:
+            blockCreationDelay = 0
         else:
             blockCreationDelay -= 1
-        
         
         ### Draw stuff
         draw_space(backgroundScreen, space)
@@ -203,7 +221,7 @@ def main():
             position = player.body.position +(-16*2,28*2 + 16)
             backgroundScreen.blit(player.img, to_pygame(position, backgroundScreen), (animation_offset, direction_offset, 32*2, 48*2))
 
-        backgroundScreen.blit(jumpBar, to_pygame((300,30), backgroundScreen), (0, 150 - player.remaining_jumps*30, 150, 30))
+        
 
 
         # Did we land?
@@ -217,13 +235,25 @@ def main():
             player.landing['n'] -= 1
       
       
+            
+        backgroundScreen.blit(scoreBar, (0,600))
+      
+        backgroundScreen.blit(jumpBar, to_pygame((300,35), backgroundScreen), (0, 150 - player.remaining_jumps*30, 150, 30))
+
+        backgroundScreen.blit(currentColorIcon, to_pygame((600,35), backgroundScreen), (0, color_dict[currentColor]*30, 75, 30))
+        backgroundScreen.blit(nextColorIcon, to_pygame((680,35), backgroundScreen), (0, color_dict[currentColor2]*30, 50, 30))
+        backgroundScreen.blit(nextColorIcon, to_pygame((730,35), backgroundScreen), (0, color_dict[currentColor3]*30, 50, 30))
       
         # Display score
-        backgroundScreen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,610))
-        backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,610))
+        backgroundScreen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,605))
+        backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,605))
+        backgroundScreen.blit(font.render("Next : ", 1, THECOLORS["white"]), (520,605))
+        
+        
         
         # Display objects
         screen.blit(backgroundScreen,(0,0))
+        
         pygame.display.flip()
         
         frame_number += 1

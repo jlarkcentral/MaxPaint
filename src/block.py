@@ -25,10 +25,9 @@ class Block(object):
         Constructor
         '''
         
-        self.PLATFORM_SPEED = 2
+        self.PLATFORM_SPEED = 1
         
         randPosX = 0
-        print str(previousBlockPosition)
         if previousBlockPosition >= 490:
             randPosX = randint(110,previousBlockPosition - 100)
         elif previousBlockPosition <= 210:
@@ -48,23 +47,34 @@ class Block(object):
         self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.friction = 1.
         self.segment.group = 1
+        self.segment.ignore_draw = True
         randColorIndex = randint(0,3)
         if(randColorIndex == 0):
             self.color = "blue"
-            #self.imgActive = pygame.image.load("../img/blockBlueActive.png")
-            #self.imgInactive = pygame.image.load("../img/blockBlueInactive.png")
+            self.PLATFORM_SPEED = 1.0
+            self.img = pygame.image.load("../img/blockBlue.png")
         elif(randColorIndex == 1):
             self.color = "red"
+            self.PLATFORM_SPEED = 1.75
+            self.img = pygame.image.load("../img/blockRed.png")
         elif(randColorIndex == 2):
             self.color = "yellow"
+            self.PLATFORM_SPEED = 1.5
+            self.img = pygame.image.load("../img/blockYellow.png")
         elif(randColorIndex == 3):
             self.color = "green"
+            self.PLATFORM_SPEED = 1.25
+            self.img = pygame.image.load("../img/blockGreen.png")
         else:
             print 'bad color index !'
-        self.segment.color = pygame.color.THECOLORS[self.color]
+        #self.segment.color = pygame.color.THECOLORS[self.color]
+
         
         self.isCurrentBlock = False
         self.active = False
+        
+        #self.PLATFORM_SPEED = randint(5,20) / 10.0
+        
        
     def update(self, dt):
         destination = self.path[self.path_index]

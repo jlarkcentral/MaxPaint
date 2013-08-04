@@ -57,7 +57,7 @@ class Player(object):
         
         
         self.body = pymunk.Body(200, pymunk.inf)
-        self.body.position = 100,100
+        self.body.position = 10,420
         
         self.head = pymunk.Circle(self.body, 20, (0,20))
         self.head2 = pymunk.Circle(self.body, 15, (0,50))
