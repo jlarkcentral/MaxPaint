@@ -20,29 +20,29 @@ class Block(object):
 
 
 
-    def __init__(self, previousBlockPosition):
+    def __init__(self, maxPosY):
         '''
         Constructor
         '''
         
-        self.PLATFORM_SPEED = 1
+        #self.PLATFORM_SPEED = 0
         
-        randPosX = 0
-        if previousBlockPosition >= 490:
-            randPosX = randint(110,previousBlockPosition - 100)
-        elif previousBlockPosition <= 210:
-            randPosX = randint(previousBlockPosition+100,590)    
-        else:    
-            randPosBool = random.choice([True, False])
-            if randPosBool:
-                randPosX = randint(110,previousBlockPosition - 100)
-            else:
-                randPosX = randint(previousBlockPosition+100,590)    
-        self.path = [(randPosX,640),(randPosX,0)]
-        self.path_index = 0
+        #randPosX = 0
+        #if previousBlockPosition >= 490:
+        #    randPosX = randint(110,previousBlockPosition - 100)
+        #elif previousBlockPosition <= 210:
+        #    randPosX = randint(previousBlockPosition+100,590)    
+        #else:    
+        #    randPosBool = random.choice([True, False])
+        #    if randPosBool:
+        #        randPosX = randint(110,previousBlockPosition - 100)
+        #    else:
+        #        randPosX = randint(previousBlockPosition+100,590)    
+        #self.path = [(randPosX,640),(randPosX,0)]
+        #self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
-        self.positionX = randPosX
-        self.positionY = 640
+        self.positionX = randint(0,800)
+        self.positionY = 640 #randint(maxPosY-640,maxPosY)
         self.body.position = self.positionX, self.positionY
         self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.collision_type = 2
@@ -57,19 +57,19 @@ class Block(object):
         randColorIndex = randint(0,3)
         if(randColorIndex == 0):
             self.color = "blue"
-            self.PLATFORM_SPEED = 1.0
+            self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blockBlue.png")
         elif(randColorIndex == 1):
             self.color = "red"
-            self.PLATFORM_SPEED = 1.75
+            self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blockRed.png")
         elif(randColorIndex == 2):
             self.color = "yellow"
-            self.PLATFORM_SPEED = 1.5
+            self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blockYellow.png")
         elif(randColorIndex == 3):
             self.color = "green"
-            self.PLATFORM_SPEED = 1.25
+            self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blockGreen.png")
         else:
             print 'bad color index !'
@@ -83,17 +83,18 @@ class Block(object):
         
        
     def update(self, dt):
-        destination = self.path[self.path_index]
-        current = Vec2d(self.body.position)
-        distance = current.get_distance(destination)
-        if distance < self.PLATFORM_SPEED:
-            self.path_index += 1
-            self.path_index = self.path_index % len(self.path)
-            t = 1
-        else:
-            t = self.PLATFORM_SPEED / distance
-        self.positionX, self.positionY = current.interpolate_to(destination, t)
-        self.body.position = self.positionX, self.positionY
-        self.body.velocity = (self.body.position - current) / dt
+        
+        #destination = self.path[self.path_index]
+        #current = Vec2d(self.body.position)
+        #distance = current.get_distance(destination)
+        #if distance < self.PLATFORM_SPEED:
+        #    self.path_index += 1
+        #    self.path_index = self.path_index % len(self.path)
+        #    t = 1
+        #else:
+        #    t = self.PLATFORM_SPEED / distance
+        #self.positionX, self.positionY = current.interpolate_to(destination, t)
+        #self.body.position = self.positionX, self.positionY
+        #self.body.velocity = (self.body.position - current) / dt
         
         self.isCurrentBlock = False    

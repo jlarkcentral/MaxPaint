@@ -32,11 +32,38 @@ width, height = 800,640
 fps = 60
 dt = 1./fps
 
+class Camera(object):
+    def __init__(self, camera_func, width, height):
+        self.camera_func = camera_func
+        self.state = Rect(0, 0, width, height)
+
+    def apply(self, rect):
+        return rect.move(self.state.topleft)
+
+    def update(self, rect):
+        self.state = self.camera_func(self.state, rect)
+
+#def simple_camera(camera, target_rect):
+#    l, t, _, _ = target_rect
+#    _, _, w, h = camera
+#    return Rect(-l+400, -t+320, w, h)
+
+def complex_camera(camera, target_rect):
+    l, t, _, _ = target_rect
+    _, _, w, h = camera
+    l, t, _, _ = -l+400, -t+320, w, h
+
+    l = min(0, l)                           # stop scrolling at the left edge
+    l = max(-(camera.width-400), l)   # stop scrolling at the right edge
+    t = max(-(camera.height-320), t) # stop scrolling at the bottom
+    t = min(0, t)                           # stop scrolling at the top
+    return Rect(l, t, w, h)
 
 
 
 def main():
 
+    camera = Camera(complex_camera, 800, 8640)
     ### PyGame init
     pygame.init()
     screen = pygame.display.set_mode((width,height)) 
@@ -154,10 +181,14 @@ def main():
         
         # player update
         player.update(space, dt, events)
-        if player.positionY < 0:
-            player.body.position = player.positionX, 640
+        if player.positionY < 40:
+            player.body.position = player.positionX, 40
             score = 0
-    
+            player.remaining_jumps = 4000
+        if player.positionY > 8640:
+            player.body.position = player.positionX, 8640
+            score = 0
+            player.remaining_jumps = 4000
         
         # Move the moving platform
         for b in blocks:
@@ -192,11 +223,12 @@ def main():
                     #for w in outWalls:
                     #    w.color = pygame.color.THECOLORS[currentColor]
         
-            backgroundScreen.blit(b.img, to_pygame(b.body.position + (0,10), backgroundScreen), (0, b.active*50, 100, 50))
-        
+            backgroundScreen.blit(b.img, camera.apply(Rect(b.positionX, 640-b.positionY, 0, 0)), (0, b.active*50, 100, 50))
+            #to_pygame(b.body.position + (0,10), backgroundScreen)
+            
         # randomly add one
         if blockCreationDelay == 0 and len(blocks) < 5:
-            block = Block(previousBlockPosition)
+            block = Block(camera.state.y)
             space.add(block.segment)
             blocks.append(block)
             previousBlockPosition = block.positionX
@@ -250,7 +282,7 @@ def main():
         backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,605))
         backgroundScreen.blit(font.render("Next : ", 1, THECOLORS["white"]), (520,605))
         
-        
+        camera.update((player.positionX, 640-player.positionY, 32, 48))
         
         # Display objects
         screen.blit(backgroundScreen,(0,0))
