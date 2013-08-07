@@ -72,16 +72,16 @@ def main():
     static = [
               #pymunk.Segment(space.static_body, (10, 40), (790, 40), 5)
                 pymunk.Segment(space.static_body, (800, 40), (800, 640), 10)
-                , pymunk.Segment(space.static_body, (800, 640), (0, 640), 10)
+                #, pymunk.Segment(space.static_body, (800, 640), (0, 640), 10)
                 , pymunk.Segment(space.static_body, (0, 640), (0, 40), 10)
                 ]
     
     ## side ladders
-    side_ladders = [pymunk.Segment(space.static_body, (0, 200), (110, 200), 5)
-                , pymunk.Segment(space.static_body, (0, 400), (110, 400), 5)
-                , pymunk.Segment(space.static_body, (800, 200), (690, 200), 5)
-                , pymunk.Segment(space.static_body, (800, 400), (690, 400), 5)
-                ]
+    #side_ladders = [pymunk.Segment(space.static_body, (0, 200), (110, 200), 5)
+    #            , pymunk.Segment(space.static_body, (0, 400), (110, 400), 5)
+    #            , pymunk.Segment(space.static_body, (800, 200), (690, 200), 5)
+    #            , pymunk.Segment(space.static_body, (800, 400), (690, 400), 5)
+    #            ]
     
     # colored out walls
     #outWalls = [pymunk.Segment(space.static_body, (5, 35), (795, 35), 5)
@@ -90,11 +90,11 @@ def main():
     #            , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
     #            ]
     
-    for l in side_ladders:
-        l.friction = 1.
-        l.collision_type = 2
-        l.layers = l.layers ^ 0b1000
-        space.add(l)
+    #for l in side_ladders:
+    #    l.friction = 1.
+    #    l.collision_type = 2
+    #    l.layers = l.layers ^ 0b1000
+    #    space.add(l)
         
     def passthrough_handler(space, arbiter):
         if arbiter.shapes[0].body.velocity.y < 0:
@@ -154,6 +154,9 @@ def main():
         
         # player update
         player.update(space, dt, events)
+        if player.positionY < 0:
+            player.body.position = player.positionX, 640
+            score = 0
     
         
         # Move the moving platform
@@ -182,11 +185,9 @@ def main():
                     #    w.color = pygame.color.THECOLORS[currentColor]
                             
                 elif player.landed_previous and b.color != currentColor and b.active == False:
-                    score -= 1
-                    
-                    currentColor = currentColor2
-                    currentColor2 = currentColor3
-                    currentColor3 = randomColor()
+                    #score = 0
+                    if score > 0:
+                        score -= 1
                                 
                     #for w in outWalls:
                     #    w.color = pygame.color.THECOLORS[currentColor]

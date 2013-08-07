@@ -45,9 +45,15 @@ class Block(object):
         self.positionY = 640
         self.body.position = self.positionX, self.positionY
         self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
-        self.segment.friction = 1.
+        self.segment.collision_type = 2
+        self.segment.layers = self.segment.layers ^ 0b1000
+        
+        self.segment.friction = 100
         self.segment.group = 1
         self.segment.ignore_draw = True
+        
+        
+        
         randColorIndex = randint(0,3)
         if(randColorIndex == 0):
             self.color = "blue"

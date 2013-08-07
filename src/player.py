@@ -36,7 +36,7 @@ class Player(object):
         
         self.img = pygame.image.load("../img/robot.png")
         
-        self.PLAYER_VELOCITY = 100. *2.
+        self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
         
@@ -46,9 +46,9 @@ class Player(object):
         self.JUMP_HEIGHT = 16.*3*2
         self.JUMP_BOOST_HEIGHT = 24.*2
         self.JUMP_CUTOFF_VELOCITY = 100
-        self.FALL_VELOCITY = 250.
+        self.FALL_VELOCITY = 500.
         
-        self.JUMP_LENIENCY = 0.05
+        self.JUMP_LENIENCY = 5
         
         self.HEAD_FRICTION = 0.7
         
