@@ -35,7 +35,7 @@ dt = 1./fps
 class Camera(object):
     def __init__(self, camera_func, width, height):
         self.camera_func = camera_func
-        self.state = Rect(0, 0, width, height)
+        self.state = Rect(0, -8640, width, height)
 
     def apply(self, rect):
         return rect.move(self.state.topleft)
@@ -43,19 +43,20 @@ class Camera(object):
     def update(self, rect):
         self.state = self.camera_func(self.state, rect)
 
-#def simple_camera(camera, target_rect):
-#    l, t, _, _ = target_rect
-#    _, _, w, h = camera
-#    return Rect(-l+400, -t+320, w, h)
-
 def complex_camera(camera, target_rect):
     l, t, _, _ = target_rect
+    
+    print "t :" + str(t)
+    
     _, _, w, h = camera
-    l, t, _, _ = -l+400, -t+320, w, h
+    l, t, _, _ = l, -t+320, w, h
 
     l = min(0, l)                           # stop scrolling at the left edge
-    l = max(-(camera.width-400), l)   # stop scrolling at the right edge
-    t = max(-(camera.height-320), t) # stop scrolling at the bottom
+    l = max((camera.width-800), l)   # stop scrolling at the right edge
+    
+    
+    
+    t = min((camera.height), t) # stop scrolling at the bottom
     t = min(0, t)                           # stop scrolling at the top
     return Rect(l, t, w, h)
 
@@ -102,26 +103,6 @@ def main():
                 #, pymunk.Segment(space.static_body, (800, 640), (0, 640), 10)
                 , pymunk.Segment(space.static_body, (0, 640), (0, 40), 10)
                 ]
-    
-    ## side ladders
-    #side_ladders = [pymunk.Segment(space.static_body, (0, 200), (110, 200), 5)
-    #            , pymunk.Segment(space.static_body, (0, 400), (110, 400), 5)
-    #            , pymunk.Segment(space.static_body, (800, 200), (690, 200), 5)
-    #            , pymunk.Segment(space.static_body, (800, 400), (690, 400), 5)
-    #            ]
-    
-    # colored out walls
-    #outWalls = [pymunk.Segment(space.static_body, (5, 35), (795, 35), 5)
-    #            , pymunk.Segment(space.static_body, (795, 35), (795, 635), 5)
-    #            , pymunk.Segment(space.static_body, (795, 635), (5, 635), 5)
-    #            , pymunk.Segment(space.static_body, (5, 635), (5, 35), 5)
-    #            ]
-    
-    #for l in side_ladders:
-    #    l.friction = 1.
-    #    l.collision_type = 2
-    #    l.layers = l.layers ^ 0b1000
-    #    space.add(l)
         
     def passthrough_handler(space, arbiter):
         if arbiter.shapes[0].body.velocity.y < 0:
@@ -138,13 +119,14 @@ def main():
     space.add(static)
     
     
-    previousBlockPosition = width/2
+    #previousBlockPosition = width/2
     
     blocks = []
-    block = Block(previousBlockPosition)
-    space.add(block.segment)
-    blocks.append(block)
-    previousBlockPosition = block.positionX
+    for i in range(40):
+        block = Block(i*200)
+        space.add(block.segment)
+        blocks.append(block)
+    #previousBlockPosition = block.positionX
     
     blockCreationDelay = randint(60,150)
     
@@ -163,7 +145,11 @@ def main():
     #    w.color = pygame.color.THECOLORS[currentColor]
     
     
+    
     while running:
+        
+        print "camera : " + str(camera.state.y) + "  , player : " + str(player.positionY)
+        
         events = pygame.event.get()
         for event in events:
             if event.type == QUIT or \
@@ -186,7 +172,7 @@ def main():
             score = 0
             player.remaining_jumps = 4000
         if player.positionY > 8640:
-            player.body.position = player.positionX, 8640
+            #player.body.position = player.positionX, 8640
             score = 0
             player.remaining_jumps = 4000
         
@@ -223,20 +209,21 @@ def main():
                     #for w in outWalls:
                     #    w.color = pygame.color.THECOLORS[currentColor]
         
-            backgroundScreen.blit(b.img, camera.apply(Rect(b.positionX, 640-b.positionY, 0, 0)), (0, b.active*50, 100, 50))
+            backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen), (0, b.active*50, 100, 50))
             #to_pygame(b.body.position + (0,10), backgroundScreen)
+            backgroundScreen.blit(font.render(b.color + " block there", 1, THECOLORS["black"]), (b.positionX, 640-(camera.state.y + b.positionY)))
             
         # randomly add one
-        if blockCreationDelay == 0 and len(blocks) < 5:
-            block = Block(camera.state.y)
-            space.add(block.segment)
-            blocks.append(block)
-            previousBlockPosition = block.positionX
-            blockCreationDelay = randint(10,150)
-        elif blockCreationDelay == 0 and len(blocks) == 5:
-            blockCreationDelay = 0
-        else:
-            blockCreationDelay -= 1
+        #if blockCreationDelay == 0 and len(blocks) < 5:
+        #    block = Block(camera.state.y)
+        #    space.add(block.segment)
+        #    blocks.append(block)
+        #    previousBlockPosition = block.positionX
+        #    blockCreationDelay = randint(10,150)
+        #elif blockCreationDelay == 0 and len(blocks) == 5:
+        #    blockCreationDelay = 0
+        #else:
+        #    blockCreationDelay -= 1
         
         ### Draw stuff
         draw_space(backgroundScreen, space)
@@ -251,9 +238,9 @@ def main():
             else:
                 animation_offset = 32*0
 
-            position = player.body.position +(-16*2,28*2 + 16)
-            backgroundScreen.blit(player.img, to_pygame(position, backgroundScreen), (animation_offset, direction_offset, 32*2, 48*2))
-
+            posX, posY = player.body.position +(-16*2,28*2 + 16)
+            backgroundScreen.blit(player.img, to_pygame(camera.apply(Rect(posX ,posY, 0, 0)), backgroundScreen) , (animation_offset, direction_offset, 32*2, 48*2))
+            # 
         
 
 
@@ -282,7 +269,9 @@ def main():
         backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,605))
         backgroundScreen.blit(font.render("Next : ", 1, THECOLORS["white"]), (520,605))
         
-        camera.update((player.positionX, 640-player.positionY, 32, 48))
+        backgroundScreen.blit(font.render("Player here", 1, THECOLORS["black"]), (player.positionX,640-(camera.state.y + player.positionY)))
+        
+        camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
         
         # Display objects
         screen.blit(backgroundScreen,(0,0))

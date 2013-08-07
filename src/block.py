@@ -42,7 +42,7 @@ class Block(object):
         #self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.positionX = randint(0,800)
-        self.positionY = 640 #randint(maxPosY-640,maxPosY)
+        self.positionY = maxPosY #randint(maxPosY-640,maxPosY)
         self.body.position = self.positionX, self.positionY
         self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.collision_type = 2

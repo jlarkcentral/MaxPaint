@@ -68,12 +68,12 @@ class Player(object):
         self.feet.ignore_draw = self.head.ignore_draw = self.head2.ignore_draw = True
         
         self.direction = 1
-        self.remaining_jumps = 5
+        self.remaining_jumps = 100
         self.landing = {'p':Vec2d.zero(), 'n':0}
         
         self.landed_previous = False
         
-        
+        self.positionX, self.positionY = self.body.position
         
         
     def update(self, space, dt, events):
