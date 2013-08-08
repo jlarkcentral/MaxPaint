@@ -34,7 +34,7 @@ class Player(object):
         Constructor
         '''
         
-        self.img = pygame.image.load("../img/robot.png")
+        self.img = pygame.image.load("../img/kube.png")
         
         self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
