@@ -23,6 +23,7 @@ from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 from block import Block
 from player import Player
 from camera import Camera
+from enemy import Enemy
 
 
 def gameInit():
@@ -61,7 +62,7 @@ def loadResources():
     jumpBar = pygame.image.load("../img/jumpBar.png")
     currentColorIcon = pygame.image.load("../img/nextColor1.png")
     nextColorIcon = pygame.image.load("../img/nextColor23.png")
-    color_dict = {'blue': 1, 'green': 2, 'yellow': 3, 'red': 4}
+    color_dict = {'blue': 0, 'green': 0, 'yellow': 0, 'red': 0}
 
 def loadPhysics():
     global space
@@ -99,40 +100,26 @@ def main():
     loadResources()
     loadPhysics()
     
-    score = 0
-    bestScore = 0
     frame_number = 0
     
     
-    # box walls
-    static = [
-                pymunk.Segment(space.static_body, (800, 40), (800, 640), 10)
-                , pymunk.Segment(space.static_body, (0, 640), (0, 40), 10)
-                ]
-    
-    for s in static :
-        s.friction = 1.
-        s.group = 1
-    space.add(static)
-    
-    
     blocks = []
-    blocksPos = [(0,100,100),(100,100,100),(200,100,100),
-                 (600,300,100),(700,300,100),
-                 (300,500,100),(400,500,100),
-                 (200,700,100),
-                 (300,900,100),
-                 (600,800,100),(700,800,100),
-                 (650,1000,100),
-                 (750,1200,100),
-                 (400,1300,100),(500,1300,100),
-                 (300,1500,100),(400,1500,100),
-                 (-50,1800,100),(-50,1850,100),(-50,1900,100),
-                 (100,2100,100),(400,2100,100),
-                 (600,2300,100),(700,2300,100),
-                 (200,2500,100),(300,2500,100),
-                 (100,2700,100),(0,2900,100),
-                 (100,3000,100),(200,3000,100),(300,3000,100),(400,3000,100),(500,3000,100),(600,3000,100),(700,3000,100),
+    blocksPos = [(0,100,1),(100,100,1),(200,100,1),
+                 (600,300,2),(700,300,2),
+                 (300,500,1),(400,500,1),
+                 (200,700,3),
+                 (300,900,2),
+                 (600,800,1),(700,800,1),
+                 (650,1000,0),
+                 (750,1200,0),
+                 (400,1300,1),(500,1300,2),
+                 (300,1500,3),(400,1500,3),
+                 (-50,1800,2),
+                 (100,2100,1),(400,2100,1),
+                 (600,2300,0),(700,2300,0),
+                 (200,2500,2),(300,2500,2),
+                 (100,2700,1),(0,2900,1),
+                 (100,3000,0),(200,3000,0),(300,3000,0),(400,3000,0),(500,3000,0),(600,3000,0),(700,3000,0),
                  ]
     
     for x,y,l in blocksPos:
@@ -140,17 +127,18 @@ def main():
         space.add(b.segment)
         blocks.append(b)
     
+    enemies = [
+               Enemy([(600,340),(760,340)], 1),
+               Enemy([(300,540),(460,540)], 1),
+               Enemy([(200,740),(260,740)], 1),
+               Enemy([(300,940),(360,940)], 1),
+               ]
+    
     # player
     player = Player()
     space.add(player.body, player.head, player.feet, player.head2)
-    
-    
-    
-    currentColor = randomColor()
-    currentColor2 = randomColor()
-    currentColor3 = randomColor()
 
-    
+
     while running:
         
         #print "player" + str(player.positionY)
@@ -173,59 +161,29 @@ def main():
         player.update(space, dt, events)
         if player.positionY < 40:
             player.body.position = player.positionX, 40
-            score = 0
-            player.remaining_jumps = 4000
-        if player.positionY > 8640:
-            player.body.position = player.positionX, 8640
-            score = 0
-            player.remaining_jumps = 4000
+        if player.positionX < 16:
+            player.body.position = 16, player.positionY
+        if player.positionX > 770:
+            player.body.position = 770, player.positionY
         
-        # Move the moving platform
+        
+        # Update platforms
         for b in blocks:
-            b.update(dt)
-            
             if b.positionY <= 40:
                 blocks.remove(b)
                 space.remove(b.segment)
-                
             elif abs((b.positionY ) - (player.positionY - 28)) < 5 and \
             b.positionX <= player.positionX and \
             (b.positionX + 100) >= player.positionX:
-                b.isCurrentBlock = True
-                if player.landed_previous and b.color == currentColor and b.active == False:
-                    score += 1
+                if b.active == False:
                     b.active = True
-                    if score > bestScore:
-                        bestScore = score
-                    
-                    currentColor = currentColor2
-                    currentColor2 = currentColor3
-                    currentColor3 = randomColor()
-                        
-                    #for w in outWalls:
-                    #    w.color = pygame.color.THECOLORS[currentColor]
-                            
-                elif player.landed_previous and b.color != currentColor and b.active == False:
-                    #score = 0
-                    if score > 0:
-                        score -= 1
-        
+                    color_dict[b.color] += 1
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen), (0, b.active*50, 100, 50))
-            #backgroundScreen.blit(font.render(b.color + " block there", 1, THECOLORS["black"]), (b.positionX, 640-(camera.state.y + b.positionY)))
 
-            
-            
-        # randomly add one
-        #if blockCreationDelay == 0 and len(blocks) < 5:
-        #    block = Block(camera.state.y)
-        #    space.add(block.segment)
-        #    blocks.append(block)
-        #    previousBlockPosition = block.positionX
-        #    blockCreationDelay = randint(10,150)
-        #elif blockCreationDelay == 0 and len(blocks) == 5:
-        #    blockCreationDelay = 0
-        #else:
-        #    blockCreationDelay -= 1
+        # Update enemies
+        for e in enemies:
+            e.update(dt)
+            backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX, e.positionY, 0, 0)), backgroundScreen))
         
         ### Draw stuff
         draw_space(backgroundScreen, space)
@@ -240,38 +198,29 @@ def main():
             else:
                 animation_offset = 32*0
 
-            posX, posY = player.body.position +(-16*2,40)
+            posX, posY = player.body.position +(-16*2,35)
             backgroundScreen.blit(player.img, to_pygame(camera.apply(Rect(posX ,posY, 0, 0)), backgroundScreen) , (animation_offset, direction_offset, 32*2, 32*2))
-            
+      
         
-
-
-        # Did we land?
-        if abs(player.grounding['impulse'].y) / player.body.mass > 30 and not player.landed_previous: 
-            player.landing = {'p':player.grounding['position'],'n':5}
-            player.landed_previous = True
-        else:
-            player.landed_previous = False
-        if player.landing['n'] > 0:
-            pygame.draw.circle(backgroundScreen, pygame.color.THECOLORS['yellow'], to_pygame(player.landing['p'], backgroundScreen), 5)
-            player.landing['n'] -= 1
-      
-      
-            
+        # Display bottom bar
         backgroundScreen.blit(scoreBar, (0,600))
-      
-        backgroundScreen.blit(jumpBar, to_pygame((300,35), backgroundScreen), (0, 150 - player.remaining_jumps*30, 150, 30))
-
-        backgroundScreen.blit(currentColorIcon, to_pygame((600,35), backgroundScreen), (0, color_dict[currentColor]*30, 75, 30))
-        backgroundScreen.blit(nextColorIcon, to_pygame((680,35), backgroundScreen), (0, color_dict[currentColor2]*30, 50, 30))
-        backgroundScreen.blit(nextColorIcon, to_pygame((730,35), backgroundScreen), (0, color_dict[currentColor3]*30, 50, 30))
-      
-        # Display score
-        backgroundScreen.blit(font.render("Score : " + str(score), 1, THECOLORS["white"]), (15,605))
-        backgroundScreen.blit(font.render("Best : " + str(bestScore), 1, THECOLORS["white"]), (150,605))
-        backgroundScreen.blit(font.render("Next : ", 1, THECOLORS["white"]), (520,605))
         
-        #backgroundScreen.blit(font.render("Player here", 1, THECOLORS["black"]), (player.positionX,640-(camera.state.y + player.positionY)))
+        # Display jump state
+        backgroundScreen.blit(jumpBar, to_pygame((400,35), backgroundScreen), (0, 150 - player.remaining_jumps*30, 150, 30))
+        
+        # Display color pick ups
+        backgroundScreen.blit(font.render(str(color_dict["blue"]), 1, THECOLORS["white"]), (15,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((30,35), backgroundScreen), (0, 30, 50, 30))
+        
+        backgroundScreen.blit(font.render(str(color_dict["green"]), 1, THECOLORS["white"]), (100,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((115,35), backgroundScreen), (0, 2*30, 50, 30))
+        
+        backgroundScreen.blit(font.render(str(color_dict["yellow"]), 1, THECOLORS["white"]), (185,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((200,35), backgroundScreen), (0, 3*30, 50, 30))
+        
+        backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (270,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((285,35), backgroundScreen), (0, 4*30, 50, 30))
+        
         
         camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
         
@@ -279,13 +228,10 @@ def main():
         screen.blit(backgroundScreen,(0,0))
         
         pygame.display.flip()
-        
         frame_number += 1
         
-        
-        ### Update physics
+        # Update game mechanics
         space.step(dt)
-
         clock.tick(fps)
 
 

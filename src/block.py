@@ -14,37 +14,19 @@ from random import randint
 
 class Block(object):
     '''
-    Moving platform class
     '''
 
 
-
-
-    def __init__(self, startX, startY, length):
+    def __init__(self, startX, startY, randColorIndex):
         '''
         Constructor
         '''
         
-        #self.PLATFORM_SPEED = 0
-        
-        #randPosX = 0
-        #if previousBlockPosition >= 490:
-        #    randPosX = randint(110,previousBlockPosition - 100)
-        #elif previousBlockPosition <= 210:
-        #    randPosX = randint(previousBlockPosition+100,590)    
-        #else:    
-        #    randPosBool = random.choice([True, False])
-        #    if randPosBool:
-        #        randPosX = randint(110,previousBlockPosition - 100)
-        #    else:
-        #        randPosX = randint(previousBlockPosition+100,590)    
-        #self.path = [(randPosX,640),(randPosX,0)]
-        #self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
-        self.positionX = startX #randint(0,800)
-        self.positionY = startY #randint(maxPosY-640,maxPosY)
+        self.positionX = startX
+        self.positionY = startY
         self.body.position = self.positionX, self.positionY
-        self.segment = pymunk.Segment(self.body, (0, 0), (length, 0), 10)
+        self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
         self.segment.collision_type = 1
         self.segment.layers = self.segment.layers ^ 0b1000
         
@@ -58,44 +40,22 @@ class Block(object):
         if(randColorIndex == 0):
             self.color = "blue"
             self.PLATFORM_SPEED = 0
-            #self.img = pygame.image.load("../img/blockBlue.png")
+            self.img = pygame.image.load("../img/blockBlue.png")
         elif(randColorIndex == 1):
             self.color = "red"
             self.PLATFORM_SPEED = 0
-            #self.img = pygame.image.load("../img/blockRed.png")
+            self.img = pygame.image.load("../img/blockRed.png")
         elif(randColorIndex == 2):
             self.color = "yellow"
             self.PLATFORM_SPEED = 0
-            #self.img = pygame.image.load("../img/blockYellow.png")
+            self.img = pygame.image.load("../img/blockYellow.png")
         elif(randColorIndex == 3):
             self.color = "green"
             self.PLATFORM_SPEED = 0
-            #self.img = pygame.image.load("../img/blockGreen.png")
+            self.img = pygame.image.load("../img/blockGreen.png")
         else:
-            print 'bad color index !'
-        #self.segment.color = pygame.color.THECOLORS[self.color]
+            self.img = pygame.image.load("../img/tile.png")
 
-        self.img = pygame.image.load("../img/tile.png")
         
-        self.isCurrentBlock = False
         self.active = False
-        
-        #self.PLATFORM_SPEED = randint(5,20) / 10.0
-        
-       
-    def update(self, dt):
-        
-        #destination = self.path[self.path_index]
-        #current = Vec2d(self.body.position)
-        #distance = current.get_distance(destination)
-        #if distance < self.PLATFORM_SPEED:
-        #    self.path_index += 1
-        #    self.path_index = self.path_index % len(self.path)
-        #    t = 1
-        #else:
-        #    t = self.PLATFORM_SPEED / distance
-        #self.positionX, self.positionY = current.interpolate_to(destination, t)
-        #self.body.position = self.positionX, self.positionY
-        #self.body.velocity = (self.body.position - current) / dt
-        
-        self.isCurrentBlock = False    
+           
