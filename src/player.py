@@ -14,6 +14,8 @@ from pygame.locals import *
 import pymunk
 from pymunk.vec2d import Vec2d
 
+from bullet import Bullet
+
 class Player(object):
     '''
     classdocs
@@ -35,6 +37,9 @@ class Player(object):
         '''
         
         self.img = pygame.image.load("../img/kube.png")
+        self.shieldImg = pygame.image.load("../img/shield.png")
+        
+        self.shielded = False
         
         self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
@@ -68,15 +73,23 @@ class Player(object):
         self.feet.ignore_draw = self.head.ignore_draw = self.head2.ignore_draw = True
         
         self.direction = 1
-        self.remaining_jumps = 100
+        self.remaining_jumps = 0
         self.landing = {'p':Vec2d.zero(), 'n':0}
         
         self.landed_previous = False
         
         self.positionX, self.positionY = self.body.position
         
+        self.bullets = []
         
-    def update(self, space, dt, events):
+        self.shooting = False
+        
+        self.shots = 0
+        
+        self.shields = 0
+        
+        
+    def update(self, space, dt, events, color_dict):
         self.grounding = {
             'normal' : Vec2d.zero(),
             'penetration' : Vec2d.zero(),
@@ -100,7 +113,7 @@ class Player(object):
         self.well_grounded = False
         if self.grounding['body'] != None and abs(self.grounding['normal'].x/self.grounding['normal'].y) < self.feet.friction:
             self.well_grounded = True
-            self.remaining_jumps = 5
+            #self.remaining_jumps = 5
     
     
         self.ground_velocity = Vec2d.zero()
@@ -109,12 +122,18 @@ class Player(object):
             
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
-                if self.well_grounded or self.remaining_jumps > 0:                    
+                #if self.well_grounded or 
+                if self.remaining_jumps > 0:                    
                     jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
                     self.body.velocity.y = self.ground_velocity.y + jump_v;
                     self.remaining_jumps -=1
-            elif event.type == KEYUP and event.key == K_UP:                
-                self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
+                    color_dict["green"] -= 1
+            elif event.type == KEYUP:
+                if event.key == K_UP:                
+                    self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
+                if event.key == K_SPACE:
+                    self.shooting = False
+                    
                 
         # Target horizontal velocity of player
         self.target_vx = 0
@@ -131,10 +150,16 @@ class Player(object):
         if (keys[K_RIGHT]):
             self.direction = 1
             self.target_vx += self.PLAYER_VELOCITY
-        if (keys[K_DOWN]):
-            self.direction = -3
-        
-        
+        if (keys[K_SPACE]) and not self.shooting and self.shots > 0:
+            self.shoot(space)
+            self.shooting = True
+            self.shots -= 1
+            color_dict["red"] -= 1
+        if (keys[K_LSHIFT]) and not self.shielded:
+            self.shield()
+            self.shields -= 1
+            color_dict["blue"] -= 1
+            
             
             
         self.feet.surface_velocity = self.target_vx,0
@@ -155,7 +180,23 @@ class Player(object):
         
         self.positionX, self.positionY = self.body.position
     
+        if self.shielded:
+            self.shieldDelay -= 1
+            if self.shieldDelay == 0:
+                self.shielded = False
         
     
-    
+    def shoot(self,space):
+        path = []
+        if self.direction == -1:
+            path = [(self.body.position),(0, self.positionY)]
+        elif self.direction == 1:
+            path = [(self.body.position),(800, self.positionY)]    
+        b = Bullet(path)
+        self.bullets.append(b)
+        #space.add(b.body,b.hitbox)
+        
+    def shield(self):
+        self.shielded = True
+        self.shieldDelay = 100    
     

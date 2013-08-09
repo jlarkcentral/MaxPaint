@@ -22,7 +22,7 @@ class Block(object):
         Constructor
         '''
         
-        self.body = pymunk.Body(pymunk.inf, pymunk.inf)
+        self.body = pymunk.Body()
         self.positionX = startX
         self.positionY = startY
         self.body.position = self.positionX, self.positionY
