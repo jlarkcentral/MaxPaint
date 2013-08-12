@@ -14,6 +14,8 @@ from pygame.locals import *
 import pymunk
 from pymunk.vec2d import Vec2d
 
+import pyganim
+
 from bullet import Bullet
 
 class Player(object):
@@ -37,9 +39,12 @@ class Player(object):
         '''
         
         self.img = pygame.image.load("../img/kube.png")
-        self.shieldImg = pygame.image.load("../img/shield.png")
-        
-        self.shielded = False
+        self.swordAnim = pyganim.PygAnimation([('../img/anims/sword/sword1.png', 0.05),
+                                        ('../img/anims/sword/sword2.png', 0.05),
+                                        ('../img/anims/sword/sword3.png', 0.05),
+                                        ('../img/anims/sword/sword4.png', 0.05),
+                                        ('../img/anims/sword/sword5.png', 0.05)])
+        self.swordAnim.loop = False
         
         self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
@@ -48,7 +53,7 @@ class Player(object):
         self.PLAYER_AIR_ACCEL_TIME = 0.25
         self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
         
-        self.JUMP_HEIGHT = 16.*3*2
+        self.JUMP_HEIGHT = 20*3*2
         self.JUMP_BOOST_HEIGHT = 24.*2
         self.JUMP_CUTOFF_VELOCITY = 100
         self.FALL_VELOCITY = 500.
@@ -62,15 +67,21 @@ class Player(object):
         
         
         self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,120
+        self.body.position = 10,220
         
-        self.head = pymunk.Circle(self.body, 20, (0,20))
-        self.head2 = pymunk.Circle(self.body, 15, (0,50))
-        self.feet = pymunk.Circle(self.body, 10, (0,-5))
+        #self.head = pymunk.Circle(self.body, 20, (0,20))
+        #self.head2 = pymunk.Circle(self.body, 15, (0,50))
+        #self.feet = pymunk.Circle(self.body, 10, (0,-5))
     
-        self.head.layers = self.head2.layers = 0b1000
-        self.feet.collision_type = 1
-        self.feet.ignore_draw = self.head.ignore_draw = self.head2.ignore_draw = True
+        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
+        #self.hitbox = pymunk.Circle(self.body, 20, (0,30))
+        self.hitbox.layers = 0b1000
+        self.hitbox.collision_type = 1
+        self.hitbox.ignore_draw = False
+    
+        #self.head.layers = self.head2.layers = 0b1000
+        #self.feet.collision_type = 1
+        #self.feet.ignore_draw = self.head.ignore_draw = self.head2.ignore_draw = False
         
         self.direction = 1
         self.remaining_jumps = 0
@@ -86,7 +97,9 @@ class Player(object):
         
         self.shots = 0
         
-        self.shields = 0
+        self.swording = False
+        
+        self.swords = 0
         
         
     def update(self, space, dt, events, color_dict):
@@ -111,7 +124,7 @@ class Player(object):
         self.body.each_arbiter(f)
             
         self.well_grounded = False
-        if self.grounding['body'] != None and abs(self.grounding['normal'].x/self.grounding['normal'].y) < self.feet.friction:
+        if self.grounding['body'] != None and abs(self.grounding['normal'].x/self.grounding['normal'].y) < 0.7:#self.hitbox.friction: #self.feet.friction:
             self.well_grounded = True
             #self.remaining_jumps = 5
     
@@ -155,22 +168,23 @@ class Player(object):
             self.shooting = True
             self.shots -= 1
             color_dict["red"] -= 1
-        if (keys[K_LSHIFT]) and not self.shielded:
-            self.shield()
-            self.shields -= 1
+        if (keys[K_LSHIFT]) and not self.swording: #and self.swords > 0:
+            self.sword()
+            self.swords -= 1
             color_dict["blue"] -= 1
             
             
             
-        self.feet.surface_velocity = self.target_vx,0
-
+        #self.feet.surface_velocity = self.target_vx,0
+        self.hitbox.surface_velocity = self.target_vx,0
         
         if self.grounding['body'] != None:
-            self.feet.friction = -self.PLAYER_GROUND_ACCEL/space.gravity.y
-            self.head.friciton = self.HEAD_FRICTION
+            self.hitbox.friction = -self.PLAYER_GROUND_ACCEL/space.gravity.y
+            #self.feet.friction = -self.PLAYER_GROUND_ACCEL/space.gravity.y
+            #self.head.friciton = self.HEAD_FRICTION
         else:
-            self.feet.friction,self.head.friction = 0,0
-        
+            #self.feet.friction,self.head.friction = 0,0
+            self.hitbox.friction = 0
         # Air control
         if self.grounding['body'] == None:
             self.body.velocity.x = self.cpflerpconst(self.body.velocity.x, self.target_vx + self.ground_velocity.x, self.PLAYER_AIR_ACCEL*dt)
@@ -179,24 +193,18 @@ class Player(object):
         
         
         self.positionX, self.positionY = self.body.position
-    
-        if self.shielded:
-            self.shieldDelay -= 1
-            if self.shieldDelay == 0:
-                self.shielded = False
-        
+     
     
     def shoot(self,space):
         path = []
         if self.direction == -1:
-            path = [(self.body.position),(0, self.positionY)]
+            path = [(self.body.position - (0,20) ),(0, self.positionY)]
         elif self.direction == 1:
-            path = [(self.body.position),(800, self.positionY)]    
+            path = [(self.body.position - (0,20)),(800, self.positionY)]    
         b = Bullet(path)
         self.bullets.append(b)
         #space.add(b.body,b.hitbox)
         
-    def shield(self):
-        self.shielded = True
-        self.shieldDelay = 100    
+    def sword(self):
+        self.swording = True  
     

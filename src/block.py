@@ -26,17 +26,17 @@ class Block(object):
         self.positionX = startX
         self.positionY = startY
         self.body.position = self.positionX, self.positionY
-        self.segment = pymunk.Segment(self.body, (0, 0), (100, 0), 10)
-        self.segment.collision_type = 1
-        self.segment.layers = self.segment.layers ^ 0b1000
+        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(100,50),(100,0)], (0,-50))
+        self.hitbox.collision_type = 1
+        self.hitbox.layers = 0b1000
         
-        self.segment.friction = 100
-        self.segment.group = 1
-        self.segment.ignore_draw = True
+        self.hitbox.friction = 1
+        self.hitbox.group = 1
+        self.hitbox.ignore_draw = False
         
         
-        
-        randColorIndex = randint(0,3)
+        if randColorIndex < 5:
+            randColorIndex = randint(0,3)
         if(randColorIndex == 0):
             self.color = "blue"
             self.PLATFORM_SPEED = 0
@@ -53,9 +53,7 @@ class Block(object):
             self.color = "green"
             self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blockGreen.png")
-        else:
-            self.img = pygame.image.load("../img/tile.png")
-
+        
         
         self.active = False
            

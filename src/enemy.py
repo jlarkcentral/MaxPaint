@@ -29,8 +29,8 @@ class Enemy(object):
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
         
-        self.hitbox = pymunk.Poly.create_box(self.body, (40,40))
-        self.hitbox.ignore_draw = True
+        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,40),(40,40),(40,0)],(0,-40))
+        self.hitbox.ignore_draw = False
         self.hitbox.group = 1
         self.hitbox.friction = 100
     
