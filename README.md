@@ -7,13 +7,13 @@ game test with Pygame &amp; Pymunk
 ### todo
 
 
-- true collision for bullets // if using pymunk !!
+# physics
 
-- shooting enemies
+- true collision for bullets // if using pymunk !!
 - enemy stops at player side of platform
-- find use for yellow power
 - fix the camera movement when landing
 
+## gameplay
 
 - timeout ?
 - more levels to test
@@ -21,8 +21,8 @@ game test with Pygame &amp; Pymunk
 - moving blocks
 - walljump
 - vertical blocks
+- find use for yellow power
 
+## graphics
 
 - animation sprites : pick up, frag...
-
-- game/level reinit
