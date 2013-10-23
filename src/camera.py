@@ -23,10 +23,14 @@ class Camera(object):
         l, t, _, _ = target_rect    
         _, _, w, h = camera
         l, t, _, _ = l, -t+320, w, h
-    
-        l = min(0, l)                           # stop scrolling at the left edge
-        l = max((camera.width-800), l)   # stop scrolling at the right edge
-    
-        t = min((camera.height), t) # stop scrolling at the bottom
-        t = min(0, t)                           # stop scrolling at the top
+
+        # stop scrolling at the left edge
+        l = min(0, l)
+        # stop scrolling at the right edge 
+        l = max((camera.width-800), l)
+        # stop scrolling at the bottom
+        t = min((camera.height), t)
+        # stop scrolling at the top
+        t = min(0, t)
+        
         return Rect(l, t, w, h)

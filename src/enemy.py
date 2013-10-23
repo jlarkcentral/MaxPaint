@@ -10,34 +10,22 @@ import pygame
 import pymunk
 
 class Enemy(object):
-    '''
-    classdocs
-    '''
-
-
 
     def __init__(self, path, speed):
-        '''
-        Constructor
-        '''
                 
         self.speed = speed
         self.path = path
         self.path_index = 0
-
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
-        
         self.hitbox = pymunk.Poly(self.body, [(0,0),(0,40),(40,40),(40,0)],(0,-40))
         self.hitbox.ignore_draw = False
         self.hitbox.group = 1
         self.hitbox.friction = 100
-    
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        
-        self.img = pygame.image.load("../img/enemy1.png")
+        self.img = pygame.image.load("../img/enemies/enemy1.png")
         
     def update(self, dt):
         

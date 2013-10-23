@@ -10,34 +10,22 @@ import pymunk
 from pymunk.vec2d import Vec2d
 
 class Bullet(object):
-    '''
-    classdocs
-    '''
-
 
     def __init__(self, path):
-        '''
-        Constructor
-        '''
+
         self.speed = 15
         self.path = path
         self.path_index = 0
-
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
-        
         self.hitbox = pymunk.Circle(self.body, 5, (5,-5))
         self.hitbox.ignore_draw = True
-        
         self.hitbox.group = 1
         self.hitbox.friction = 100
-    
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        
-        
-        self.img = pygame.image.load("../img/bullet.png")
+        self.img = pygame.image.load("../img/player/bullet.png")
         
     def update(self, dt):
         
@@ -47,8 +35,7 @@ class Bullet(object):
         if distance < self.speed:
             self.path_index += 1
             self.path_index = self.path_index % len(self.path)
-            t = 1
-                
+            t = 1        
         else:
             t = self.speed / distance
         self.positionX, self.positionY = current.interpolate_to(destination, t)
