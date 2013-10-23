@@ -8,12 +8,13 @@ import pygame
 from pygame.locals import *
 from pygame.color import *
     
-
 sys.path.append('../lib/')
 import pyganim
 
-
 import game
+
+
+
 
 def startScreen(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
@@ -27,14 +28,6 @@ def startScreen(width,height,space,backgroundScreen,dt,screen,clock,fps):
     running = True
     frame_number = 0
     while running:
-        events = pygame.event.get()
-        for event in events:
-            if event.type == KEYDOWN: # and event.key == K_RETURN:
-                game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                running = False
-            if event.type == QUIT:
-                running = False
-
         backgroundScreen.blit(background, (0,0))
         backgroundScreen.blit(titleG, (100,200))
         backgroundScreen.blit(titleL, (250,200))
@@ -47,3 +40,11 @@ def startScreen(width,height,space,backgroundScreen,dt,screen,clock,fps):
         pygame.display.flip()
         clock.tick(fps)
         frame_number += 1
+
+        events = pygame.event.get()
+        for event in events:
+            if event.type == KEYDOWN: # and event.key == K_RETURN:
+                game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                running = False
+            if event.type == QUIT:
+                running = False

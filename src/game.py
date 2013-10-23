@@ -29,6 +29,7 @@ from camera import Camera
 from enemy import Enemy
 from level import Level
 
+import pauseScreen
 
 def gameScreenInit(width_,height_,space_):
     global width
@@ -170,11 +171,12 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]): 
                 running = False
             elif event.type == KEYDOWN and event.key == K_p:    
-                pause = True
-                while(pause):
-                    for event in events:
-                        if event.type == KEYDOWN and event.key == K_RETURN:
-                            pause = False
+                pauseScreen.pauseScreen(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                #pause = True
+                #while(pause):
+                #    for event in events:
+                #        if event.type == KEYDOWN and event.key == K_RETURN:
+                #            pause = False
                     #showPauseMenu(backgroundScreen)
 
             elif event.type == KEYDOWN and event.key == K_TAB:
