@@ -31,6 +31,11 @@ from level import Level
 
 import pauseScreen
 
+
+
+# INITIALIZATION & CONTENT LOADING
+
+
 def gameScreenInit(width_,height_,space_):
     global width
     global height
@@ -109,10 +114,6 @@ def loadResources():
 
 
 
-
-
-
-
 def randomColor():
     return random.choice(["blue","red","yellow","green"])
 
@@ -124,9 +125,13 @@ def showPauseMenu(backgroundScreen):
 
 
 
+
+
+# LAUNCH GAME SCREEN
+
+
 def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
-    # Global game stuff 
-    #loadPhysics()
+    
     gameScreenInit(width,height,space)
     loadResources()
     running = True
@@ -258,4 +263,6 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         clock.tick(fps)
 
         if retry:
+            space.remove(player.body)
+            space.remove(player.hitbox)
             launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)

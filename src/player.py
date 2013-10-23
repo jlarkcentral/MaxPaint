@@ -24,6 +24,50 @@ from bullet import Bullet
 
 class Player(object):
 
+    def __init__(self):
+        
+        self.img = pygame.image.load("../img/player/kube.png")
+        '''self.swordAnim = pyganim.PygAnimation([('../img/anims/sword/sword1.png', 0.05),
+                                        ('../img/anims/sword/sword2.png', 0.05),
+                                        ('../img/anims/sword/sword3.png', 0.05),
+                                        ('../img/anims/sword/sword4.png', 0.05),
+                                        ('../img/anims/sword/sword5.png', 0.05)])
+        '''
+        #self.swordAnim.loop = False
+        self.PLAYER_VELOCITY = 100. *2 *2.
+        self.PLAYER_GROUND_ACCEL_TIME = 0.05
+        self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
+        self.PLAYER_AIR_ACCEL_TIME = 0.25
+        self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
+        self.JUMP_HEIGHT = 20*3*2
+        self.JUMP_BOOST_HEIGHT = 24.*2
+        self.JUMP_CUTOFF_VELOCITY = 100
+        self.FALL_VELOCITY = 500.
+        self.JUMP_LENIENCY = 5
+        self.HEAD_FRICTION = 0.07
+        self.body = pymunk.Body(2000, pymunk.inf)
+        self.body.position = 10,220    
+        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
+        self.hitbox.layers = 0b1000
+        self.hitbox.collision_type = 1
+        self.hitbox.ignore_draw = False
+        self.target_vx = 0
+        self.direction = 1
+        self.landing = {'p':Vec2d.zero(), 'n':0}
+        self.landed_previous = False
+        self.positionX, self.positionY = self.body.position
+        self.bullets = []
+        self.shooting = False
+        self.shots = 0
+        self.remaining_jumps = 0
+        #self.swording = False
+        self.swords = 0
+
+
+
+
+        
+
     def cpfclamp(self, f, min_, max_):
         """Clamp f between min and max"""
         return min(max(f, min_), max_)
@@ -98,44 +142,7 @@ class Player(object):
         self.hitbox.surface_velocity = self.target_vx,0
 
 
-    def __init__(self):
-        
-        self.img = pygame.image.load("../img/player/kube.png")
-        '''self.swordAnim = pyganim.PygAnimation([('../img/anims/sword/sword1.png', 0.05),
-                                        ('../img/anims/sword/sword2.png', 0.05),
-                                        ('../img/anims/sword/sword3.png', 0.05),
-                                        ('../img/anims/sword/sword4.png', 0.05),
-                                        ('../img/anims/sword/sword5.png', 0.05)])
-        '''
-        #self.swordAnim.loop = False
-        self.PLAYER_VELOCITY = 100. *2 *2.
-        self.PLAYER_GROUND_ACCEL_TIME = 0.05
-        self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
-        self.PLAYER_AIR_ACCEL_TIME = 0.25
-        self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
-        self.JUMP_HEIGHT = 20*3*2
-        self.JUMP_BOOST_HEIGHT = 24.*2
-        self.JUMP_CUTOFF_VELOCITY = 100
-        self.FALL_VELOCITY = 500.
-        self.JUMP_LENIENCY = 5
-        self.HEAD_FRICTION = 0.07
-        self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,220    
-        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
-        self.hitbox.layers = 0b1000
-        self.hitbox.collision_type = 1
-        self.hitbox.ignore_draw = False
-        self.target_vx = 0
-        self.direction = 1
-        self.landing = {'p':Vec2d.zero(), 'n':0}
-        self.landed_previous = False
-        self.positionX, self.positionY = self.body.position
-        self.bullets = []
-        self.shooting = False
-        self.shots = 0
-        self.remaining_jumps = 0
-        #self.swording = False
-        self.swords = 0
+    
         
         
     def update(self, space, dt, events, color_dict, backgroundScreen, camera, enemies):

@@ -23,17 +23,10 @@ from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 sys.path.append('../lib/')
 import pyganim
 
-from block import Block
-from player import Player
-from camera import Camera
-from enemy import Enemy
-from level import Level
-
-import game
 import startScreen
 
 
-# INITIALIZATION & TOOLS
+# INITIALIZATION
 
 def gameGlobalInit():
     global width, height
