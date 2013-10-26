@@ -23,6 +23,7 @@ from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 sys.path.append('../lib/')
 import pyganim
 
+sys.path.append('screens/')
 import startScreen
 
 
@@ -62,14 +63,13 @@ def loadPhysics():
 
 
 
-
 # MAIN PROGRAM
 
 
 def main():
     gameGlobalInit()
     loadPhysics()
-    startScreen.startScreen(width,height,space,backgroundScreen,dt,screen,clock,fps)
+    startScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
     
 
 

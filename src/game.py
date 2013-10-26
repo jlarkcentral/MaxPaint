@@ -23,6 +23,7 @@ from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 sys.path.append('../lib/')
 import pyganim
 
+sys.path.append('gameObjects/')
 from block import Block
 from player import Player
 from camera import Camera
@@ -176,7 +177,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]): 
                 running = False
             elif event.type == KEYDOWN and event.key == K_p:    
-                pauseScreen.pauseScreen(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                pauseScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                 #pause = True
                 #while(pause):
                 #    for event in events:

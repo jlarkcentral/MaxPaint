@@ -46,7 +46,8 @@ class Player(object):
         self.JUMP_LENIENCY = 5
         self.HEAD_FRICTION = 0.07
         self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,220    
+        self.body.position = 10,220
+        self.body.velocity = (0.0, 0.0)  
         self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
@@ -62,6 +63,7 @@ class Player(object):
         self.remaining_jumps = 0
         #self.swording = False
         self.swords = 0
+        self.luck = 0
 
 
 
@@ -108,14 +110,15 @@ class Player(object):
     def handleKeyboardEvents(self, events, space, color_dict):
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
-                #if self.well_grounded or 
-                if self.remaining_jumps > 0:                    
+                if self.well_grounded or \
+                self.remaining_jumps > 1:                    
                     jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
                     self.body.velocity.y = self.ground_velocity.y + jump_v;
-                    self.remaining_jumps -=1
-                    color_dict["green"] -= 1
+                    if self.remaining_jumps > 1 and self.well_grounded == False:
+                        self.remaining_jumps -= 1
+                        color_dict["green"] -= 1
             elif event.type == KEYUP:
-                if event.key == K_UP:                
+                if event.key == K_UP:              
                     self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
                 if event.key == K_SPACE:
                     self.shooting = False
@@ -139,6 +142,9 @@ class Player(object):
                 self.sword()
                 self.swords -= 1
                 color_dict["blue"] -= 1
+            if (keys[K_LCTRL]) and self.luck > 0:
+                color_dict["yellow"] -= 1
+                color_dict["green"] += 1
         self.hitbox.surface_velocity = self.target_vx,0
 
 
@@ -166,10 +172,14 @@ class Player(object):
         
         self.body.each_arbiter(f)
         self.well_grounded = False
-        if self.grounding['body'] != None and abs(self.grounding['normal'].x/self.grounding['normal'].y) < 0.7:#self.hitbox.friction: #self.feet.friction:
+        if self.grounding['body'] != None and \
+        abs(self.grounding['normal'].x/self.grounding['normal'].y) < 0.7:
             self.well_grounded = True
+        if abs(self.body.velocity.y) < 0.1:
+            self.well_grounded = True
+
         self.ground_velocity = Vec2d.zero()
-        if self.well_grounded:
+        if self.well_grounded and self.grounding['body'] != None:
             self.ground_velocity = self.grounding['body'].velocity
         
         if self.grounding['body'] != None:
@@ -197,9 +207,10 @@ class Player(object):
 
 
         # powerups update
-        self.remaining_jumps = color_dict["green"]
+        self.remaining_jumps = color_dict["green"] + 1
         self.shots = color_dict["red"]
         self.swords = color_dict["blue"]
+        self.luck = color_dict["yellow"]
 
         # sword update
         '''if player.swording:
