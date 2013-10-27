@@ -73,16 +73,16 @@ def loadResources():
     jumpBar = pygame.image.load("../img/hud/jumpBar.png").convert()
     currentColorIcon = pygame.image.load("../img/hud/nextColor1.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
-    color_dict = {'blue': 5, 'green': 5, 'yellow': 5, 'red': 5}
+    color_dict = {'blue': 5, 'yellow': 5, 'red': 5}
     
-    plusOneAnimGreen = pyganim.PygAnimation([('../img/anims/plusOneGreen7.png', 0.05),
-                                        ('../img/anims/plusOneGreen6.png', 0.05),
-                                        ('../img/anims/plusOneGreen5.png', 0.05),
-                                        ('../img/anims/plusOneGreen4.png', 0.05),
-                                        ('../img/anims/plusOneGreen3.png', 0.05),
-                                        ('../img/anims/plusOneGreen2.png', 0.05),
-                                        ('../img/anims/plusOneGreen1.png', 0.05)])
-    plusOneAnimGreen.loop = False
+    #plusOneAnimGreen = pyganim.PygAnimation([('../img/anims/plusOneGreen7.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen6.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen5.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen4.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen3.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen2.png', 0.05),
+    #                                    ('../img/anims/plusOneGreen1.png', 0.05)])
+    #plusOneAnimGreen.loop = False
     
     plusOneAnimBlue = pyganim.PygAnimation([('../img/anims/plusOneBlue7.png', 0.05),
                                         ('../img/anims/plusOneBlue6.png', 0.05),
@@ -111,12 +111,12 @@ def loadResources():
                                         ('../img/anims/plusOneRed1.png', 0.05)])
     plusOneAnimRed.loop = False
     
-    plusOneAnim_dict = {'green':plusOneAnimGreen, 'blue':plusOneAnimBlue, 'yellow':plusOneAnimYellow, 'red':plusOneAnimRed}
+    plusOneAnim_dict = {'blue':plusOneAnimBlue, 'yellow':plusOneAnimYellow, 'red':plusOneAnimRed}
 
 
 
 def randomColor():
-    return random.choice(["blue","red","yellow","green"])
+    return random.choice(["blue","red","yellow"])
 
 
 def showPauseMenu(backgroundScreen):
@@ -173,28 +173,25 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # keyboard events
         events = pygame.event.get()
         for event in events:
-            if event.type == QUIT or \
-                event.type == KEYDOWN and (event.key in [K_ESCAPE, K_q]): 
+            if event.type == QUIT: 
                 running = False
-            elif event.type == KEYDOWN and event.key == K_p:    
-                pauseScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                #pause = True
-                #while(pause):
-                #    for event in events:
-                #        if event.type == KEYDOWN and event.key == K_RETURN:
-                #            pause = False
-                    #showPauseMenu(backgroundScreen)
+            elif event.type == KEYDOWN:
+                if event.key in [K_p,K_ESCAPE]:    
+                    pauseScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
 
-            elif event.type == KEYDOWN and event.key == K_TAB:
-                retry = True
-                running = False
+                elif event.key == K_TAB:
+                    retry = True
+                    running = False
         
         # draw background
         backgroundScreen.blit(background, (0,0))
         
         # player update
         player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
-               
+        
+        if color_dict["yellow"] <= 0:
+            retry = True
+
         # Update platforms
         for b in blocks:
             if abs((b.positionY ) - (player.positionY - 58)) < 5 and \
@@ -212,11 +209,18 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # Update enemies
         for e in enemies:
             e.update(dt)
+            e.updateBullets(dt, backgroundScreen, camera, player.positionX, player.positionY, color_dict)
             backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX, e.positionY, 0, 0)), backgroundScreen))
             if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((e.positionX + 20,e.positionY-20)) < 50 :
                 retry = True
                 running = False
                 backgroundScreen.fill(pygame.color.THECOLORS['red'])
+            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((e.positionX + 20,e.positionY-20)) < 250 \
+            and e.shootingDelay == 0:
+                e.shootAtTarget((player.positionX + 32,player.positionY - 32))
+                e.shootingDelay = 30
+            if e.shootingDelay > 0:
+                e.shootingDelay -= 1
 
         # show anims
         for anim,pos in anims:
@@ -244,13 +248,14 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # Display color pick ups
         backgroundScreen.blit(font.render(str(color_dict["blue"]), 1, THECOLORS["white"]), (15,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 30, 50, 30))
-        backgroundScreen.blit(font.render(str(color_dict["green"]), 1, THECOLORS["white"]), (100,605))
-        backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 2*30, 50, 30))
-        backgroundScreen.blit(font.render(str(color_dict["yellow"]), 1, THECOLORS["white"]), (185,605))
-        backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 3*30, 50, 30))
-        backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (270,605))
-        backgroundScreen.blit(nextColorIcon, to_pygame((290,35), backgroundScreen), (0, 4*30, 50, 30))
+        #backgroundScreen.blit(font.render(str(color_dict["green"]), 1, THECOLORS["white"]), (100,605))
+        #backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 2*30, 50, 30))
+        backgroundScreen.blit(font.render(str(color_dict["yellow"]), 1, THECOLORS["white"]), (100,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 3*30, 50, 30))
+        backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
+        backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 4*30, 50, 30))
         
+
         # update camera
         camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
             

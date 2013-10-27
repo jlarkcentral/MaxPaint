@@ -22,7 +22,7 @@ import mainMenuScreen
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 24)
+    font = pygame.font.SysFont("Impact", 44)
     background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -55,11 +55,12 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 if event.key == K_ESCAPE:
                     mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                     running = False
-                #if event.key == K_RETURN:
-                    #if menuChoice == 0:
-                        ## actions
+                if event.key == K_RETURN:
+                    if menuChoice == 3:
+                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        running = False
                 if event.key == K_UP:
-                        menuChoice = cycle("up",menuColors,menuChoice)
+                    menuChoice = cycle("up",menuColors,menuChoice)
                 if event.key == K_DOWN:
                     menuChoice = cycle("down",menuColors,menuChoice)
             if event.type == QUIT:

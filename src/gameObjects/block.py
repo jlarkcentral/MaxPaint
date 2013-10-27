@@ -28,8 +28,8 @@ class Block(object):
         self.hitbox.ignore_draw = False
         self.active = False
         
-        if randColorIndex < 5:
-            randColorIndex = randint(0,3)
+        if randColorIndex < 4:
+            randColorIndex = randint(0,2)
         if(randColorIndex == 0):
             self.color = "blue"
             self.PLATFORM_SPEED = 0
@@ -42,10 +42,10 @@ class Block(object):
             self.color = "yellow"
             self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blocks/blockYellow.png")
-        elif(randColorIndex == 3):
-            self.color = "green"
-            self.PLATFORM_SPEED = 0
-            self.img = pygame.image.load("../img/blocks/blockGreen.png")
+        #elif(randColorIndex == 3):
+        #    self.color = "green"
+        #    self.PLATFORM_SPEED = 0
+        #    self.img = pygame.image.load("../img/blocks/blockGreen.png")
         
         
         

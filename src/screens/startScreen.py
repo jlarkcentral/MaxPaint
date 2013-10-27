@@ -43,9 +43,11 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
 
         events = pygame.event.get()
         for event in events:
-            if event.type == KEYDOWN: # and event.key == K_RETURN:
-                #game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                running = False
+            if event.type == KEYDOWN:
+                if event.key != K_ESCAPE:
+                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    running = False
+                elif event.key == K_ESCAPE:
+                    running = False
             if event.type == QUIT:
                 running = False

@@ -16,13 +16,14 @@ from utils import cycle
 
 import optionsScreen
 import startGameScreen
+import startScreen
 
 
 
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 24)
+    font = pygame.font.SysFont("Impact", 44)
     background = pygame.image.load("../img/backgrounds/bgMainMenu.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -51,6 +52,9 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         events = pygame.event.get()
         for event in events:
             if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    startScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    running = False
                 if event.key == K_RETURN:
                     if menuChoice == 0:
                         #game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
@@ -58,6 +62,8 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                         running = False
                     if menuChoice == 1:
                         optionsScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        running = False
+                    if menuChoice == 2:
                         running = False
                 if event.key == K_UP:
                     menuChoice = cycle("up",menuColors,menuChoice)

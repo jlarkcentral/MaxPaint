@@ -23,7 +23,7 @@ import mainMenuScreen
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("Impact", 24)
-    background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
+    background = pygame.image.load("../img/backgrounds/bgGameStart.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
 
@@ -88,6 +88,9 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
             events = pygame.event.get()
             for event in events:
                 if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        running = False
                     if event.key == K_RETURN:
                         currentMenu = menuEntries
                     if event.key == K_LEFT:
@@ -103,6 +106,9 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
             events = pygame.event.get()
             for event in events:
                 if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        running = False
                     if event.key == K_UP:
                         currentMenu = gameEntries
                     if event.key == K_LEFT:

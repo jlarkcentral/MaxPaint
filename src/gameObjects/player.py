@@ -27,13 +27,6 @@ class Player(object):
     def __init__(self):
         
         self.img = pygame.image.load("../img/player/kube.png")
-        '''self.swordAnim = pyganim.PygAnimation([('../img/anims/sword/sword1.png', 0.05),
-                                        ('../img/anims/sword/sword2.png', 0.05),
-                                        ('../img/anims/sword/sword3.png', 0.05),
-                                        ('../img/anims/sword/sword4.png', 0.05),
-                                        ('../img/anims/sword/sword5.png', 0.05)])
-        '''
-        #self.swordAnim.loop = False
         self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
@@ -60,10 +53,9 @@ class Player(object):
         self.bullets = []
         self.shooting = False
         self.shots = 0
-        self.remaining_jumps = 0
+        #self.remaining_jumps = 0
         #self.swording = False
-        self.swords = 0
-        self.luck = 0
+        #self.swords = 0
 
 
 
@@ -99,24 +91,21 @@ class Player(object):
             path = [(self.body.position - (0,20) ),(0, self.positionY)]
         elif self.direction == 1:
             path = [(self.body.position - (-40,20)),(800, self.positionY)]    
-        b = Bullet(path)
+        b = Bullet(path, 15)
         self.bullets.append(b)
         
-    
-    def sword(self):
-        self.swording = True
 
     
     def handleKeyboardEvents(self, events, space, color_dict):
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
-                if self.well_grounded or \
-                self.remaining_jumps > 1:                    
+                if self.well_grounded:# or \
+                #self.remaining_jumps > 1:                    
                     jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
                     self.body.velocity.y = self.ground_velocity.y + jump_v;
-                    if self.remaining_jumps > 1 and self.well_grounded == False:
-                        self.remaining_jumps -= 1
-                        color_dict["green"] -= 1
+                    #if self.remaining_jumps > 1 and self.well_grounded == False:
+                    #    self.remaining_jumps -= 1
+                    #    color_dict["green"] -= 1
             elif event.type == KEYUP:
                 if event.key == K_UP:              
                     self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
@@ -138,13 +127,6 @@ class Player(object):
                 self.shooting = True
                 self.shots -= 1
                 color_dict["red"] -= 1
-            if (keys[K_LSHIFT]) and not self.swording: #and self.swords > 0:
-                self.sword()
-                self.swords -= 1
-                color_dict["blue"] -= 1
-            if (keys[K_LCTRL]) and self.luck > 0:
-                color_dict["yellow"] -= 1
-                color_dict["green"] += 1
         self.hitbox.surface_velocity = self.target_vx,0
 
 
@@ -207,18 +189,9 @@ class Player(object):
 
 
         # powerups update
-        self.remaining_jumps = color_dict["green"] + 1
+        #self.remaining_jumps = color_dict["green"] + 1
         self.shots = color_dict["red"]
-        self.swords = color_dict["blue"]
-        self.luck = color_dict["yellow"]
-
-        # sword update
-        '''if player.swording:
-            player.swordAnim.play()
-            anims.append((player.swordAnim, (player.positionX, 640-(camera.state.y + player.positionY))))
-            if player.swordAnim.isFinished():
-                player.swording = False
-        '''
+        #self.luck = color_dict["yellow"]
 
 
         # bullets update

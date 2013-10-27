@@ -11,9 +11,9 @@ from pymunk.vec2d import Vec2d
 
 class Bullet(object):
 
-    def __init__(self, path):
+    def __init__(self, path, speed):
 
-        self.speed = 15
+        self.speed = speed
         self.path = path
         self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
@@ -27,8 +27,9 @@ class Bullet(object):
         self.hitbox.collision_type = 1
         self.img = pygame.image.load("../img/player/bullet.png")
         
-    def update(self, dt):
         
+    def update(self, dt):
+
         destination = self.path[self.path_index]
         current = Vec2d(self.body.position)
         distance = current.get_distance(destination)
