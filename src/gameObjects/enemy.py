@@ -37,7 +37,7 @@ class Enemy(object):
 
     def shootAtTarget(self,targetPosition):
         path = []
-        path = [(self.body.position),targetPosition + (targetPosition - self.body.position)*100]    
+        path = [(Vec2d(self.body.position)),targetPosition + (targetPosition - self.body.position)*10]    
         b = Bullet(path, 5)
         self.bullets.append(b)
 
@@ -45,7 +45,7 @@ class Enemy(object):
     def updateBullets(self,dt, backgroundScreen, camera, playerPositionX, playerPositionY, color_dict):
         for b in self.bullets:
             b.update(dt)
-            if b.positionX < 0 or b.positionX > 800 or b.positionY < 0 or b.positionY > 640:
+            if b.positionX < 0 or b.positionX > 800 or b.positionY < 0 or b.positionY > 8640:
                 self.bullets.remove(b)
             #if abs(b.positionX - playerPositionX + 32) < 10 and \
             #abs( (640-(camera.state.y + b.positionY - 32)) - (640-(camera.state.y + playerPositionY - 32)) ) < 40:

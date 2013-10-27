@@ -30,6 +30,7 @@ from camera import Camera
 from enemy import Enemy
 from level import Level
 
+sys.path.append('screens/')
 import pauseScreen
 
 
@@ -73,7 +74,7 @@ def loadResources():
     jumpBar = pygame.image.load("../img/hud/jumpBar.png").convert()
     currentColorIcon = pygame.image.load("../img/hud/nextColor1.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
-    color_dict = {'blue': 5, 'yellow': 5, 'red': 5}
+    color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
     
     #plusOneAnimGreen = pyganim.PygAnimation([('../img/anims/plusOneGreen7.png', 0.05),
     #                                    ('../img/anims/plusOneGreen6.png', 0.05),
@@ -189,7 +190,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # player update
         player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
         
-        if color_dict["yellow"] <= 0:
+        if color_dict["yellow"] < 0:
             retry = True
 
         # Update platforms

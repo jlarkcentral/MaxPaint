@@ -16,6 +16,7 @@ import game
 from utils import cycle
 
 import mainMenuScreen
+import levelSelectScreen
 
 
 
@@ -123,7 +124,8 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                             specialsScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                             running = False
                         if menuChoice == 2:
-                            game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            #game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            levelSelectScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                             running = False
                 if event.type == QUIT:
                     running = False
