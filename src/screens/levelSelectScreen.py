@@ -15,7 +15,11 @@ sys.path.append('../')
 from utils import cycle
 import game
 
+sys.path.append('../gameObjects/')
+from level import Level
+
 import mainMenuScreen
+import startGameScreen
 
 
 
@@ -27,9 +31,10 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     #background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
-    levelTitles = ["Initial Friction", "Hot Lift", "Magma Chamber",\
+    levelTitles = ["Tutorial","Initial Friction", "Hot Lift", "Magma Chamber",\
      "Lava Rush", "Volcano Explosion", "Big Smoke", "Clear Sky"]
-    levelBackgrounds = [pygame.image.load("../img/backgrounds/1_InitialFriction_menu.png").convert(),\
+    levelBackgrounds = [pygame.image.load("../img/backgrounds/0_Tutorial_menu.png").convert(),\
+                        pygame.image.load("../img/backgrounds/1_InitialFriction_menu.png").convert(),\
                         pygame.image.load("../img/backgrounds/2_HotLift_menu.png").convert(),\
                         pygame.image.load("../img/backgrounds/3_MagmaChamber_menu.png").convert(),\
                         pygame.image.load("../img/backgrounds/4_lavaRush_menu.png").convert(),\
@@ -38,9 +43,10 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                         pygame.image.load("../img/backgrounds/bg_menu.png").convert()]
     currentLevel = 0
     menuEntries = ["Stage 1","Stage 2","Stage 3","Back"]
-    menuChoice = 0
+    
     activeColor = THECOLORS["black"]
     inactiveColor = THECOLORS["grey"]
+    menuChoice = 0
     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
 
 
@@ -70,17 +76,22 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice < 3:
-                        game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,Level(currentLevel*3 + (menuChoice + 1)))
+                        #running = False
+                    elif menuChoice == 3:
+                        startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                         running = False
-                    #elif menuChoice == 3:
-
                 if event.key == K_UP:
                     menuChoice = cycle("up",menuColors,menuChoice)
                 if event.key == K_DOWN:
                     menuChoice = cycle("down",menuColors,menuChoice)
                 if event.key == K_LEFT:
                     currentLevel = (currentLevel - 1) % len(levelTitles)
+                    menuChoice = 0
+                    menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
                 if event.key == K_RIGHT:
                     currentLevel = (currentLevel + 1) % len(levelTitles)
+                    menuChoice = 0
+                    menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
             if event.type == QUIT:
                 running = False

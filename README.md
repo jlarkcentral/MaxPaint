@@ -18,11 +18,12 @@ game test with Pygame &amp; Pymunk
 ## gameplay
 
 - !! tutorial level
-- !! specials screen : "talent tree" mechanics
 
 - more levels to test
 - moving blocks
 - different enemies
+- save game
+- color powerups counting & spending
 
 ## graphics
 
@@ -34,3 +35,4 @@ game test with Pygame &amp; Pymunk
 ## other
 
 - clean functions : many unused parameters ...
+- !! abandon volcano story > find free nice backgrounds , other story 

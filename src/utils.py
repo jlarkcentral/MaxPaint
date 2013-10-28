@@ -2,6 +2,7 @@
 Utils
 '''
 
+# cycle through an array, return the new position : should be used in menus
 def cycle(direc,menu,choice):
     if direc == "up":
         temp = menu[0]

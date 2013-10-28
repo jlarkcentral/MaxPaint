@@ -17,13 +17,14 @@ from utils import cycle
 
 import mainMenuScreen
 import levelSelectScreen
+import specialsScreen
 
 
 
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 24)
+    font = pygame.font.SysFont("Impact", 44)
     background = pygame.image.load("../img/backgrounds/bgGameStart.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -39,7 +40,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     activeColor = THECOLORS["black"]
     inactiveColor = THECOLORS["grey"]
     gameEntriesColors = [activeColor,inactiveColor,inactiveColor]
-    menuEntriesColors = [inactiveColor,inactiveColor,activeColor]
+    menuEntriesColors = [inactiveColor,inactiveColor,inactiveColor]
     
     currentMenu = gameEntries
 
@@ -94,6 +95,8 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                         running = False
                     if event.key == K_RETURN:
                         currentMenu = menuEntries
+                        menuChoice = 2
+                        menuEntriesColors = [inactiveColor,inactiveColor,activeColor]
                     if event.key == K_LEFT:
                         gameChoice = cycle("up",gameEntriesColors,gameChoice)
                         cycle("up",gameBackgrounds,0)
@@ -112,6 +115,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                         running = False
                     if event.key == K_UP:
                         currentMenu = gameEntries
+                        menuEntriesColors = [inactiveColor,inactiveColor,inactiveColor]
                     if event.key == K_LEFT:
                         menuChoice = cycle("up",menuEntriesColors,menuChoice)
                     if event.key == K_RIGHT:

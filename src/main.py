@@ -4,6 +4,7 @@ PyGame & PyMunk game test
 
 modified code from platformer example
 
+Main program
 
 """
 
@@ -14,14 +15,8 @@ import sys
 
 import pygame
 from pygame.locals import *
-from pygame.color import *
-    
-import pymunk
-from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 
-sys.path.append('../lib/')
-import pyganim
+import pymunk
 
 sys.path.append('screens/')
 import startScreen
@@ -40,6 +35,7 @@ def gameGlobalInit():
     fps = 50
     dt = 1./fps
     pygame.init()
+    pygame.mixer.init()
     screen = pygame.display.set_mode((width,height))
     backgroundScreen = pygame.Surface(screen.get_size())
     clock = pygame.time.Clock()
@@ -55,9 +51,8 @@ def loadPhysics():
             return True
         else:
             return False
-            
-    space.add_collision_handler(1,2, begin=passthrough_handler)
 
+    space.add_collision_handler(1,2, begin=passthrough_handler)
 
 
 

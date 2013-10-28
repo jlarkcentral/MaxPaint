@@ -27,6 +27,9 @@ class Player(object):
     def __init__(self):
         
         self.img = pygame.image.load("../img/player/kube.png")
+        self.shieldImg = pygame.image.load("../img/player/shield.png")
+        self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
+        self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.PLAYER_VELOCITY = 100. *2 *2.
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
@@ -53,9 +56,9 @@ class Player(object):
         self.bullets = []
         self.shooting = False
         self.shots = 0
-        #self.remaining_jumps = 0
-        #self.swording = False
-        #self.swords = 0
+        self.shields = 0
+        self.shieldDelay = 0
+        self.lives = 0
 
 
 
@@ -93,19 +96,20 @@ class Player(object):
             path = [(self.body.position - (-40,20)),(800, self.positionY)]    
         b = Bullet(path, 15)
         self.bullets.append(b)
-        
-
+        self.shootSound.play()
     
+
+    def shield(self, backgroundScreen, camera):
+        backgroundScreen.blit(self.shieldImg, to_pygame(camera.apply(Rect(self.positionX - 7,self.positionY + 5, 0, 0)), backgroundScreen))
+        self.shieldDelay -= 1
+    
+
     def handleKeyboardEvents(self, events, space, color_dict):
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
-                if self.well_grounded:# or \
-                #self.remaining_jumps > 1:                    
+                if self.well_grounded:
                     jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
                     self.body.velocity.y = self.ground_velocity.y + jump_v;
-                    #if self.remaining_jumps > 1 and self.well_grounded == False:
-                    #    self.remaining_jumps -= 1
-                    #    color_dict["green"] -= 1
             elif event.type == KEYUP:
                 if event.key == K_UP:              
                     self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
@@ -127,6 +131,11 @@ class Player(object):
                 self.shooting = True
                 self.shots -= 1
                 color_dict["red"] -= 1
+            if (keys[K_LSHIFT]) and self.shields > 0 and self.shieldDelay == 0:
+                self.shieldDelay = 120
+                self.shieldSound.play()
+                color_dict["blue"] -= 1
+
         self.hitbox.surface_velocity = self.target_vx,0
 
 
@@ -189,10 +198,13 @@ class Player(object):
 
 
         # powerups update
-        #self.remaining_jumps = color_dict["green"] + 1
         self.shots = color_dict["red"]
-        #self.luck = color_dict["yellow"]
-
+        self.shields = color_dict["blue"]
+        self.lives = color_dict["yellow"]
 
         # bullets update
         self.updateBullets(dt, backgroundScreen, camera, enemies)
+
+        # shield
+        if self.shieldDelay > 0:
+            self.shield(backgroundScreen, camera)

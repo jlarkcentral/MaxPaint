@@ -1,35 +1,36 @@
+import sys
+
+from block import Block
 from enemy import Enemy
 
 class Level(object):
 
 	def __init__(self,index):
-		if index == 1:
-			self.blocks = [(0,100,0),(100,100,0),(200,100,0),(300,100,0),(400,100,0),(500,100,0),(600,100,0),(700,100,0),
-	                 (500,200,1),
-	                 (600,300,2),(700,300,2),
-	                 (300,400,1),(400,400,1),
-	                 (200,500,3),
-	                 (300,600,2),
-	                 (600,700,1),(700,700,1),
-	                 (650,800,0),
-	                 (700,900,0),
-	                 (400,1000,1),(500,1000,2),
-	                 (300,1100,3),(400,1100,3),
-	                 (0,1200,2),
-	                 (200,1300,1),(400,1300,1),
-	                 (600,1400,0),(700,1400,0),
-	                 (200,1500,2),(300,1500,2),
-	                 (100,1600,1),(0,1600,1),
-	                 (100,3000,0),(200,3000,0),(300,3000,0),(400,3000,0),(500,3000,0),(600,3000,0),(700,3000,0),
-	                 ]
+		
+		self.blocks = []
+		self.enemies = []
+		self.loadLevel(index)
 
-	    	self.enemies = [
-	    		Enemy([(600,340),(760,340)], 1),
-	        	Enemy([(300,440),(460,440)], 1),
-	        	Enemy([(200,540),(260,540)], 1),
-	            Enemy([(300,640),(360,640)], 1),
-	            Enemy([(600,740),(760,740)], 1),
-	            Enemy([(700,940),(760,940)], 1),
-	            Enemy([(400,1040),(560,1040)], 1),
-	            Enemy([(200,1340),(260,1340)], 1)
-	            ]
+
+	def loadLevel(self,index):
+		with open('gameObjects/levels/'+str(index)+'/staticblocks') as f:
+			i = 1
+			for line in f:
+				blocksTemp = line.split(',')
+				currentY = i * 100
+				j = 0
+				for elem in blocksTemp:
+					currentX = j * 100
+					if elem[0] == '1':
+						self.blocks.append(Block(currentX,currentY))
+					j += 1
+				i += 1
+
+		with open('gameObjects/levels/'+str(index)+'/enemies') as f:
+			for line in f:
+				enemyTemp = line.split(',')
+				enemyPath = []
+				for i in range(0,len(enemyTemp)-1,2):
+					enemyPath.append((int(enemyTemp[i + 1])*100,int(enemyTemp[i])*100 + 40))
+					enemyPath.append((int(enemyTemp[i + 1])*100 + 60,int(enemyTemp[i])*100 + 40))
+				self.enemies.append(Enemy(enemyPath,int(enemyTemp[len(enemyTemp) - 1])))

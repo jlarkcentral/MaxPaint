@@ -1,7 +1,6 @@
 '''
 Created on Aug 7, 2013
 
-@author: primo
 
 from
 http://stackoverflow.com/questions/14354171/how-to-add-scrolling-to-a-platformer-in-pygame

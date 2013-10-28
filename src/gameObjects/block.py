@@ -7,14 +7,13 @@ Created on 1 aout 2013
 import pygame
 
 import pymunk
-from pymunk.vec2d import Vec2d
 
 import random
 from random import randint
 
 class Block(object):
 
-    def __init__(self, startX, startY, randColorIndex):
+    def __init__(self, startX, startY):
         
         self.body = pymunk.Body()
         self.positionX = startX
@@ -28,8 +27,8 @@ class Block(object):
         self.hitbox.ignore_draw = False
         self.active = False
         
-        if randColorIndex < 4:
-            randColorIndex = randint(0,2)
+        
+        randColorIndex = randint(0,2)
         if(randColorIndex == 0):
             self.color = "blue"
             self.PLATFORM_SPEED = 0
@@ -42,10 +41,6 @@ class Block(object):
             self.color = "yellow"
             self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blocks/blockYellow.png")
-        #elif(randColorIndex == 3):
-        #    self.color = "green"
-        #    self.PLATFORM_SPEED = 0
-        #    self.img = pygame.image.load("../img/blocks/blockGreen.png")
         
         
         

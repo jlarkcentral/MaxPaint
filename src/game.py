@@ -4,6 +4,7 @@ PyGame & PyMunk game test
 
 modified code from platformer example
 
+Game launcher
 
 """
 
@@ -24,11 +25,8 @@ sys.path.append('../lib/')
 import pyganim
 
 sys.path.append('gameObjects/')
-from block import Block
 from player import Player
 from camera import Camera
-from enemy import Enemy
-from level import Level
 
 sys.path.append('screens/')
 import pauseScreen
@@ -63,7 +61,6 @@ def loadResources():
     global background
     global scoreBar
     global jumpBar
-    global currentColorIcon
     global nextColorIcon
     global color_dict
     global plusOneAnim_dict
@@ -71,45 +68,34 @@ def loadResources():
     font = pygame.font.SysFont("Impact", 24)
     background = pygame.image.load("../img/backgrounds/bg.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
-    jumpBar = pygame.image.load("../img/hud/jumpBar.png").convert()
-    currentColorIcon = pygame.image.load("../img/hud/nextColor1.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
     color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
     
-    #plusOneAnimGreen = pyganim.PygAnimation([('../img/anims/plusOneGreen7.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen6.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen5.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen4.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen3.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen2.png', 0.05),
-    #                                    ('../img/anims/plusOneGreen1.png', 0.05)])
-    #plusOneAnimGreen.loop = False
-    
-    plusOneAnimBlue = pyganim.PygAnimation([('../img/anims/plusOneBlue7.png', 0.05),
-                                        ('../img/anims/plusOneBlue6.png', 0.05),
-                                        ('../img/anims/plusOneBlue5.png', 0.05),
-                                        ('../img/anims/plusOneBlue4.png', 0.05),
-                                        ('../img/anims/plusOneBlue3.png', 0.05),
-                                        ('../img/anims/plusOneBlue2.png', 0.05),
-                                        ('../img/anims/plusOneBlue1.png', 0.05)])
+    plusOneAnimBlue = pyganim.PygAnimation([('../img/anims/plusOne/plusOneBlue7.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue6.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue5.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue4.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue3.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue2.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneBlue1.png', 0.05)])
     plusOneAnimBlue.loop = False
     
-    plusOneAnimYellow = pyganim.PygAnimation([('../img/anims/plusOneYellow7.png', 0.05),
-                                        ('../img/anims/plusOneYellow6.png', 0.05),
-                                        ('../img/anims/plusOneYellow5.png', 0.05),
-                                        ('../img/anims/plusOneYellow4.png', 0.05),
-                                        ('../img/anims/plusOneYellow3.png', 0.05),
-                                        ('../img/anims/plusOneYellow2.png', 0.05),
-                                        ('../img/anims/plusOneYellow1.png', 0.05)])
+    plusOneAnimYellow = pyganim.PygAnimation([('../img/anims/plusOne/plusOneYellow7.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow6.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow5.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow4.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow3.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow2.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneYellow1.png', 0.05)])
     plusOneAnimYellow.loop = False
     
-    plusOneAnimRed = pyganim.PygAnimation([('../img/anims/plusOneRed7.png', 0.05),
-                                        ('../img/anims/plusOneRed6.png', 0.05),
-                                        ('../img/anims/plusOneRed5.png', 0.05),
-                                        ('../img/anims/plusOneRed4.png', 0.05),
-                                        ('../img/anims/plusOneRed3.png', 0.05),
-                                        ('../img/anims/plusOneRed2.png', 0.05),
-                                        ('../img/anims/plusOneRed1.png', 0.05)])
+    plusOneAnimRed = pyganim.PygAnimation([('../img/anims/plusOne/plusOneRed7.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed6.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed5.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed4.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed3.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed2.png', 0.05),
+                                        ('../img/anims/plusOne/plusOneRed1.png', 0.05)])
     plusOneAnimRed.loop = False
     
     plusOneAnim_dict = {'blue':plusOneAnimBlue, 'yellow':plusOneAnimYellow, 'red':plusOneAnimRed}
@@ -120,10 +106,6 @@ def randomColor():
     return random.choice(["blue","red","yellow"])
 
 
-def showPauseMenu(backgroundScreen):
-    pauseBackground = pygame.image.load("../img/backgrounds/pauseBG.png").convert()
-    backgroundScreen.blit(pauseBackground,(200,200))
-
 
 
 
@@ -132,35 +114,28 @@ def showPauseMenu(backgroundScreen):
 # LAUNCH GAME SCREEN
 
 
-def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
     
     gameScreenInit(width,height,space)
     loadResources()
     running = True
-    pause = False
     retry = False
     frame_number = 0
     anims = []
 
-    
+    # Music load
+    pygame.mixer.music.load("../sounds/music.mp3")
+    pygame.mixer.music.play()
+
     # Player
     player = Player()
     space.add(player.body, player.hitbox)
 
-
-    # Level choice
-    level = Level(1)
-
-
     # Level blocks constrution
-    blocks = []
     blocksPos = level.blocks
-    for x,y,l in blocksPos:
-        b = Block(x,y,l)
+    for b in level.blocks:
         space.add(b.hitbox)
-        blocks.append(b)
     
-
     # Spawning enemies
     enemies = level.enemies
     for e in enemies:
@@ -175,14 +150,13 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         events = pygame.event.get()
         for event in events:
             if event.type == QUIT: 
-                running = False
+                #running = False
+                exit()
             elif event.type == KEYDOWN:
                 if event.key in [K_p,K_ESCAPE]:    
                     pauseScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-
                 elif event.key == K_TAB:
                     retry = True
-                    running = False
         
         # draw background
         backgroundScreen.blit(background, (0,0))
@@ -190,11 +164,12 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # player update
         player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
         
+        # TODO manage death
         if color_dict["yellow"] < 0:
             retry = True
 
         # Update platforms
-        for b in blocks:
+        for b in level.blocks:
             if abs((b.positionY ) - (player.positionY - 58)) < 5 and \
             b.positionX - 64 + 20 <= player.positionX and \
             (b.positionX + 100 - 20) >= player.positionX:
@@ -209,19 +184,8 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         
         # Update enemies
         for e in enemies:
-            e.update(dt)
-            e.updateBullets(dt, backgroundScreen, camera, player.positionX, player.positionY, color_dict)
+            e.update(dt, backgroundScreen, camera, player.positionX, player.positionY, color_dict, player.shieldDelay)
             backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX, e.positionY, 0, 0)), backgroundScreen))
-            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((e.positionX + 20,e.positionY-20)) < 50 :
-                retry = True
-                running = False
-                backgroundScreen.fill(pygame.color.THECOLORS['red'])
-            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((e.positionX + 20,e.positionY-20)) < 250 \
-            and e.shootingDelay == 0:
-                e.shootAtTarget((player.positionX + 32,player.positionY - 32))
-                e.shootingDelay = 30
-            if e.shootingDelay > 0:
-                e.shootingDelay -= 1
 
         # show anims
         for anim,pos in anims:
@@ -249,8 +213,6 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         # Display color pick ups
         backgroundScreen.blit(font.render(str(color_dict["blue"]), 1, THECOLORS["white"]), (15,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 30, 50, 30))
-        #backgroundScreen.blit(font.render(str(color_dict["green"]), 1, THECOLORS["white"]), (100,605))
-        #backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 2*30, 50, 30))
         backgroundScreen.blit(font.render(str(color_dict["yellow"]), 1, THECOLORS["white"]), (100,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 3*30, 50, 30))
         backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
@@ -272,4 +234,4 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps):
         if retry:
             space.remove(player.body)
             space.remove(player.hitbox)
-            launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
+            running = False
