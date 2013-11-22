@@ -45,7 +45,7 @@ def loadPhysics():
     global space
     space = pymunk.Space()
     space.gravity = 0,-1000
-    
+    '''
     def passthrough_handler(space, arbiter):
         if arbiter.shapes[0].body.velocity.y < 0:
             return True
@@ -53,7 +53,7 @@ def loadPhysics():
             return False
 
     space.add_collision_handler(1,2, begin=passthrough_handler)
-
+    '''
 
 
 

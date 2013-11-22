@@ -60,7 +60,7 @@ class Player(object):
         self.shieldDelay = 0
         self.lives = 0
 
-
+        self.well_grounded_prev = False
 
 
         
@@ -116,25 +116,25 @@ class Player(object):
                 if event.key == K_SPACE:
                     self.shooting = False
                     
-            # Target horizontal velocity of player
-            self.target_vx = 0
+        # Target horizontal velocity of player
+        self.target_vx = 0
 
-            keys = pygame.key.get_pressed()
-            if (keys[K_LEFT]):
-                self.direction = -1
-                self.target_vx -= self.PLAYER_VELOCITY
-            if (keys[K_RIGHT]):
-                self.direction = 1
-                self.target_vx += self.PLAYER_VELOCITY
-            if (keys[K_SPACE]) and not self.shooting and self.shots > 0:
-                self.shoot(space)
-                self.shooting = True
-                self.shots -= 1
-                color_dict["red"] -= 1
-            if (keys[K_LSHIFT]) and self.shields > 0 and self.shieldDelay == 0:
-                self.shieldDelay = 120
-                self.shieldSound.play()
-                color_dict["blue"] -= 1
+        keys = pygame.key.get_pressed()
+        if (keys[K_LEFT]):
+            self.direction = -1
+            self.target_vx -= self.PLAYER_VELOCITY
+        if (keys[K_RIGHT]):
+            self.direction = 1
+            self.target_vx += self.PLAYER_VELOCITY
+        if (keys[K_SPACE]) and not self.shooting and self.shots > 0:
+            self.shoot(space)
+            self.shooting = True
+            self.shots -= 1
+            color_dict["red"] -= 1
+        if (keys[K_LSHIFT]) and self.shields > 0 and self.shieldDelay == 0:
+            self.shieldDelay = 120
+            self.shieldSound.play()
+            color_dict["blue"] -= 1
 
         self.hitbox.surface_velocity = self.target_vx,0
 
@@ -160,7 +160,7 @@ class Player(object):
                 self.grounding['body'] = arbiter.shapes[1].body
                 self.grounding['impulse'] = arbiter.total_impulse
                 self.grounding['position'] = arbiter.contacts[0].position
-        
+        #if self.
         self.body.each_arbiter(f)
         self.well_grounded = False
         if self.grounding['body'] != None and \
@@ -168,6 +168,8 @@ class Player(object):
             self.well_grounded = True
         if abs(self.body.velocity.y) < 0.1:
             self.well_grounded = True
+            # Avoid being block when going right
+            self.grounding['body'] = None
 
         self.ground_velocity = Vec2d.zero()
         if self.well_grounded and self.grounding['body'] != None:
@@ -191,11 +193,10 @@ class Player(object):
             self.body.position = 0, self.positionY
         if self.positionX > 770:
             self.body.position = 770, self.positionY
-
+        
 
         # keyboard handling
         self.handleKeyboardEvents(events, space, color_dict)
-
 
         # powerups update
         self.shots = color_dict["red"]
@@ -208,3 +209,26 @@ class Player(object):
         # shield
         if self.shieldDelay > 0:
             self.shield(backgroundScreen, camera)
+
+
+
+
+        
+        '''
+        if self.well_grounded_prev and not self.well_grounded:
+            print 'WELL  -->  NOT'
+            print 'hitbox friction', self.hitbox.friction
+            print 'self.body.velocity.x' , self.body.velocity.x
+            print 'self.body.velocity.y' , self.body.velocity.y
+            print self.grounding
+            print '\n'
+
+        elif not self.well_grounded_prev and self.well_grounded:
+            print 'NOT   -->  WELL'
+            print 'hitbox friction', self.hitbox.friction
+            print 'self.body.velocity.x' , self.body.velocity.x
+            print 'self.body.velocity.y' , self.body.velocity.y
+            print self.grounding
+            print '\n'
+        '''
+        self.well_grounded_prev = self.well_grounded

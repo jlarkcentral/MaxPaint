@@ -66,7 +66,7 @@ def loadResources():
     global plusOneAnim_dict
     
     font = pygame.font.SysFont("Impact", 24)
-    background = pygame.image.load("../img/backgrounds/bg.png").convert()
+    background = pygame.image.load("../img/backgrounds/levelBackgrounds/shmup.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
     color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
@@ -123,9 +123,11 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
     frame_number = 0
     anims = []
 
+    bgSurface = pygame.Surface(screen.get_size())
+
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(-1)
 
     # Player
     player = Player()
@@ -159,8 +161,9 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
                     retry = True
         
         # draw background
-        backgroundScreen.blit(background, (0,0))
+        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, b.positionY, 0, 0)), backgroundScreen))
         
+
         # player update
         player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
         
@@ -173,7 +176,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
             if abs((b.positionY ) - (player.positionY - 58)) < 5 and \
             b.positionX - 64 + 20 <= player.positionX and \
             (b.positionX + 100 - 20) >= player.positionX:
-                if b.active == False:
+                if b.active == False and b.color in ['red','blue','yellow']:
                     b.active = True
                     color_dict[b.color] += 1
                     anim = plusOneAnim_dict[b.color].getCopy()
@@ -223,7 +226,9 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
             
         # Display objects
+        
         screen.blit(backgroundScreen,(0,0))
+
         pygame.display.flip()
         
         # Update game mechanics

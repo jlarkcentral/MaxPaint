@@ -3,6 +3,7 @@ LevelSelectScreen
 '''
 
 import sys
+import os
 
 import pygame
 from pygame.locals import *
@@ -28,19 +29,20 @@ import startGameScreen
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("Impact", 44)
-    #background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
+    background = pygame.image.load("../img/backgrounds/levelBackgrounds/shmup.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
-    levelTitles = ["Tutorial","Initial Friction", "Hot Lift", "Magma Chamber",\
-     "Lava Rush", "Volcano Explosion", "Big Smoke", "Clear Sky"]
-    levelBackgrounds = [pygame.image.load("../img/backgrounds/0_Tutorial_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/1_InitialFriction_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/2_HotLift_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/3_MagmaChamber_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/4_lavaRush_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/5_volcanoExplosion_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/6_BigSmoke_menu.png").convert(),\
-                        pygame.image.load("../img/backgrounds/bg_menu.png").convert()]
+    levelTitles = ["Tutorial","Sleeping", "Rivers", "Asphodel",\
+     "Tartarus", "Elysian Fields", "Out"]
+    levelBackgrounds = []
+    lvlbgsNames = []
+    #os.chdir("../img/backgrounds/levelBackgrounds/")
+    #for fname in os.listdir("../img/backgrounds/levelBackgrounds/"):
+    #    lvlbgsNames.append(fname)
+    #lvlbgsNames.sort()
+    #for n in lvlbgsNames:
+    #    levelBackgrounds.append(pygame.image.load(n).convert())
+    
     currentLevel = 0
     menuEntries = ["Stage 1","Stage 2","Stage 3","Back"]
     
@@ -53,7 +55,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     running = True
     frame_number = 0
     while running:
-        backgroundScreen.blit(levelBackgrounds[currentLevel], (0,0))
+        backgroundScreen.blit(background, (0,0))
         backgroundScreen.blit(infoBar, (0,600))
 
         backgroundScreen.blit(font.render(levelTitles[currentLevel], 1, activeColor), (100,50))

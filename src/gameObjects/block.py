@@ -41,6 +41,10 @@ class Block(object):
             self.color = "yellow"
             self.PLATFORM_SPEED = 0
             self.img = pygame.image.load("../img/blocks/blockYellow.png")
+        elif(randColorIndex == 3):
+            self.color = "green"
+            self.PLATFORM_SPEED = 0
+            self.img = pygame.image.load("../img/blocks/blockGreen.png")
         
         
         
