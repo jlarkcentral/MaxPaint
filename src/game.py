@@ -168,7 +168,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
         
         # TODO manage death
-        if color_dict["yellow"] < 0:
+        if player.lives == 0:
             retry = True
 
         # Update platforms
@@ -187,7 +187,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         
         # Update enemies
         for e in enemies:
-            e.update(dt, backgroundScreen, camera, player.positionX, player.positionY, color_dict, player.shieldDelay)
+            e.update(dt, backgroundScreen, camera, player)
             backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX, e.positionY, 0, 0)), backgroundScreen))
 
         # show anims
@@ -221,6 +221,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 4*30, 50, 30))
         
+        backgroundScreen.blit(font.render(str(player.lives), 1, THECOLORS["white"]), (385,605))
 
         # update camera
         camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))

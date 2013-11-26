@@ -58,7 +58,7 @@ class Player(object):
         self.shots = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 0
+        self.lives = 3
 
         self.well_grounded_prev = False
 
@@ -201,7 +201,6 @@ class Player(object):
         # powerups update
         self.shots = color_dict["red"]
         self.shields = color_dict["blue"]
-        self.lives = color_dict["yellow"]
 
         # bullets update
         self.updateBullets(dt, backgroundScreen, camera, enemies)

@@ -42,21 +42,22 @@ class Enemy(object):
         self.bullets.append(b)
 
 
-    def updateBullets(self,dt, backgroundScreen, camera, playerPositionX, playerPositionY, color_dict, shieldDelay):
+    def updateBullets(self,dt, backgroundScreen, camera, player):
+        playerHit = False
         for b in self.bullets:
             b.update(dt)
             if b.positionX < 0 or b.positionX > 800 or b.positionY < 0 or b.positionY > 8640:
                 self.bullets.remove(b)
             #if abs(b.positionX - playerPositionX + 32) < 10 and \
             #abs( (640-(camera.state.y + b.positionY - 32)) - (640-(camera.state.y + playerPositionY - 32)) ) < 40:
-            if Vec2d(playerPositionX + 32,playerPositionY - 32).get_distance((b.positionX + 20,b.positionY-20)) < 40 :
-                if shieldDelay == 0:
-                    color_dict["yellow"] -= 1
+            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((b.positionX + 20,b.positionY-20)) < 40 :
+                if player.shieldDelay == 0:
+                    player.lives -= 1
                 self.bullets.remove(b)
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
+        return playerHit
 
-
-    def update(self, dt, backgroundScreen, camera, playerPositionX, playerPositionY, color_dict, shieldDelay):
+    def update(self, dt, backgroundScreen, camera, player):
         
         destination = self.path[self.path_index]
         current = Vec2d(self.body.position)
@@ -71,15 +72,15 @@ class Enemy(object):
         self.body.position = self.positionX, self.positionY
         self.body.velocity = (self.body.position - current) / dt
 
-        self.updateBullets(dt, backgroundScreen, camera, playerPositionX, playerPositionY, color_dict, shieldDelay)
+        self.updateBullets(dt, backgroundScreen, camera, player)
 
-        if Vec2d(playerPositionX + 32,playerPositionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 250 \
+        if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 250 \
             and self.shootingDelay == 0:
-            self.shootAtTarget((playerPositionX + 32,playerPositionY - 32))
+            self.shootAtTarget((player.positionX + 32,player.positionY - 32))
             self.shootingDelay = 30
         if self.shootingDelay > 0:
             self.shootingDelay -= 1
 
-        if Vec2d(playerPositionX + 32,playerPositionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 50 :
+        if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 50 :
             return True
         return False
