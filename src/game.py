@@ -34,9 +34,7 @@ import pauseScreen
 
 
 # INITIALIZATION & CONTENT LOADING
-
-
-def gameScreenInit(width_,height_,space_):
+def gameScreenInit(width_,height_,space_,cameraHeight):
     global width
     global height
     global space
@@ -46,11 +44,11 @@ def gameScreenInit(width_,height_,space_):
     height = height_
     space = space_
 
-    cameraHeight = 8640
-    camera = Camera(width, cameraHeight)
+    camera = Camera(cameraHeight, width, cameraHeight)
     static_body = pymunk.Body()
-    static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0)
-                    ,pymunk.Segment(static_body, (width, 0), (width, width), 0.0)
+    static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0),
+                    pymunk.Segment(static_body, (width, 0), (width, height), 0.0)
+                    #pymunk.Segment(static_body, (0, 50), (width, 50), 20.0)
                     ]
     for l in static_lines:
         l.friction = 0.5
@@ -66,11 +64,12 @@ def loadResources():
     global plusOneAnim_dict
     
     font = pygame.font.SysFont("Impact", 24)
-    background = pygame.image.load("../img/backgrounds/levelBackgrounds/shmup.png").convert()
+    background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
     color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
     
+    # TODO modif pyganim to load directly entire anim
     plusOneAnimBlue = pyganim.PygAnimation([('../img/anims/plusOne/plusOneBlue7.png', 0.05),
                                         ('../img/anims/plusOne/plusOneBlue6.png', 0.05),
                                         ('../img/anims/plusOne/plusOneBlue5.png', 0.05),
@@ -106,28 +105,21 @@ def randomColor():
     return random.choice(["blue","red","yellow"])
 
 
-
-
-
-
-
 # LAUNCH GAME SCREEN
-
-
 def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
     
-    gameScreenInit(width,height,space)
     loadResources()
+    gameScreenInit(width,height,space,background.get_size()[1])
     running = True
     retry = False
     frame_number = 0
     anims = []
 
-    bgSurface = pygame.Surface(screen.get_size())
+    bgSurface = pygame.Surface(background.get_size())
 
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
     # Player
     player = Player()
@@ -161,7 +153,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
                     retry = True
         
         # draw background
-        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, b.positionY, 0, 0)), backgroundScreen))
+        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, 3000, 0, 0)), backgroundScreen))
         
 
         # player update

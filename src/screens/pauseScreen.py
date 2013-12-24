@@ -20,7 +20,7 @@ import game
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 24)
+    font = pygame.font.SysFont("SigmarOne", 24)
     background = pygame.image.load("../img/backgrounds/pauseBG.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 

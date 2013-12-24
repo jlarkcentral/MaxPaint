@@ -24,8 +24,9 @@ import specialsScreen
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 44)
-    background = pygame.image.load("../img/backgrounds/bgGameStart.png").convert()
+    font = pygame.font.SysFont("SigmarOne", 44)
+    namefont = pygame.font.SysFont("SigmarOne", 24)
+    background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
 
@@ -34,7 +35,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     pygame.image.load("../img/backgrounds/gameMenuNotSelect.png") ]
 
     gameEntries = ["New","New","New"]
-    menuEntries = ["Back","Specials","Start"]
+    menuEntries = ["Back","Shop","Start"]
     gameChoice = 0
     menuChoice = 2
     activeColor = THECOLORS["black"]
@@ -52,25 +53,25 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
 
         if gameChoice == 0:
             backgroundScreen.blit(font.render(gameEntries[0], 1, gameEntriesColors[0]), (200,100))
-            backgroundScreen.blit(font.render(gameEntries[1], 1, gameEntriesColors[1]), (450,100))
-            backgroundScreen.blit(font.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
+            backgroundScreen.blit(namefont.render(gameEntries[1], 1, gameEntriesColors[1]), (450,100))
+            backgroundScreen.blit(namefont.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
 
             backgroundScreen.blit(gameBackgrounds[0], (100,100))
             backgroundScreen.blit(gameBackgrounds[1], (400,100))
             backgroundScreen.blit(gameBackgrounds[2], (550,100))
 
         elif gameChoice == 1:
-            backgroundScreen.blit(font.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
+            backgroundScreen.blit(namefont.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
             backgroundScreen.blit(font.render(gameEntries[1], 1, gameEntriesColors[1]), (350,100))
-            backgroundScreen.blit(font.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
+            backgroundScreen.blit(namefont.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
 
             backgroundScreen.blit(gameBackgrounds[0], (100,100))
             backgroundScreen.blit(gameBackgrounds[1], (250,100))
             backgroundScreen.blit(gameBackgrounds[2], (550,100))
 
         elif gameChoice == 2:
-            backgroundScreen.blit(font.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
-            backgroundScreen.blit(font.render(gameEntries[1], 1, gameEntriesColors[1]), (300,100))
+            backgroundScreen.blit(namefont.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
+            backgroundScreen.blit(namefont.render(gameEntries[1], 1, gameEntriesColors[1]), (300,100))
             backgroundScreen.blit(font.render(gameEntries[2], 1, gameEntriesColors[2]), (500,100))
 
             backgroundScreen.blit(gameBackgrounds[0], (100,100))

@@ -10,20 +10,15 @@ Main program
 
 import random
 from random import randint
-
 import sys
-
 import pygame
 from pygame.locals import *
-
 import pymunk
-
 sys.path.append('screens/')
 import startScreen
 
 
-# INITIALIZATION
-
+# Initialization
 def gameGlobalInit():
     global width, height
     global screen
@@ -31,6 +26,7 @@ def gameGlobalInit():
     global dt
     global backgroundScreen
     global clock
+    global space
     width, height = 800,640
     fps = 50
     dt = 1./fps
@@ -39,31 +35,15 @@ def gameGlobalInit():
     screen = pygame.display.set_mode((width,height))
     backgroundScreen = pygame.Surface(screen.get_size())
     clock = pygame.time.Clock()
-    
-
-def loadPhysics():
-    global space
     space = pymunk.Space()
     space.gravity = 0,-1000
-    '''
-    def passthrough_handler(space, arbiter):
-        if arbiter.shapes[0].body.velocity.y < 0:
-            return True
-        else:
-            return False
-
-    space.add_collision_handler(1,2, begin=passthrough_handler)
-    '''
 
 
-
-
-# MAIN PROGRAM
+#################################################
 
 
 def main():
     gameGlobalInit()
-    loadPhysics()
     startScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
     
 

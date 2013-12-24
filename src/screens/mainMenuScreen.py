@@ -23,11 +23,13 @@ import startScreen
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 44)
-    background = pygame.image.load("../img/backgrounds/bgMainMenu.png").convert()
+    font = pygame.font.SysFont("SigmarOne", 44)
+    infofont = pygame.font.SysFont("SigmarOne", 18)
+    background = pygame.image.load("../img/backgrounds/mainMenuScreenBG.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen
+    menuInfo = ["Start or continue your adventure","Change game and user settings","Exit the game. Goodbye!"]
     menuChoice = 0
     activeColor = THECOLORS["black"]
     inactiveColor = THECOLORS["grey"]
@@ -39,6 +41,8 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     while running:
         backgroundScreen.blit(background, (0,0))
         backgroundScreen.blit(infoBar, (0,600))
+
+        backgroundScreen.blit(infofont.render(menuInfo[menuChoice], 1, THECOLORS["white"]),(200,605))
 
         backgroundScreen.blit(font.render(menuEntries[0], 1, menuColors[0]), (200,100))
         backgroundScreen.blit(font.render(menuEntries[1], 1, menuColors[1]), (200,300))

@@ -11,7 +11,7 @@ from pymunk.vec2d import Vec2d
 
 class Bullet(object):
 
-    def __init__(self, path, speed):
+    def __init__(self, path, speed, color):
 
         self.speed = speed
         self.path = path
@@ -25,7 +25,7 @@ class Bullet(object):
         self.hitbox.friction = 100
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        self.img = pygame.image.load("../img/player/bullet.png")
+        self.img = pygame.image.load("../img/player/bullet_"+color+".png")
         
         
     def update(self, dt):

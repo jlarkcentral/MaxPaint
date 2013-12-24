@@ -32,20 +32,15 @@ class Block(object):
         if(randColorIndex == 0):
             self.color = "blue"
             self.PLATFORM_SPEED = 0
-            self.img = pygame.image.load("../img/blocks/blockBlue.png")
+            self.img = pygame.image.load("../img/blocks/blockBlue_canvas.png")
         elif(randColorIndex == 1):
             self.color = "red"
             self.PLATFORM_SPEED = 0
-            self.img = pygame.image.load("../img/blocks/blockRed.png")
+            self.img = pygame.image.load("../img/blocks/blockRed_canvas.png")
         elif(randColorIndex == 2):
             self.color = "yellow"
             self.PLATFORM_SPEED = 0
-            self.img = pygame.image.load("../img/blocks/blockYellow.png")
-        elif(randColorIndex == 3):
-            self.color = "green"
-            self.PLATFORM_SPEED = 0
-            self.img = pygame.image.load("../img/blocks/blockGreen.png")
-        
+            self.img = pygame.image.load("../img/blocks/blockYellow_canvas.png") 
         
         
            

@@ -16,8 +16,10 @@ import pymunk
 from pymunk.vec2d import Vec2d
 from pymunk.pygame_util import to_pygame
 
-sys.path.append('../lib/')
+sys.path.append('../lib/pyganim')
 import pyganim
+sys.path.append('../lib/PAdLib')
+import PAdLib.particles as particles
 
 from bullet import Bullet
 
@@ -26,21 +28,23 @@ class Player(object):
 
     def __init__(self):
         
+        # sprites & sounds
         self.img = pygame.image.load("../img/player/kube.png")
         self.shieldImg = pygame.image.load("../img/player/shield.png")
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
-        self.PLAYER_VELOCITY = 100. *2 *2.
+        
+        # behavior variables
+        self.PLAYER_VELOCITY = 400
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
         self.PLAYER_AIR_ACCEL_TIME = 0.25
         self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
-        self.JUMP_HEIGHT = 20*3*2
-        self.JUMP_BOOST_HEIGHT = 24.*2
-        self.JUMP_CUTOFF_VELOCITY = 100
+        self.JUMP_HEIGHT = 120
+        self.JUMP_CUTOFF_VELOCITY = 200
         self.FALL_VELOCITY = 500.
-        self.JUMP_LENIENCY = 5
-        self.HEAD_FRICTION = 0.07
+        
+        # physics variables
         self.body = pymunk.Body(2000, pymunk.inf)
         self.body.position = 10,220
         self.body.velocity = (0.0, 0.0)  
@@ -53,14 +57,19 @@ class Player(object):
         self.landing = {'p':Vec2d.zero(), 'n':0}
         self.landed_previous = False
         self.positionX, self.positionY = self.body.position
+        
+        # game variables
         self.bullets = []
         self.shooting = False
         self.shots = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 3
+        self.lives = 300
 
-        self.well_grounded_prev = False
+        #shooting
+        self.particle_system = particles.ParticleSystem()
+        self.particle_system.set_particle_acceleration([0.0,500.0])
+
 
 
         
@@ -78,13 +87,17 @@ class Player(object):
     def updateBullets(self,dt, backgroundScreen, camera, enemies):
         for b in self.bullets:
             b.update(dt)
-            if b.positionX == 0 or b.positionX == 800:
+            if b.positionX <= 0 or b.positionX >= 800:
                 self.bullets.remove(b)
-            for e in enemies:
-                if abs(b.positionX - e.positionX) < 10 and \
-                abs( (640-(camera.state.y + b.positionY)) - (640-(camera.state.y + e.positionY)) ) < 40:
-                    enemies.remove(e)
-                    self.bullets.remove(b)
+                del(self.particle_system.emitters[str(id(b))])
+            else:
+                self.particle_system.emitters[str(id(b))].set_position([b.positionX,(640-(camera.state.y + b.positionY))])
+                for e in enemies:
+                    if abs(b.positionX - e.positionX) < 10 and \
+                    abs( (640-(camera.state.y + b.positionY)) - (640-(camera.state.y + e.positionY)) ) < 40:
+                        enemies.remove(e)
+                        del(self.particle_system.emitters[str(id(b))])
+                        self.bullets.remove(b)
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
     
     
@@ -94,8 +107,17 @@ class Player(object):
             path = [(self.body.position - (0,20) ),(0, self.positionY)]
         elif self.direction == 1:
             path = [(self.body.position - (-40,20)),(800, self.positionY)]    
-        b = Bullet(path, 15)
+        b = Bullet(path, 15, 'red')
         self.bullets.append(b)
+
+        emitter = particles.Emitter()
+        emitter.set_density(200)
+        emitter.set_angle(self.direction*180,10.0)
+        emitter.set_speed([350.0,150.0])
+        emitter.set_life([1.0,1.0])
+        emitter.set_colors([(255,0,0)])
+        self.particle_system.add_emitter(emitter,str(id(b)))
+        
         self.shootSound.play()
     
 
@@ -118,7 +140,6 @@ class Player(object):
                     
         # Target horizontal velocity of player
         self.target_vx = 0
-
         keys = pygame.key.get_pressed()
         if (keys[K_LEFT]):
             self.direction = -1
@@ -166,9 +187,10 @@ class Player(object):
         if self.grounding['body'] != None and \
         abs(self.grounding['normal'].x/self.grounding['normal'].y) < 0.7:
             self.well_grounded = True
-        if abs(self.body.velocity.y) < 0.1:
+
+        if abs(self.body.velocity.y) < 0.01:
             self.well_grounded = True
-            # Avoid being block when going right
+            # Avoid being blocked when going right
             self.grounding['body'] = None
 
         self.ground_velocity = Vec2d.zero()
@@ -209,25 +231,6 @@ class Player(object):
         if self.shieldDelay > 0:
             self.shield(backgroundScreen, camera)
 
-
-
-
-        
-        '''
-        if self.well_grounded_prev and not self.well_grounded:
-            print 'WELL  -->  NOT'
-            print 'hitbox friction', self.hitbox.friction
-            print 'self.body.velocity.x' , self.body.velocity.x
-            print 'self.body.velocity.y' , self.body.velocity.y
-            print self.grounding
-            print '\n'
-
-        elif not self.well_grounded_prev and self.well_grounded:
-            print 'NOT   -->  WELL'
-            print 'hitbox friction', self.hitbox.friction
-            print 'self.body.velocity.x' , self.body.velocity.x
-            print 'self.body.velocity.y' , self.body.velocity.y
-            print self.grounding
-            print '\n'
-        '''
-        self.well_grounded_prev = self.well_grounded
+        self.particle_system.update(dt)
+        self.particle_system.draw(backgroundScreen)
+            

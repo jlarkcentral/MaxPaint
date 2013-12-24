@@ -3,16 +3,21 @@ Created on Aug 8, 2013
 
 @author: primo
 '''
-
-from pymunk.vec2d import Vec2d
+import sys
+import random
 
 import pygame
 from pygame.locals import *
 
 import pymunk
+from pymunk.vec2d import Vec2d
 from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 
+sys.path.append('../../lib/PAdLib')
+import PAdLib.particles as particles
+
 from bullet import Bullet
+
 
 class Enemy(object):
 
@@ -33,27 +38,46 @@ class Enemy(object):
         self.img = pygame.image.load("../img/enemies/enemy1.png")
         self.bullets = []
         self.shootingDelay = 0
-    
+
+        #shooting
+        self.particle_system = particles.ParticleSystem()
+        self.particle_system.set_particle_acceleration([0.0,500.0])
+        
+
+        
 
     def shootAtTarget(self,targetPosition):
         path = []
         path = [(Vec2d(self.body.position)),targetPosition + (targetPosition - self.body.position)*10]    
-        b = Bullet(path, 5)
+        b = Bullet(path, 5, random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
+
+        #emitter = particles.Emitter()
+        #emitter.set_density(200)
+        #ang = particles.angle((0.1,0.0),self.body.position - targetPosition)
+        #emitter.set_angle(ang,10.0)
+        #emitter.set_speed([350.0,150.0])
+        #emitter.set_life([1.0,1.0])
+        #emitter.set_colors([(255,0,0)])
+        #self.particle_system.add_emitter(emitter,str(id(b)))
 
 
     def updateBullets(self,dt, backgroundScreen, camera, player):
         playerHit = False
         for b in self.bullets:
             b.update(dt)
-            if b.positionX < 0 or b.positionX > 800 or b.positionY < 0 or b.positionY > 8640:
+            if b.positionX < 0 or b.positionX > 800 or b.positionY < 0 or b.positionY > camera.maxH:
                 self.bullets.remove(b)
+                #del(self.particle_system.emitters[str(id(b))])
             #if abs(b.positionX - playerPositionX + 32) < 10 and \
             #abs( (640-(camera.state.y + b.positionY - 32)) - (640-(camera.state.y + playerPositionY - 32)) ) < 40:
-            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((b.positionX + 20,b.positionY-20)) < 40 :
-                if player.shieldDelay == 0:
-                    player.lives -= 1
-                self.bullets.remove(b)
+            else:
+                #self.particle_system.emitters[str(id(b))].set_position([b.positionX,(640-(camera.state.y + b.positionY))])
+                if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((b.positionX + 20,b.positionY-20)) < 40 :
+                    if player.shieldDelay == 0:
+                        player.lives -= 1
+                    self.bullets.remove(b)
+                    #del(self.particle_system.emitters[str(id(b))])
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
         return playerHit
 
@@ -80,6 +104,9 @@ class Enemy(object):
             self.shootingDelay = 30
         if self.shootingDelay > 0:
             self.shootingDelay -= 1
+
+        #self.particle_system.update(dt)
+        #self.particle_system.draw(backgroundScreen)
 
         if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 50 :
             return True

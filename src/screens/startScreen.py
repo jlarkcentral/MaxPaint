@@ -8,7 +8,7 @@ import pygame
 from pygame.locals import *
 from pygame.color import *
     
-sys.path.append('../lib/')
+sys.path.append('../lib/pyganim')
 import pyganim
 
 import mainMenuScreen
@@ -18,23 +18,17 @@ import mainMenuScreen
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 24)
-    background = pygame.image.load("../img/backgrounds/bgStart.png").convert()
-    titleG = pygame.image.load("../img/backgrounds/g.png")
-    titleL = pygame.image.load("../img/backgrounds/l.png")
-    titleO = pygame.image.load("../img/backgrounds/o.png")
-    titleX = pygame.image.load("../img/backgrounds/x.png")
+    font = pygame.font.SysFont("SigmarOne", 18)
+    background = pygame.image.load("../img/backgrounds/startScreenBG_withcanvas_withtaches.png").convert()
+    hudbar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     running = True
     frame_number = 0
     while running:
         backgroundScreen.blit(background, (0,0))
-        backgroundScreen.blit(titleG, (100,200))
-        backgroundScreen.blit(titleL, (250,200))
-        backgroundScreen.blit(titleO, (400,200))
-        backgroundScreen.blit(titleX, (550,200))
+        backgroundScreen.blit(hudbar,(0,605))
         backgroundScreen.blit(font.render("A python game using pygame, pymunk and pyganim", \
-            1, THECOLORS["white"]), (250,605))
+            1, THECOLORS["white"]), (230,605))
     
         screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()

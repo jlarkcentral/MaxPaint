@@ -9,8 +9,9 @@ http://stackoverflow.com/questions/14354171/how-to-add-scrolling-to-a-platformer
 from pygame import Rect
 
 class Camera(object):
-    def __init__(self, width, height):
-        self.state = Rect(0, -8640, width, height)
+    def __init__(self, maxH_, width, height):
+        self.state = Rect(0, maxH_, width, height)
+        self.maxH = maxH_
 
     def apply(self, rect):
         return rect.move(self.state.topleft)
@@ -26,9 +27,9 @@ class Camera(object):
         # stop scrolling at the left edge
         l = min(0, l)
         # stop scrolling at the right edge 
-        l = max((camera.width-800), l)
+        l = max(0, l)
         # stop scrolling at the bottom
-        t = min((camera.height), t)
+        t = max(-(camera.height-640), t)
         # stop scrolling at the top
         t = min(0, t)
         

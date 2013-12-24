@@ -28,20 +28,13 @@ import startGameScreen
 
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
-    font = pygame.font.SysFont("Impact", 44)
-    background = pygame.image.load("../img/backgrounds/levelBackgrounds/shmup.png").convert()
+    font = pygame.font.SysFont("SigmarOne", 44)
+    background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
-    levelTitles = ["Tutorial","Sleeping", "Rivers", "Asphodel",\
-     "Tartarus", "Elysian Fields", "Out"]
+    levelTitles = ["Tutorial","Green Machine", "Strange Orange", "Purple Trouble"]
     levelBackgrounds = []
     lvlbgsNames = []
-    #os.chdir("../img/backgrounds/levelBackgrounds/")
-    #for fname in os.listdir("../img/backgrounds/levelBackgrounds/"):
-    #    lvlbgsNames.append(fname)
-    #lvlbgsNames.sort()
-    #for n in lvlbgsNames:
-    #    levelBackgrounds.append(pygame.image.load(n).convert())
     
     currentLevel = 0
     menuEntries = ["Stage 1","Stage 2","Stage 3","Back"]
