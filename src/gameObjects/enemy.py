@@ -36,6 +36,7 @@ class Enemy(object):
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
         self.img = pygame.image.load("../img/enemies/enemy1.png")
+        self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
 
@@ -77,6 +78,7 @@ class Enemy(object):
                     if player.shieldDelay == 0:
                         player.lives -= 1
                     self.bullets.remove(b)
+                    self.hitSound.play()
                     #del(self.particle_system.emitters[str(id(b))])
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
         return playerHit

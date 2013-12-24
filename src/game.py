@@ -60,6 +60,7 @@ def loadResources():
     global scoreBar
     global jumpBar
     global nextColorIcon
+    global lifeHud
     global color_dict
     global plusOneAnim_dict
     
@@ -67,6 +68,7 @@ def loadResources():
     background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
+    lifeHud = pygame.image.load("../img/hud/life.png")
     color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
     
     # TODO modif pyganim to load directly entire anim
@@ -119,7 +121,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
 
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
-    #pygame.mixer.music.play(-1)
+    pygame.mixer.music.play(-1)
 
     # Player
     player = Player()
@@ -213,7 +215,8 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 4*30, 50, 30))
         
-        backgroundScreen.blit(font.render(str(player.lives), 1, THECOLORS["white"]), (385,605))
+        for i in range(player.lives):
+            backgroundScreen.blit(lifeHud, (385+i*40,605))
 
         # update camera
         camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
@@ -233,3 +236,4 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
             space.remove(player.body)
             space.remove(player.hitbox)
             running = False
+            pygame.mixer.music.stop()

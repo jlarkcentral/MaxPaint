@@ -33,6 +33,7 @@ class Player(object):
         self.shieldImg = pygame.image.load("../img/player/shield.png")
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
+        self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
         
         # behavior variables
         self.PLAYER_VELOCITY = 400
@@ -64,7 +65,7 @@ class Player(object):
         self.shots = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 300
+        self.lives = 3
 
         #shooting
         self.particle_system = particles.ParticleSystem()
@@ -98,6 +99,7 @@ class Player(object):
                         enemies.remove(e)
                         del(self.particle_system.emitters[str(id(b))])
                         self.bullets.remove(b)
+                        self.hitSound.play()
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
     
     
