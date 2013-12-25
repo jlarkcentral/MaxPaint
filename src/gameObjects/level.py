@@ -31,6 +31,6 @@ class Level(object):
 				enemyTemp = line.split(',')
 				enemyPath = []
 				for i in range(0,len(enemyTemp)-1,2):
-					enemyPath.append((int(enemyTemp[i + 1])*100,int(enemyTemp[i])*100 + 40))
-					enemyPath.append((int(enemyTemp[i + 1])*100 + 60,int(enemyTemp[i])*100 + 40))
-				self.enemies.append(Enemy(enemyPath,int(enemyTemp[len(enemyTemp) - 1])))
+					enemyPath.append((int(enemyTemp[i+1])*100,int(enemyTemp[i])*100 + 40))
+					enemyPath.append((int(enemyTemp[i+1])*100 + 60,int(enemyTemp[i])*100 + 40))
+				self.enemies.append(Enemy([enemyPath[0],enemyPath[-1]],int(enemyTemp[-1])))

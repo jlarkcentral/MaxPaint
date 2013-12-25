@@ -14,6 +14,7 @@ class Bullet(object):
     def __init__(self, path, speed, color):
 
         self.speed = speed
+        self.color = color
         self.path = path
         self.path_index = 0
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
@@ -25,7 +26,7 @@ class Bullet(object):
         self.hitbox.friction = 100
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        self.img = pygame.image.load("../img/player/bullet_"+color+".png")
+        self.img = pygame.image.load("../img/bullets/bullet_"+color+".png")
         
         
     def update(self, dt):

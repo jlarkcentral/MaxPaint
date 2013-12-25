@@ -29,26 +29,26 @@ class Enemy(object):
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
-        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,40),(40,40),(40,0)],(0,-40))
+        self.hitbox = pymunk.Circle(self.body, 50, offset=(80,-100))#[(0,0),(0,30),(70,160),(130,160),(30,0),(0,0)])
         self.hitbox.ignore_draw = False
         self.hitbox.group = 1
         self.hitbox.friction = 100
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        self.img = pygame.image.load("../img/enemies/enemy1.png")
+        self.img = pygame.image.load("../img/enemies/brush.png")
         self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
+        self.waitDelay = 0
 
         #shooting
-        self.particle_system = particles.ParticleSystem()
-        self.particle_system.set_particle_acceleration([0.0,500.0])
+        #self.particle_system = particles.ParticleSystem()
+        #self.particle_system.set_particle_acceleration([0.0,500.0])
         
 
         
 
     def shootAtTarget(self,targetPosition):
-        path = []
         path = [(Vec2d(self.body.position)),targetPosition + (targetPosition - self.body.position)*10]    
         b = Bullet(path, 5, random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
@@ -76,27 +76,39 @@ class Enemy(object):
                 #self.particle_system.emitters[str(id(b))].set_position([b.positionX,(640-(camera.state.y + b.positionY))])
                 if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((b.positionX + 20,b.positionY-20)) < 40 :
                     if player.shieldDelay == 0:
+                        self.hitSound.play()
                         player.lives -= 1
+                        player.changeColor(b.color)
                     self.bullets.remove(b)
-                    self.hitSound.play()
                     #del(self.particle_system.emitters[str(id(b))])
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
         return playerHit
 
     def update(self, dt, backgroundScreen, camera, player):
-        
+
         destination = self.path[self.path_index]
         current = Vec2d(self.body.position)
         distance = current.get_distance(destination)
+        toEdge = self.positionX - self.path[self.path_index][0]
+        if self.path_index == 0:
+            print(toEdge)
+        t = 1
         if distance < self.speed:
-            self.path_index += 1
-            self.path_index = self.path_index % len(self.path)
-            t = 1
+            if self.waitDelay == 0:
+                self.path_index += 1
+                self.path_index = self.path_index % len(self.path)
+                t = 1
         else:
             t = self.speed / distance
+
         self.positionX, self.positionY = current.interpolate_to(destination, t)
         self.body.position = self.positionX, self.positionY
         self.body.velocity = (self.body.position - current) / dt
+
+        if self.waitDelay == 0 and (toEdge < 0 or self.path_index == 0 and toEdge < 5):
+            self.waitDelay = random.randint(1,200)
+        elif self.waitDelay > 0:
+            self.waitDelay -= 1
 
         self.updateBullets(dt, backgroundScreen, camera, player)
 

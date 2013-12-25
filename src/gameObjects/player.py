@@ -29,12 +29,27 @@ class Player(object):
     def __init__(self):
         
         # sprites & sounds
-        self.img = pygame.image.load("../img/player/kube.png")
-        self.shieldImg = pygame.image.load("../img/player/shield.png")
+        self.imgNormal = pygame.image.load("../img/player/kube.png")
+        self.img = self.imgNormal
+        self.imgHitY = pygame.image.load("../img/player/kubeY.png")
+        self.imgHitB = pygame.image.load("../img/player/kubeB.png")
+        self.imgHitR = pygame.image.load("../img/player/kubeR.png")
+        #self.shieldImg = pygame.image.load("../img/player/shield.png")
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
         
+        self.shieldAnim = pyganim.PygAnimation([('../img/anims/shield/shield2.png', 0.25),
+                                        ('../img/anims/shield/shield3.png', 0.25),
+                                        ('../img/anims/shield/shield4.png', 0.25),
+                                        ('../img/anims/shield/shield5.png', 0.25),
+                                        ('../img/anims/shield/shield6.png', 0.25),
+                                        ('../img/anims/shield/shield7.png', 0.25),
+                                        ('../img/anims/shield/shield8.png', 0.25),
+                                        ('../img/anims/shield/shield9.png', 0.25),
+                                        ('../img/anims/shield/shield10.png', 0.25)])
+        self.shieldAnim.loop = False
+
         # behavior variables
         self.PLAYER_VELOCITY = 400
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
@@ -65,7 +80,9 @@ class Player(object):
         self.shots = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 3
+        self.lives = 300
+        self.hit = False
+        self.hitColorDelay = 0
 
         #shooting
         self.particle_system = particles.ParticleSystem()
@@ -73,7 +90,16 @@ class Player(object):
 
 
 
-        
+    def changeColor(self,color):
+        if color == 'yellow':
+            self.img = self.imgHitY
+        if color == 'blue':
+            self.img = self.imgHitB
+        if color == 'red':
+            self.img = self.imgHitR
+        self.hitColorDelay = 5
+        self.hit = True
+
 
     def cpfclamp(self, f, min_, max_):
         """Clamp f between min and max"""
@@ -124,7 +150,8 @@ class Player(object):
     
 
     def shield(self, backgroundScreen, camera):
-        backgroundScreen.blit(self.shieldImg, to_pygame(camera.apply(Rect(self.positionX - 7,self.positionY + 5, 0, 0)), backgroundScreen))
+        #backgroundScreen.blit(self.shieldImg, to_pygame(camera.apply(Rect(self.positionX - 7,self.positionY + 5, 0, 0)), backgroundScreen))
+        self.shieldAnim.blit(backgroundScreen, to_pygame(camera.apply(Rect(self.positionX -20, self.positionY+15, 0, 0)), backgroundScreen))
         self.shieldDelay -= 1
     
 
@@ -156,6 +183,8 @@ class Player(object):
             color_dict["red"] -= 1
         if (keys[K_LSHIFT]) and self.shields > 0 and self.shieldDelay == 0:
             self.shieldDelay = 120
+            #anim = self.shieldAnim.getCopy()
+            self.shieldAnim.play()
             self.shieldSound.play()
             color_dict["blue"] -= 1
 
@@ -232,6 +261,13 @@ class Player(object):
         # shield
         if self.shieldDelay > 0:
             self.shield(backgroundScreen, camera)
+
+        if self.hit:
+            if self.hitColorDelay == 0:
+                self.img = self.imgNormal
+                self.hit = False
+            else:
+                self.hitColorDelay -= 1
 
         self.particle_system.update(dt)
         self.particle_system.draw(backgroundScreen)

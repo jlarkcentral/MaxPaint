@@ -44,7 +44,7 @@ def gameScreenInit(width_,height_,space_,cameraHeight):
     height = height_
     space = space_
 
-    camera = Camera(cameraHeight, width, cameraHeight)
+    camera = Camera(height, width, cameraHeight)
     static_body = pymunk.Body()
     static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0),
                     pymunk.Segment(static_body, (width, 0), (width, height), 0.0)
@@ -121,7 +121,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
 
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
     # Player
     player = Player()
@@ -155,7 +155,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
                     retry = True
         
         # draw background
-        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, 3000, 0, 0)), backgroundScreen))
+        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, background.get_size()[1], 0, 0)), backgroundScreen))
         
 
         # player update
@@ -182,7 +182,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         # Update enemies
         for e in enemies:
             e.update(dt, backgroundScreen, camera, player)
-            backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX, e.positionY, 0, 0)), backgroundScreen))
+            backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX-70, e.positionY+100, 0, 0)), backgroundScreen))
 
         # show anims
         for anim,pos in anims:
