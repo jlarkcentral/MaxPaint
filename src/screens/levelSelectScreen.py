@@ -71,7 +71,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice < 3:
-                        game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,Level(currentLevel*3 + (menuChoice + 1)))
+                        game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,currentLevel*3 + (menuChoice + 1))
                         #running = False
                     elif menuChoice == 3:
                         startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)

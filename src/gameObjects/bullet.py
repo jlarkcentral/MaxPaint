@@ -21,7 +21,7 @@ class Bullet(object):
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
         self.hitbox = pymunk.Circle(self.body, 5, (5,-5))
-        self.hitbox.ignore_draw = True
+        self.hitbox.ignore_draw = False
         self.hitbox.group = 1
         self.hitbox.friction = 100
         self.hitbox.layers = 0b1000

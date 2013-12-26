@@ -27,6 +27,7 @@ import pyganim
 sys.path.append('gameObjects/')
 from player import Player
 from camera import Camera
+from level import Level
 
 sys.path.append('screens/')
 import pauseScreen
@@ -56,16 +57,17 @@ def gameScreenInit(width_,height_,space_,cameraHeight):
 
 def loadResources():
     global font
-    global background
+    #global background
     global scoreBar
     global jumpBar
     global nextColorIcon
     global lifeHud
     global color_dict
     global plusOneAnim_dict
-    
+    global exitAnim
+
     font = pygame.font.SysFont("Impact", 24)
-    background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1.png").convert()
+    #background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+levelInd+".png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
     lifeHud = pygame.image.load("../img/hud/life.png")
@@ -101,23 +103,32 @@ def loadResources():
     
     plusOneAnim_dict = {'blue':plusOneAnimBlue, 'yellow':plusOneAnimYellow, 'red':plusOneAnimRed}
 
-
+    exitAnim = pyganim.PygAnimation([('../img/anims/exit/exit0.png', 0.05),
+                                        ('../img/anims/exit/exit6.png', 0.05),
+                                        ('../img/anims/exit/exit5.png', 0.05),
+                                        ('../img/anims/exit/exit4.png', 0.05),
+                                        ('../img/anims/exit/exit3.png', 0.05),
+                                        ('../img/anims/exit/exit2.png', 0.05),
+                                        ('../img/anims/exit/exit1.png', 0.05)])
+    exitAnim.loop = True
+    exitAnim.play()
 
 def randomColor():
     return random.choice(["blue","red","yellow"])
 
 
 # LAUNCH GAME SCREEN
-def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
+def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd):
     
     loadResources()
-    gameScreenInit(width,height,space,background.get_size()[1])
+    level = Level(levelInd)
+    gameScreenInit(width,height,space,level.background.get_size()[1])
     running = True
     retry = False
     frame_number = 0
     anims = []
 
-    bgSurface = pygame.Surface(background.get_size())
+    bgSurface = pygame.Surface(level.background.get_size())
 
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
@@ -155,7 +166,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
                     retry = True
         
         # draw background
-        backgroundScreen.blit(background,to_pygame(camera.apply(Rect(0, background.get_size()[1], 0, 0)), backgroundScreen))
+        backgroundScreen.blit(level.background,to_pygame(camera.apply(Rect(0, level.background.get_size()[1], 0, 0)), backgroundScreen))
         
 
         # player update
@@ -163,6 +174,9 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         
         # TODO manage death
         if player.lives == 0:
+            retry = True
+
+        if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((level.exitPos[0] + 20,level.exitPos[1]-20)) < 50:
             retry = True
 
         # Update platforms
@@ -182,7 +196,6 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         # Update enemies
         for e in enemies:
             e.update(dt, backgroundScreen, camera, player)
-            backgroundScreen.blit(e.img, to_pygame(camera.apply(Rect(e.positionX-70, e.positionY+100, 0, 0)), backgroundScreen))
 
         # show anims
         for anim,pos in anims:
@@ -215,6 +228,8 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 4*30, 50, 30))
         
+        exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
+
         for i in range(player.lives):
             backgroundScreen.blit(lifeHud, (385+i*40,605))
 
@@ -235,5 +250,10 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,level):
         if retry:
             space.remove(player.body)
             space.remove(player.hitbox)
+            for b in level.blocks:
+                space.remove(b.hitbox)
+            for e in enemies:
+                space.remove(e.body)
+                space.remove(e.hitbox)
             running = False
             pygame.mixer.music.stop()

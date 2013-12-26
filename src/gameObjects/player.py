@@ -28,13 +28,14 @@ class Player(object):
 
     def __init__(self):
         
-        # sprites & sounds
+        # sprites
         self.imgNormal = pygame.image.load("../img/player/kube.png")
         self.img = self.imgNormal
         self.imgHitY = pygame.image.load("../img/player/kubeY.png")
         self.imgHitB = pygame.image.load("../img/player/kubeB.png")
         self.imgHitR = pygame.image.load("../img/player/kubeR.png")
-        #self.shieldImg = pygame.image.load("../img/player/shield.png")
+
+        # sounds
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
@@ -62,7 +63,7 @@ class Player(object):
         
         # physics variables
         self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,220
+        self.body.position = 10,160
         self.body.velocity = (0.0, 0.0)  
         self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
         self.hitbox.layers = 0b1000
@@ -80,7 +81,7 @@ class Player(object):
         self.shots = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 300
+        self.lives = 3
         self.hit = False
         self.hitColorDelay = 0
 
@@ -183,7 +184,6 @@ class Player(object):
             color_dict["red"] -= 1
         if (keys[K_LSHIFT]) and self.shields > 0 and self.shieldDelay == 0:
             self.shieldDelay = 120
-            #anim = self.shieldAnim.getCopy()
             self.shieldAnim.play()
             self.shieldSound.play()
             color_dict["blue"] -= 1

@@ -1,5 +1,7 @@
 import sys
 
+import pygame
+
 from block import Block
 from enemy import Enemy
 
@@ -7,13 +9,17 @@ class Level(object):
 
 	def __init__(self,index):
 		
+		self.index = index
 		self.blocks = []
 		self.enemies = []
-		self.loadLevel(index)
+		self.exitPosDict = dict({1:(50,1200),2:(700,1200)})
+		self.exitPos = self.exitPosDict[index]
+		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
+		self.loadLevel()
 
 
-	def loadLevel(self,index):
-		with open('gameObjects/levels/'+str(index)+'/staticblocks') as f:
+	def loadLevel(self):
+		with open('gameObjects/levels/'+str(self.index)+'/staticblocks') as f:
 			i = 1
 			for line in f:
 				blocksTemp = line.split(',')
@@ -26,7 +32,7 @@ class Level(object):
 					j += 1
 				i += 1
 
-		with open('gameObjects/levels/'+str(index)+'/enemies') as f:
+		with open('gameObjects/levels/'+str(self.index)+'/enemies') as f:
 			for line in f:
 				enemyTemp = line.split(',')
 				enemyPath = []
