@@ -9,12 +9,11 @@ import random
 import pygame
 from pygame.locals import *
 
+import pyganim
+
 import pymunk
 from pymunk.vec2d import Vec2d
 from pymunk.pygame_util import draw_space, from_pygame, to_pygame
-
-sys.path.append('../../lib/PAdLib')
-import PAdLib.particles as particles
 
 from bullet import Bullet
 
@@ -35,17 +34,18 @@ class Enemy(object):
         self.hitbox.friction = 100
         self.hitbox.layers = 0b1000
         self.hitbox.collision_type = 1
-        self.img = pygame.image.load("../img/enemies/brush.png")
+        self.img = pygame.image.load("../img/enemies/enemy2_cvs.png")
         self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
         self.waitDelay = 0
-        
+        self.lives = 3
+        #self.killAnim = pyganim.loadAnim('../img/anims/enemyKill',0.05)
 
         
 
     def shootAtTarget(self,targetPosition):
-        path = [(Vec2d(self.body.position)),targetPosition + (targetPosition - self.body.position)*10]    
+        path = [(Vec2d((self.positionX+15,self.positionY))),targetPosition + (targetPosition - self.body.position)*10]    
         b = Bullet(path, 5, random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
 
@@ -90,8 +90,7 @@ class Enemy(object):
         elif self.waitDelay > 0:
             self.waitDelay -= 1
 
-        # bullets
-        self.updateBullets(dt, backgroundScreen, camera, player)
+        
 
         # shooting
         if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 300 \
@@ -102,7 +101,12 @@ class Enemy(object):
             self.shootingDelay -= 1
 
         # display
-        backgroundScreen.blit(self.img, to_pygame(camera.apply(Rect(self.positionX-70, self.positionY+100, 0, 0)), backgroundScreen))
+        backgroundScreen.blit(self.img,to_pygame(camera.apply(Rect(self.positionX, self.positionY+18, 0, 0)), backgroundScreen),(0, 64*(3-self.lives), 64, 64))
+        
+        # bullets
+        self.updateBullets(dt, backgroundScreen, camera, player)
+
+
 
         # colliding ?
         if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((self.positionX + 20,self.positionY-20)) < 50 :

@@ -13,6 +13,7 @@ class Level(object):
 		self.blocks = []
 		self.enemies = []
 		self.exitPosDict = dict({1:(50,1200),2:(700,1200),3:(400,1250)})
+		#self.dayTimeDict = dict({1:}) #TODO : day time in nb_frames before night falls
 		self.exitPos = self.exitPosDict[index]
 		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
 		self.loadLevel()

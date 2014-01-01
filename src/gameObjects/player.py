@@ -16,10 +16,10 @@ import pymunk
 from pymunk.vec2d import Vec2d
 from pymunk.pygame_util import to_pygame
 
-sys.path.append('../lib/pyganim')
+sys.path.append('../../lib/pyganim/')
 import pyganim
-sys.path.append('../lib/PAdLib')
-import PAdLib.particles as particles
+#sys.path.append('../../lib/')
+#import PAdLib.particles as particles
 
 from bullet import Bullet
 
@@ -40,16 +40,7 @@ class Player(object):
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
         
-        self.shieldAnim = pyganim.PygAnimation([('../img/anims/shield/shield2.png', 0.25),
-                                        ('../img/anims/shield/shield3.png', 0.25),
-                                        ('../img/anims/shield/shield4.png', 0.25),
-                                        ('../img/anims/shield/shield5.png', 0.25),
-                                        ('../img/anims/shield/shield6.png', 0.25),
-                                        ('../img/anims/shield/shield7.png', 0.25),
-                                        ('../img/anims/shield/shield8.png', 0.25),
-                                        ('../img/anims/shield/shield9.png', 0.25),
-                                        ('../img/anims/shield/shield10.png', 0.25)])
-        self.shieldAnim.loop = False
+        self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.25)
 
         # behavior variables
         self.PLAYER_VELOCITY = 400
@@ -63,7 +54,7 @@ class Player(object):
         
         # physics variables
         self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,160
+        self.body.position = 10,155
         self.body.velocity = (0.0, 0.0)  
         self.hitbox = pymunk.Poly(self.body, [(0,0),(0,50),(50,50),(50,0)],(10,-60))
         self.hitbox.layers = 0b1000
@@ -84,10 +75,12 @@ class Player(object):
         self.lives = 3
         self.hit = False
         self.hitColorDelay = 0
+        self.sunPower = 0
+        self.sunPowering = False
 
         #shooting
-        self.particle_system = particles.ParticleSystem()
-        self.particle_system.set_particle_acceleration([0.0,500.0])
+        #self.particle_system = particles.ParticleSystem()
+        #self.particle_system.set_particle_acceleration([0.0,500.0])
 
 
 
@@ -117,14 +110,19 @@ class Player(object):
             b.update(dt)
             if b.positionX <= 0 or b.positionX >= 800:
                 self.bullets.remove(b)
-                del(self.particle_system.emitters[str(id(b))])
+                #del(self.particle_system.emitters[str(id(b))])
             else:
-                self.particle_system.emitters[str(id(b))].set_position([b.positionX,(640-(camera.state.y + b.positionY))])
+                #self.particle_system.emitters[str(id(b))].set_position([b.positionX,(640-(camera.state.y + b.positionY))])
                 for e in enemies:
                     if abs(b.positionX - e.positionX) < 10 and \
                     abs( (640-(camera.state.y + b.positionY)) - (640-(camera.state.y + e.positionY)) ) < 40:
-                        enemies.remove(e)
-                        del(self.particle_system.emitters[str(id(b))])
+                        if e.lives == 1:
+                            #e.killAnim.play()
+                            #e.killAnim.blit(backgroundScreen, to_pygame(camera.apply(Rect(e.positionX, e.positionY+60, 0, 0)), backgroundScreen))
+                            enemies.remove(e)
+                        else:
+                            e.lives -= 1
+                        #del(self.particle_system.emitters[str(id(b))])
                         self.bullets.remove(b)
                         self.hitSound.play()
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
@@ -139,13 +137,13 @@ class Player(object):
         b = Bullet(path, 15, 'red')
         self.bullets.append(b)
 
-        emitter = particles.Emitter()
-        emitter.set_density(200)
-        emitter.set_angle(self.direction*180,10.0)
-        emitter.set_speed([350.0,150.0])
-        emitter.set_life([1.0,1.0])
-        emitter.set_colors([(255,0,0)])
-        self.particle_system.add_emitter(emitter,str(id(b)))
+        #emitter = particles.Emitter()
+        #emitter.set_density(200)
+        #emitter.set_angle(self.direction*180,10.0)
+        #emitter.set_speed([350.0,150.0])
+        #emitter.set_life([1.0,1.0])
+        #emitter.set_colors([(255,0,0)])
+        #self.particle_system.add_emitter(emitter,str(id(b)))
         
         self.shootSound.play()
     
@@ -156,7 +154,7 @@ class Player(object):
         self.shieldDelay -= 1
     
 
-    def handleKeyboardEvents(self, events, space, color_dict):
+    def handleKeyboardEvents(self, events, space, color_dict, lightFill):
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
                 if self.well_grounded:
@@ -167,6 +165,8 @@ class Player(object):
                     self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
                 if event.key == K_SPACE:
                     self.shooting = False
+                if event.key == K_LCTRL:
+                    self.sunPowering = False
                     
         # Target horizontal velocity of player
         self.target_vx = 0
@@ -186,7 +186,11 @@ class Player(object):
             self.shieldDelay = 120
             self.shieldAnim.play()
             self.shieldSound.play()
-            color_dict["blue"] -= 1
+            color_dict["blue"] -= 5
+        if (keys[K_LCTRL]) and self.sunPower >= 5  and not self.sunPowering:
+            color_dict["yellow"] -= 3
+            self.sunPowering = True
+            lightFill['fill'] = min(255, lightFill['fill'] + 20)
 
         self.hitbox.surface_velocity = self.target_vx,0
 
@@ -194,7 +198,7 @@ class Player(object):
     
         
         
-    def update(self, space, dt, events, color_dict, backgroundScreen, camera, enemies):
+    def update(self, space, dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill):
         self.grounding = {
             'normal' : Vec2d.zero(),
             'penetration' : Vec2d.zero(),
@@ -249,11 +253,12 @@ class Player(object):
         
 
         # keyboard handling
-        self.handleKeyboardEvents(events, space, color_dict)
+        self.handleKeyboardEvents(events, space, color_dict,lightFill)
 
         # powerups update
         self.shots = color_dict["red"]
         self.shields = color_dict["blue"]
+        self.sunPower = color_dict["yellow"]
 
         # bullets update
         self.updateBullets(dt, backgroundScreen, camera, enemies)
@@ -269,6 +274,14 @@ class Player(object):
             else:
                 self.hitColorDelay -= 1
 
-        self.particle_system.update(dt)
-        self.particle_system.draw(backgroundScreen)
-            
+        #self.particle_system.update(dt)
+        #self.particle_system.draw(backgroundScreen)
+
+        direction_offset = 64+(self.direction+1)/2 * 64
+        if abs(self.target_vx) > 1:
+            animation_offset = 64 *(frame_number / 8 % 4)
+        elif self.grounding['body'] is None:
+            animation_offset = 128
+        else:
+            animation_offset = 0
+        backgroundScreen.blit(self.img, to_pygame(camera.apply(Rect(self.positionX ,self.positionY, 0, 0)), backgroundScreen) , (animation_offset, direction_offset, 64, 64))    

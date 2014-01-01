@@ -15,6 +15,7 @@ sys.path.append('../')
 from utils import cycle
 
 import mainMenuScreen
+from saveUtil import save,load,exist
 
 
 
@@ -37,8 +38,14 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     inactiveColor = THECOLORS["grey"]
     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
 
+    
     soundLevel = 0
+    if exist('soundLevel'):
+        soundLevel = load('soundLevel')
+    
     musicLevel = 0
+    if exist('musicLevel'):
+        musicLevel = load('musicLevel')
 
     running = True
     frame_number = 0
@@ -63,12 +70,14 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
                     running = False
+                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                 if event.key == K_RETURN:
                     if menuChoice == 3:
-                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
                         running = False
+                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                 if event.key == K_UP:
                     menuChoice = cycle("up",menuColors,menuChoice)
                 if event.key == K_DOWN:
@@ -94,4 +103,5 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                         volumeTest.set_volume(musicLevel*0.2)
                         volumeTest.play()
             if event.type == QUIT:
+                save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
                 running = False

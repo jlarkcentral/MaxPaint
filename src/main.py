@@ -8,11 +8,8 @@ Main program
 
 """
 
-import random
-from random import randint
 import sys
 import pygame
-from pygame.locals import *
 import pymunk
 sys.path.append('screens/')
 import startScreen
@@ -27,6 +24,7 @@ def gameGlobalInit():
     global backgroundScreen
     global clock
     global space
+    
     width, height = 800,640
     fps = 50
     dt = 1./fps

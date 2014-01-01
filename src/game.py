@@ -8,9 +8,7 @@ Game launcher
 
 """
 
-import random
-from random import randint
-
+import os
 import sys
 
 import pygame
@@ -21,8 +19,10 @@ import pymunk
 from pymunk.vec2d import Vec2d
 from pymunk.pygame_util import draw_space, from_pygame, to_pygame
 
-sys.path.append('../lib/')
+sys.path.append('../lib/pyganim/')
 import pyganim
+sys.path.append('../lib/')
+import PAdLib.shadow as shadow
 
 sys.path.append('gameObjects/')
 from player import Player
@@ -32,6 +32,7 @@ from level import Level
 sys.path.append('screens/')
 import pauseScreen
 
+from saveUtil import save,load,exist
 
 
 # INITIALIZATION & CONTENT LOADING
@@ -44,20 +45,18 @@ def gameScreenInit(width_,height_,space_,cameraHeight):
     width = width_
     height = height_
     space = space_
-
     camera = Camera(height, width, cameraHeight)
     static_body = pymunk.Body()
     static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0),
                     pymunk.Segment(static_body, (width, 0), (width, height), 0.0)
-                    #pymunk.Segment(static_body, (0, 50), (width, 50), 20.0)
                     ]
     for l in static_lines:
         l.friction = 0.5
     space.add(static_lines)
 
+
 def loadResources():
     global font
-    #global background
     global scoreBar
     global jumpBar
     global nextColorIcon
@@ -65,53 +64,28 @@ def loadResources():
     global color_dict
     global plusOneAnim_dict
     global exitAnim
+    global lightFill
+
 
     font = pygame.font.SysFont("Impact", 24)
-    #background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+levelInd+".png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
     lifeHud = pygame.image.load("../img/hud/life.png")
+
     color_dict = {'blue': 0, 'yellow': 0, 'red': 0}
+    if exist('coins'):
+        color_dict = load('coins')
     
-    # TODO modif pyganim to load directly entire anim
-    plusOneAnimBlue = pyganim.PygAnimation([('../img/anims/plusOne/plusOneBlue7.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue6.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue5.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue4.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue3.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue2.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneBlue1.png', 0.05)])
-    plusOneAnimBlue.loop = False
-    
-    plusOneAnimYellow = pyganim.PygAnimation([('../img/anims/plusOne/plusOneYellow7.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow6.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow5.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow4.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow3.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow2.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneYellow1.png', 0.05)])
-    plusOneAnimYellow.loop = False
-    
-    plusOneAnimRed = pyganim.PygAnimation([('../img/anims/plusOne/plusOneRed7.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed6.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed5.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed4.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed3.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed2.png', 0.05),
-                                        ('../img/anims/plusOne/plusOneRed1.png', 0.05)])
-    plusOneAnimRed.loop = False
+    plusOneAnimBlue = pyganim.loadAnim('../img/anims/plusOne/blue',0.05)
+    plusOneAnimYellow = pyganim.loadAnim('../img/anims/plusOne/yellow',0.05)
+    plusOneAnimRed = pyganim.loadAnim('../img/anims/plusOne/red',0.05)
     
     plusOneAnim_dict = {'blue':plusOneAnimBlue, 'yellow':plusOneAnimYellow, 'red':plusOneAnimRed}
 
-    exitAnim = pyganim.PygAnimation([('../img/anims/exit/exit0.png', 0.05),
-                                        ('../img/anims/exit/exit6.png', 0.05),
-                                        ('../img/anims/exit/exit5.png', 0.05),
-                                        ('../img/anims/exit/exit4.png', 0.05),
-                                        ('../img/anims/exit/exit3.png', 0.05),
-                                        ('../img/anims/exit/exit2.png', 0.05),
-                                        ('../img/anims/exit/exit1.png', 0.05)])
-    exitAnim.loop = True
+    exitAnim = pyganim.loadAnim('../img/anims/exit', 0.1,True)
     exitAnim.play()
+
+    lightFill = {'fill':255}
 
 def randomColor():
     return random.choice(["blue","red","yellow"])
@@ -119,7 +93,7 @@ def randomColor():
 
 # LAUNCH GAME SCREEN
 def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd):
-    
+
     loadResources()
     level = Level(levelInd)
     gameScreenInit(width,height,space,level.background.get_size()[1])
@@ -127,9 +101,15 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
     retry = False
     frame_number = 0
     anims = []
-
     bgSurface = pygame.Surface(level.background.get_size())
 
+
+    surf_lighting = pygame.Surface(screen.get_size())
+    shad = shadow.Shadow()
+    shad.set_radius(200.0)
+    surf_falloff = pygame.image.load("../img/light_falloff100.png").convert()
+
+    
     # Music load
     pygame.mixer.music.load("../sounds/music.mp3")
     #pygame.mixer.music.play(-1)
@@ -170,76 +150,55 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
         
 
         # player update
-        player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies)
-        
+        player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill)
         # TODO manage death
         if player.lives == 0:
             retry = True
-
+        # level end
         if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((level.exitPos[0] + 20,level.exitPos[1]-20)) < 50:
             retry = True
 
-        # Update platforms
+
+        # Update blocks
         for b in level.blocks:
-            if abs((b.positionY ) - (player.positionY - 58)) < 5 and \
-            b.positionX - 64 + 20 <= player.positionX and \
-            (b.positionX + 100 - 20) >= player.positionX:
-                if b.active == False and b.color in ['red','blue','yellow']:
-                    b.active = True
-                    color_dict[b.color] += 1
-                    anim = plusOneAnim_dict[b.color].getCopy()
-                    anim.play()
-                    anims.append((anim, (b.positionX,640-(camera.state.y + b.positionY + 50))))
-            backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen), (0, b.active*50, 100, 50))
-            
-        
+            b.update(player,color_dict,plusOneAnim_dict,backgroundScreen,camera)
+
         # Update enemies
         for e in enemies:
             e.update(dt, backgroundScreen, camera, player)
-
-        # show anims
-        for anim,pos in anims:
-            if anim.isFinished():
-                anims.remove((anim,pos))
-            else:
-                anim.blit(backgroundScreen, pos)
-
-        # Character anim
-        direction_offset = 32*2+(1*player.direction+1)/2 * 32 * 2
-        if abs(player.target_vx) > 1: #player.grounding['body'] != None and 
-            animation_offset = 32 * 2 *(frame_number / 8 % 4)
-        elif player.grounding['body'] is None:
-            animation_offset = 32*1 * 4
-        else:
-            animation_offset = 32*0
-        posX, posY = player.body.position # +(-16*2*0,-10)
-        backgroundScreen.blit(player.img, to_pygame(camera.apply(Rect(posX ,posY, 0, 0)), backgroundScreen) , (animation_offset, direction_offset, 32*2, 32*2))
         
+        # Shadow
+        shad.set_light_position(to_pygame(camera.apply(Rect(player.positionX + 32, player.positionY - 32, 0, 0)), backgroundScreen))
+        mask,draw_pos = shad.get_mask_and_position(False)
+        mask.blit(surf_falloff,(0,0),special_flags=BLEND_MULT)
+        if frame_number % 10 == 0 and lightFill['fill'] > 0:
+            lightFill['fill'] -= 1
+        surf_lighting.fill((lightFill['fill'],lightFill['fill'],lightFill['fill']))
+        surf_lighting.blit(mask,draw_pos,special_flags=BLEND_MAX)
+        backgroundScreen.blit(surf_lighting,(0,0),special_flags=BLEND_MULT)
+        
+        # exit anim
+        exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
         
         # Display bottom bar
         backgroundScreen.blit(scoreBar, (0,600))
-        
-        
-        # Display color pick ups
         backgroundScreen.blit(font.render(str(color_dict["blue"]), 1, THECOLORS["white"]), (15,605))
         backgroundScreen.blit(nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 30, 50, 30))
         backgroundScreen.blit(font.render(str(color_dict["yellow"]), 1, THECOLORS["white"]), (100,605))
-        backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 3*30, 50, 30))
+        backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 90, 50, 30))
         backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
-        backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 4*30, 50, 30))
-        
-        exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
-
+        backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 120, 50, 30))
         for i in range(player.lives):
             backgroundScreen.blit(lifeHud, (385+i*40,605))
 
         # update camera
-        camera.update((player.positionX, player.body.position.y + 28*2 + 16, 32, 48))
-            
-        # Display objects
+        camera.update((player.positionX, player.body.position.y + 72, 32, 48))
         
-        screen.blit(backgroundScreen,(0,0))
 
+        
+
+        # Display objects
+        screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()
         
         # Update game mechanics
@@ -247,6 +206,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
         space.step(dt)
         clock.tick(fps)
 
+        # quit level ## TODO quit screen, fading...
         if retry:
             space.remove(player.body)
             space.remove(player.hitbox)
@@ -255,5 +215,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
             for e in enemies:
                 space.remove(e.body)
                 space.remove(e.hitbox)
-            running = False
             pygame.mixer.music.stop()
+            running = False
+
+    save([('coins',color_dict)])

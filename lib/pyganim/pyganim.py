@@ -15,7 +15,7 @@
 
 # TODO: Feature idea: if the same image file is specified, re-use the Surface object. (Make this optional though.)
 
-import pygame, time
+import pygame, time, os
 
 # setting up constants
 PLAYING = 'playing'
@@ -844,3 +844,11 @@ def findStartTime(startTimes, target):
             lb = i
         elif startTimes[i] > target:
             ub = i
+
+def loadAnim(dirName,time,loop=False):
+    frames = []
+    for f in sorted(os.listdir(dirName)):
+        frames.append((dirName+'/'+f,time))
+    anim = PygAnimation(frames)
+    anim.loop = loop
+    return anim
