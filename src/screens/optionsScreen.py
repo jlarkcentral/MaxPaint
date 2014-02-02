@@ -24,7 +24,7 @@ from saveUtil import save,load,exist
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("SigmarOne", 44)
-    background = pygame.image.load("../img/backgrounds/optionsScreenBG.png").convert()
+    background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
     musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
@@ -35,7 +35,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     menuEntries = ["Music","Sound","Controls","Back"]
     menuChoice = 0
     activeColor = THECOLORS["black"]
-    inactiveColor = THECOLORS["grey"]
+    inactiveColor = THECOLORS["grey29"]
     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
 
     

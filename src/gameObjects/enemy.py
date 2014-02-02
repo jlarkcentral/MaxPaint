@@ -13,7 +13,7 @@ import pyganim
 
 import pymunk
 from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import draw_space, from_pygame, to_pygame
+from pymunk.pygame_util import from_pygame, to_pygame
 
 from bullet import Bullet
 
@@ -28,18 +28,18 @@ class Enemy(object):
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
-        self.hitbox = pymunk.Circle(self.body, 50, offset=(0,0))#[(0,0),(0,30),(70,160),(130,160),(30,0),(0,0)])
-        self.hitbox.ignore_draw = False
-        self.hitbox.group = 1
-        self.hitbox.friction = 100
-        self.hitbox.layers = 0b1000
-        self.hitbox.collision_type = 1
-        self.img = pygame.image.load("../img/enemies/enemy2_cvs.png")
+        # self.hitbox = pymunk.Circle(self.body, 20, offset=(0,0))#[(0,0),(0,30),(70,160),(130,160),(30,0),(0,0)])
+        # self.hitbox.ignore_draw = False
+        # self.hitbox.group = 1
+        # self.hitbox.friction = 100
+        # self.hitbox.layers = 0b1000
+        # self.hitbox.collision_type = 1
+        self.img = pygame.image.load("../img/enemies/enemy3.png")
         self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
         self.waitDelay = 0
-        self.lives = 3
+        self.lives = 1
         #self.killAnim = pyganim.loadAnim('../img/anims/enemyKill',0.05)
 
         
@@ -66,7 +66,7 @@ class Enemy(object):
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
         return playerHit
 
-    def update(self, dt, backgroundScreen, camera, player):
+    def update(self, dt, backgroundScreen, camera, player, isNight):
         # movement
         destination = self.path[self.path_index]
         current = Vec2d(self.body.position)
@@ -101,7 +101,7 @@ class Enemy(object):
             self.shootingDelay -= 1
 
         # display
-        backgroundScreen.blit(self.img,to_pygame(camera.apply(Rect(self.positionX, self.positionY+18, 0, 0)), backgroundScreen),(0, 64*(3-self.lives), 64, 64))
+        backgroundScreen.blit(self.img,to_pygame(camera.apply(Rect(self.positionX, self.positionY+18, 0, 0)), backgroundScreen), (96*isNight, 64*(1-self.lives), 96, 64))#(0, 64*(3-self.lives), 64, 64))
         
         # bullets
         self.updateBullets(dt, backgroundScreen, camera, player)

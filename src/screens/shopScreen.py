@@ -10,7 +10,7 @@ from pygame.color import *
 
 import pymunk
 from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import draw_space, from_pygame, to_pygame
+from pymunk.pygame_util import from_pygame, to_pygame
 
 sys.path.append('../lib/')
 import pyganim
@@ -32,7 +32,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     fontDesc = pygame.font.SysFont("SigmarOne", 24)
     background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
-    nextColorIcon = pygame.image.load("../img/hud/nextColor23_shop.png")
+    shopBar = pygame.image.load("../img/hud/shopBar.png")
 
     shopSections = ["Blocks","Shield", "Bullets", "Misc"]
     
@@ -72,17 +72,17 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
 
         backgroundScreen.blit(sectionFont.render(shopSections[currentSection], 1, THECOLORS["black"]), (100,50))
         for i in range(len(shopItems[currentSection])):
-            backgroundScreen.blit(font.render(shopItems[currentSection][i][0], 1, inactiveColor), (100,i*50+200))
-            backgroundScreen.blit(nextColorIcon, (620,i*50+200+10), (0, 30, 50, 30))
-            backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][1]), 1, inactiveColor), (600,i*50+200))
-            backgroundScreen.blit(nextColorIcon, (690,i*50+200+10), (0, 90, 50, 30))
-            backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][2]), 1, inactiveColor), (670,i*50+200))
-            backgroundScreen.blit(nextColorIcon, (760,i*50+200+10), (0, 120, 50, 30))
-            backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][3]), 1, inactiveColor), (740,i*50+200))
-        backgroundScreen.blit(font.render(shopItems[currentSection][choice][0], 1, activeColor), (100,choice*50+200))
-        backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][1]), 1, activeColor), (600,choice*50+200))
-        backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][2]), 1, activeColor), (670,choice*50+200))
-        backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][3]), 1, activeColor), (740,choice*50+200))
+            if choice != i:
+                backgroundScreen.blit(font.render(shopItems[currentSection][i][0], 1, inactiveColor), (100,i*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][1]), 1, THECOLORS["blue4"]), (600,i*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][2]), 1, THECOLORS["yellow3"]), (670,i*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][i][3]), 1, THECOLORS["red3"]), (740,i*50+200))
+            else:
+                backgroundScreen.blit(shopBar,(580,choice*50+200))        
+                backgroundScreen.blit(font.render(shopItems[currentSection][choice][0], 1, activeColor), (100,choice*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][1]), 1, THECOLORS["blue"]), (600,choice*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][2]), 1, THECOLORS["yellow"]), (670,choice*50+200))
+                backgroundScreen.blit(fontDesc.render(str(shopItems[currentSection][choice][3]), 1, THECOLORS["red"]), (740,choice*50+200))
 
 
         screen.blit(backgroundScreen,(0,0))

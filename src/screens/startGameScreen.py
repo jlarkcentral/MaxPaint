@@ -13,7 +13,8 @@ import pyganim
 
 sys.path.append('../')
 import game
-from utils import cycle
+from utils import cycle,letterKeys
+from saveUtil import save,load,exist
 
 import mainMenuScreen
 import levelSelectScreen
@@ -26,24 +27,37 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("SigmarOne", 44)
     namefont = pygame.font.SysFont("SigmarOne", 24)
-    background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
+    background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
+    profileBackground = pygame.image.load("../img/backgrounds/gameMenuSelect.png")
 
-    gameBackgrounds = [pygame.image.load("../img/backgrounds/gameMenuSelect.png"), \
-    pygame.image.load("../img/backgrounds/gameMenuNotSelect.png"), \
-    pygame.image.load("../img/backgrounds/gameMenuNotSelect.png") ]
+    profileName = 'New'
+    if exist('profileName'):
+        profileName = load('profileName')
+    profile = []
 
-    gameEntries = ["New","New","New"]
     menuEntries = ["Back","Shop","Start"]
-    gameChoice = 0
     menuChoice = 2
     activeColor = THECOLORS["black"]
-    inactiveColor = THECOLORS["grey"]
-    gameEntriesColors = [activeColor,inactiveColor,inactiveColor]
+    inactiveColor = THECOLORS["grey29"]
     menuEntriesColors = [inactiveColor,inactiveColor,inactiveColor]
+
+    currentMenu = profile
+    nameEntering = False
+    nameEnteringShowing = False
+
+    def get_key():
+        while 1:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    return event.key
+                else:
+                    pass
+
+    current_string = ""
     
-    currentMenu = gameEntries
+
 
     running = True
     frame_number = 0
@@ -51,85 +65,77 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         backgroundScreen.blit(background, (0,0))
         backgroundScreen.blit(infoBar, (0,600))
 
-        if gameChoice == 0:
-            backgroundScreen.blit(font.render(gameEntries[0], 1, gameEntriesColors[0]), (200,100))
-            backgroundScreen.blit(namefont.render(gameEntries[1], 1, gameEntriesColors[1]), (450,100))
-            backgroundScreen.blit(namefont.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
+        if not nameEntering:
+            backgroundScreen.blit(font.render(profileName, 1, THECOLORS["black"]), (330,100))
+        backgroundScreen.blit(profileBackground, (300,100))
 
-            backgroundScreen.blit(gameBackgrounds[0], (100,100))
-            backgroundScreen.blit(gameBackgrounds[1], (400,100))
-            backgroundScreen.blit(gameBackgrounds[2], (550,100))
-
-        elif gameChoice == 1:
-            backgroundScreen.blit(namefont.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
-            backgroundScreen.blit(font.render(gameEntries[1], 1, gameEntriesColors[1]), (350,100))
-            backgroundScreen.blit(namefont.render(gameEntries[2], 1, gameEntriesColors[2]), (600,100))
-
-            backgroundScreen.blit(gameBackgrounds[0], (100,100))
-            backgroundScreen.blit(gameBackgrounds[1], (250,100))
-            backgroundScreen.blit(gameBackgrounds[2], (550,100))
-
-        elif gameChoice == 2:
-            backgroundScreen.blit(namefont.render(gameEntries[0], 1, gameEntriesColors[0]), (150,100))
-            backgroundScreen.blit(namefont.render(gameEntries[1], 1, gameEntriesColors[1]), (300,100))
-            backgroundScreen.blit(font.render(gameEntries[2], 1, gameEntriesColors[2]), (500,100))
-
-            backgroundScreen.blit(gameBackgrounds[0], (100,100))
-            backgroundScreen.blit(gameBackgrounds[1], (250,100))
-            backgroundScreen.blit(gameBackgrounds[2], (400,100))            
-
-        backgroundScreen.blit(font.render(menuEntries[0], 1, menuEntriesColors[0]), (100,500))
-        backgroundScreen.blit(font.render(menuEntries[1], 1, menuEntriesColors[1]), (300,500))
+        backgroundScreen.blit(font.render(menuEntries[0], 1, menuEntriesColors[0]), (50,500))
+        backgroundScreen.blit(font.render(menuEntries[1], 1, menuEntriesColors[1]), (350,500))
         backgroundScreen.blit(font.render(menuEntries[2], 1, menuEntriesColors[2]), (600,500))
+
+        if nameEntering:
+            backgroundScreen.blit(namefont.render(current_string, 1, activeColor), (330,100))
+            if nameEnteringShowing:
+                inkey = get_key()
+                if inkey == K_BACKSPACE:
+                    current_string = current_string[:-1]
+                elif inkey == K_RETURN or inkey == K_KP_ENTER:
+                    profileName = current_string
+                    save([('profileName',profileName)])
+                    nameEntering = False
+                    nameEnteringShowing = False
+                elif inkey in letterKeys:
+                    if len(current_string) < 10:
+                        current_string += chr(inkey)
+            else:
+                nameEnteringShowing = True
+
+        else:
+            if currentMenu == profile:
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                            mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            running = False
+                        if event.key == K_RETURN:
+                            if not exist('profileName'):
+                                nameEntering = True
+                            currentMenu = menuEntries
+                            menuChoice = 2
+                            menuEntriesColors = [inactiveColor,inactiveColor,activeColor]
+                    if event.type == QUIT:
+                        running = False
+
+            elif currentMenu == menuEntries:
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                            mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            running = False
+                        if event.key == K_UP:
+                            currentMenu = profile
+                            menuEntriesColors = [inactiveColor,inactiveColor,inactiveColor]
+                        if event.key == K_LEFT:
+                            menuChoice = cycle("up",menuEntriesColors,menuChoice)
+                        if event.key == K_RIGHT:
+                            menuChoice = cycle("down",menuEntriesColors,menuChoice)
+                        if event.key == K_RETURN:
+                            if menuChoice == 0:
+                                mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                running = False
+                            if menuChoice == 1:
+                                shopScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                running = False
+                            if menuChoice == 2:
+                                levelSelectScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                running = False
+                    if event.type == QUIT:
+                        running = False
+
 
         screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()
         clock.tick(fps)
         frame_number += 1
-
-        if currentMenu == gameEntries:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                        running = False
-                    if event.key == K_RETURN:
-                        currentMenu = menuEntries
-                        menuChoice = 2
-                        menuEntriesColors = [inactiveColor,inactiveColor,activeColor]
-                    if event.key == K_LEFT:
-                        gameChoice = cycle("up",gameEntriesColors,gameChoice)
-                        cycle("up",gameBackgrounds,0)
-                    if event.key == K_RIGHT:
-                        gameChoice = cycle("down",gameEntriesColors,gameChoice)
-                        cycle("down",gameBackgrounds,0)
-                if event.type == QUIT:
-                    running = False
-
-        elif currentMenu == menuEntries:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                        running = False
-                    if event.key == K_UP:
-                        currentMenu = gameEntries
-                        menuEntriesColors = [inactiveColor,inactiveColor,inactiveColor]
-                    if event.key == K_LEFT:
-                        menuChoice = cycle("up",menuEntriesColors,menuChoice)
-                    if event.key == K_RIGHT:
-                        menuChoice = cycle("down",menuEntriesColors,menuChoice)
-                    if event.key == K_RETURN:
-                        if menuChoice == 0:
-                            mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                            running = False
-                        if menuChoice == 1:
-                            shopScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                            running = False
-                        if menuChoice == 2:
-                            levelSelectScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
-                            running = False
-                if event.type == QUIT:
-                    running = False

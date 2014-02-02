@@ -4,8 +4,6 @@ PyGame & PyMunk game test
 
 modified code from platformer example
 
-Main program
-
 """
 
 import sys

@@ -11,6 +11,8 @@ from pygame.color import *
 sys.path.append('../lib/')
 import pyganim
 
+import pgext
+
 sys.path.append('../')
 from utils import cycle
 
@@ -25,20 +27,22 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("SigmarOne", 44)
     infofont = pygame.font.SysFont("SigmarOne", 18)
-    background = pygame.image.load("../img/backgrounds/mainMenuScreenBG.png").convert()
+    background = pygame.image.load("../img/backgrounds/bgMainMenuBW.png")
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen
     menuInfo = ["Start or continue your adventure","Change game and user settings","Exit the game. Goodbye!"]
     menuChoice = 0
     activeColor = THECOLORS["black"]
-    inactiveColor = THECOLORS["grey"]
+    inactiveColor = THECOLORS["grey29"]
     menuColors = [activeColor,inactiveColor,inactiveColor]
 
 
     running = True
     frame_number = 0
+
     while running:
+        backgroundScreen.fill((56,56,56))
         backgroundScreen.blit(background, (0,0))
         backgroundScreen.blit(infoBar, (0,600))
 
@@ -48,10 +52,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         backgroundScreen.blit(font.render(menuEntries[1], 1, menuColors[1]), (200,300))
         backgroundScreen.blit(font.render(menuEntries[2], 1, menuColors[2]), (200,500))
 
-        screen.blit(backgroundScreen,(0,0))
-        pygame.display.flip()
-        clock.tick(fps)
-        frame_number += 1
+        
 
         events = pygame.event.get()
         for event in events:
@@ -61,7 +62,6 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice == 0:
-                        #game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps)
                         startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                         running = False
                     if menuChoice == 1:
@@ -75,3 +75,9 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                     menuChoice = cycle("down",menuColors,menuChoice)
             if event.type == QUIT:
                 running = False
+
+
+        screen.blit(backgroundScreen,(0,0))
+        pygame.display.flip()
+        clock.tick(fps)
+        frame_number += 1

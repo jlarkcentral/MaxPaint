@@ -24,12 +24,10 @@ import startGameScreen
 
 
 
-
-
 def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     
     font = pygame.font.SysFont("SigmarOne", 44)
-    background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
+    background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     levelTitles = ["Tutorial","Green Machine", "Strange Orange", "Purple Trouble"]
@@ -40,10 +38,9 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
     menuEntries = ["Stage 1","Stage 2","Stage 3","Back"]
     
     activeColor = THECOLORS["black"]
-    inactiveColor = THECOLORS["grey"]
+    inactiveColor = THECOLORS["grey29"]
     menuChoice = 0
     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
-
 
     running = True
     frame_number = 0
@@ -58,16 +55,13 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         backgroundScreen.blit(font.render(menuEntries[2], 1, menuColors[2]), (200,300))
         backgroundScreen.blit(font.render(menuEntries[3], 1, menuColors[3]), (200,500))
 
-        screen.blit(backgroundScreen,(0,0))
-        pygame.display.flip()
-        clock.tick(fps)
-        frame_number += 1
+        
 
         events = pygame.event.get()
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice < 3:
@@ -90,3 +84,8 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
             if event.type == QUIT:
                 running = False
+
+        screen.blit(backgroundScreen,(0,0))
+        pygame.display.flip()
+        clock.tick(fps)
+        frame_number += 1

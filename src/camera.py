@@ -17,6 +17,7 @@ class Camera(object):
     def apply(self, rect):
         return rect.move(self.state.topleft)
 
+
     def update(self, rect):
         self.state = self.complex_camera(self.state, rect)
 
