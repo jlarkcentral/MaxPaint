@@ -16,16 +16,16 @@ import pygame
 from pygame.locals import *
 from pygame.color import *
     
-import pymunk
-from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import draw, from_pygame, to_pygame
+# import pymunk
+# from pymunk.vec2d import Vec2d
+# from pymunk.pygame_util import draw, from_pygame, to_pygame
 
 sys.path.append('../lib/pyganim/')
 import pyganim
 sys.path.append('../lib/')
 import PAdLib.shadow as shadow
 
-import pgext
+#import pgext
 
 sys.path.append('gameObjects/')
 from player import Player
@@ -36,26 +36,27 @@ sys.path.append('screens/')
 import pauseScreen
 
 from saveUtil import save,load,exist
+from utils import to_pygame,distance
 
 
 # INITIALIZATION & CONTENT LOADING
-def gameScreenInit(width_,height_,space_,cameraHeight):
+def gameScreenInit(width_,height_,cameraHeight): #space_
     global width
     global height
-    global space
+    # global space
     global camera
 
     width = width_
     height = height_
-    space = space_
+    # space = space_
     camera = Camera(height, width, cameraHeight)
-    static_body = pymunk.Body()
-    static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0),
-                    pymunk.Segment(static_body, (width, 0), (width, height), 0.0)
-                    ]
-    for l in static_lines:
-        l.friction = 0.5
-    space.add(static_lines)
+    # static_body = pymunk.Body()
+    # static_lines = [pymunk.Segment(static_body, (0, 0), (0, height), 0.0),
+    #                 pymunk.Segment(static_body, (width, 0), (width, height), 0.0)
+    #                 ]
+    # for l in static_lines:
+    #     l.friction = 0.5
+    # space.add(static_lines)
 
 
 def loadResources():
@@ -104,11 +105,11 @@ def updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_fa
     backgroundScreen.blit(surf_lighting,(0,0),special_flags=BLEND_MULT)
 
 # LAUNCH GAME SCREEN
-def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd):
+def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd): # space,
 
     loadResources()
-    level = Level(space,backgroundScreen,levelInd)
-    gameScreenInit(width,height,space,level.background.get_size()[1])
+    level = Level(backgroundScreen,levelInd) #space,
+    gameScreenInit(width,height,level.background.get_size()[1]) #space,
     running = True
     retry = False
     frame_number = 0
@@ -128,20 +129,20 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
 
     # Player
     player = Player()
-    space.add(player.body, player.hitbox)
+    #space.add(player.body, player.hitbox)
 
     # Level blocks constrution
     blocksPos = level.blocks
-    for b in level.blocks:
-        space.add(b.hitbox)
+    # for b in level.blocks:
+    #     space.add(b.hitbox)
     
     # Spawning enemies
-    enemies = level.enemies
-    for e in enemies:
-        space.add(e.body)#,e.hitbox)
+    # enemies = level.enemies
+    enemies = []
+    # for e in enemies:
+    #     space.add(e.body)#,e.hitbox)
     
     
-    pixelDelay = 50
 
 
 
@@ -156,7 +157,7 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
                     exit()
                 elif event.type == KEYDOWN:
                     if event.key in [K_p,K_ESCAPE]:    
-                        pauseScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        pauseScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                     elif event.key == K_TAB:
                         retry = True
             
@@ -171,18 +172,18 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
             for b in level.blocks:
                 b.update(player,color_dict,plusOneAnim_dict,backgroundScreen,camera,dt)#,blockimg,False)
             # Update enemies
-            for e in enemies:
-                e.update(dt, backgroundScreen, camera, player,False)
+            # for e in enemies:
+            #     e.update(dt, backgroundScreen, camera, player,False)
             # Shadow
-            updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff)
+            #updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff)
             
             # player update
-            player.update(space, dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill)
+            player.update(dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill) #space, 
             # TODO manage death
             if player.lives == 0:
                 retry = True
             # level end
-            if Vec2d(player.positionX + 32,player.positionY - 32).get_distance((level.exitPos[0] + 20,level.exitPos[1]-20)) < 50:
+            if distance((player.positionX + 32,player.positionY - 32),(level.exitPos[0] + 20,level.exitPos[1]-20)) < 50:
                 retry = True
 
             
@@ -211,25 +212,25 @@ def launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,levelInd)
             
 
         # Display objects
-        draw(backgroundScreen,space)
+        #draw(backgroundScreen,space)
         screen.blit(backgroundScreen,(0,0))
         pygame.display.flip()
         
         # Update game mechanics
         frame_number += 1
-        space.step(dt)
+        #space.step(dt)
         clock.tick(fps)
 
         # quit level ## TODO quit screen, fading...
         if retry:
             # draw background
             backgroundScreen.blit(level.background,to_pygame(camera.apply(Rect(0, level.background.get_size()[1], 0, 0)), backgroundScreen))
-            space.remove(player.body)
-            space.remove(player.hitbox)
-            for b in level.blocks:
-                space.remove(b.hitbox)
-            for e in enemies:
-                space.remove(e.body)
+            # space.remove(player.body)
+            # space.remove(player.hitbox)
+            # for b in level.blocks:
+            #     space.remove(b.hitbox)
+            # for e in enemies:
+            #     space.remove(e.body)
                 #space.remove(e.hitbox)
             #pygame.mixer.music.stop()
 

@@ -11,9 +11,9 @@ from pygame.locals import *
 
 import pyganim
 
-import pymunk
-from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import from_pygame, to_pygame
+# import pymunk
+# from pymunk.vec2d import Vec2d
+# from pymunk.pygame_util import from_pygame, to_pygame
 
 from bullet import Bullet
 

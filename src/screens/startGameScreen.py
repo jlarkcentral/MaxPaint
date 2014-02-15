@@ -13,6 +13,7 @@ import pyganim
 
 sys.path.append('../')
 import game
+import utils
 from utils import cycle,letterKeys
 from saveUtil import save,load,exist
 
@@ -23,10 +24,10 @@ import shopScreen
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    font = pygame.font.SysFont("SigmarOne", 44)
-    namefont = pygame.font.SysFont("SigmarOne", 24)
+    font = utils.getFont('SigmarOne', 44)
+    namefont = utils.getFont('SigmarOne', 24)
     background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -96,7 +97,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 for event in events:
                     if event.type == KEYDOWN:
                         if event.key == K_ESCAPE:
-                            mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                             running = False
                         if event.key == K_RETURN:
                             if not exist('profileName'):
@@ -112,7 +113,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 for event in events:
                     if event.type == KEYDOWN:
                         if event.key == K_ESCAPE:
-                            mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                            mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) # space,
                             running = False
                         if event.key == K_UP:
                             currentMenu = profile
@@ -123,13 +124,13 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                             menuChoice = cycle("down",menuEntriesColors,menuChoice)
                         if event.key == K_RETURN:
                             if menuChoice == 0:
-                                mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #,space
                                 running = False
                             if menuChoice == 1:
-                                shopScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                shopScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                                 running = False
                             if menuChoice == 2:
-                                levelSelectScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                                levelSelectScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) # space
                                 running = False
                     if event.type == QUIT:
                         running = False

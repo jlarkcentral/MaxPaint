@@ -8,7 +8,7 @@ modified code from platformer example
 
 import sys
 import pygame
-import pymunk
+#import pymunk
 sys.path.append('screens/')
 import startScreen
 
@@ -31,8 +31,8 @@ def gameGlobalInit():
     screen = pygame.display.set_mode((width,height))
     backgroundScreen = pygame.Surface(screen.get_size())
     clock = pygame.time.Clock()
-    space = pymunk.Space()
-    space.gravity = 0,-1000
+    #space = pymunk.Space()
+    #space.gravity = 0,-1000
 
 
 #################################################
@@ -40,7 +40,7 @@ def gameGlobalInit():
 
 def main():
     gameGlobalInit()
-    startScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+    startScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #,space
     
 
 

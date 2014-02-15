@@ -12,9 +12,12 @@ import math
 import pygame
 from pygame.locals import *
 
-import pymunk
-from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import to_pygame
+# import pymunk
+# from pymunk.vec2d import Vec2d
+# from pymunk.pygame_util import to_pygame
+
+sys.path.append('../')
+from utils import to_pygame
 
 sys.path.append('../../lib/pyganim/')
 import pyganim
@@ -28,7 +31,7 @@ class Player(object):
 
     def __init__(self):
         
-        # sprites
+        # img
         self.imgNormal = pygame.image.load("../img/player/kube.png")
         self.img = self.imgNormal
         self.imgHitY = pygame.image.load("../img/player/kubeY.png")
@@ -40,32 +43,39 @@ class Player(object):
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
         
+        # anims
         self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.25)
 
         # behavior variables
-        self.PLAYER_VELOCITY = 400
+        self.PLAYER_VELOCITY = 10
         self.PLAYER_GROUND_ACCEL_TIME = 0.05
         self.PLAYER_GROUND_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_GROUND_ACCEL_TIME)
         self.PLAYER_AIR_ACCEL_TIME = 0.25
         self.PLAYER_AIR_ACCEL = (self.PLAYER_VELOCITY/self.PLAYER_AIR_ACCEL_TIME)
-        self.JUMP_HEIGHT = 120
-        self.JUMP_CUTOFF_VELOCITY = 200
+        self.JUMP_HEIGHT = 5
+        self.JUMP_CUTOFF_VELOCITY = -5
         self.FALL_VELOCITY = 500.
         
         # physics variables
-        self.body = pymunk.Body(2000, pymunk.inf)
-        self.body.position = 10,155
-        self.body.velocity = (0.0, 0.0)  
-        self.hitbox = pymunk.Poly(self.body, [(0,0),(0,64),(64,64),(64,0)],(0,0))
-        #self.hitbox.layers = 0b1000
-        self.hitbox.collision_type = 1
-        self.hitbox.friction = 1.
-        self.hitbox.ignore_draw = True
+        # self.body = pymunk.Body(2000, pymunk.inf)
+        self.position = 10,155
+        self.velocity = (0.0, 0.0)  
+        # self.hitbox = pymunk.Poly(self.body, [(0,0),(0,64),(64,64),(64,0)],(0,0))
+        # #self.hitbox.layers = 0b1000
+        # self.hitbox.collision_type = 1
+        # self.hitbox.friction = 1.
+        # self.hitbox.ignore_draw = True
         self.target_vx = 0
         self.direction = 1
-        self.landing = {'p':Vec2d.zero(), 'n':0}
-        self.landed_previous = False
-        self.positionX, self.positionY = self.body.position
+
+        # self.landing = {'p':Vec2d.zero(), 'n':0}
+        # self.landed_previous = False
+        self.positionX, self.positionY = self.position
+        self.rect = Rect(self.positionX, self.positionY, 64, 64)
+        self.rectTop = Rect(self.positionX+2, self.positionY,60,5)
+        self.rectBottom = Rect(self.positionX+2, self.positionY+64,60,5)
+        self.rectLeft = Rect(self.positionX, self.positionY+2,5,60)
+        self.rectRight = Rect(self.positionX+64, self.positionY+2,5,60)
         
         # game variables
         self.bullets = []
@@ -80,6 +90,7 @@ class Player(object):
         self.sunPowering = False
         self.originalLight = 0
 
+        self.well_grounded = False
 
 
     def changeColor(self,color):
@@ -121,12 +132,12 @@ class Player(object):
             backgroundScreen.blit(b.img, to_pygame(camera.apply(Rect(b.positionX, b.positionY, 0, 0)), backgroundScreen))
     
     
-    def shoot(self,space):
+    def shoot(self): #,space
         path = []
         if self.direction == -1:
-            path = [(self.body.position - (0,-20) ),(0, self.positionY+20)]
+            path = [(self.position - (0,-20) ),(0, self.positionY+20)]
         elif self.direction == 1:
-            path = [(self.body.position - (-40,-20)),(800, self.positionY+20)]    
+            path = [(self.position - (-40,-20)),(800, self.positionY+20)]    
         b = Bullet(path, 15, 'red')
         self.bullets.append(b)
         self.shootSound.play()
@@ -137,15 +148,15 @@ class Player(object):
         self.shieldDelay -= 1
     
 
-    def handleKeyboardEvents(self, events, space, color_dict, lightFill):
+    def handleKeyboardEvents(self, events,  color_dict, lightFill): #space,
         for event in events:
             if event.type == KEYDOWN and event.key == K_UP:
-                if self.well_grounded:
-                    jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * abs(space.gravity.y))
-                    self.body.velocity.y = self.ground_velocity.y + jump_v;
+                # if self.well_grounded:
+                jump_v = math.sqrt(2.0 * self.JUMP_HEIGHT * 100) #abs(space.gravity.y))
+                self.velocity = (self.velocity[0], self.ground_velocity[1] + jump_v)
             elif event.type == KEYUP:
                 if event.key == K_UP:              
-                    self.body.velocity.y = min(self.body.velocity.y, self.JUMP_CUTOFF_VELOCITY)
+                    self.velocity = (self.velocity[0], min(self.velocity[1], self.JUMP_CUTOFF_VELOCITY))
                 if event.key == K_SPACE:
                     self.shooting = False
                     
@@ -175,63 +186,73 @@ class Player(object):
             # TODO light sound
             self.originalLight = lightFill['fill']
             lightFill['fill'] = 255
-        self.hitbox.surface_velocity = self.target_vx,0
+
 
 
     
         
         
-    def update(self, space, dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill):
-        self.grounding = {
-            'normal' : Vec2d.zero(),
-            'penetration' : Vec2d.zero(),
-            'impulse' : Vec2d.zero(),
-            'position' : Vec2d.zero(),
-            'body' : None
-        }
+    def update(self,  dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill): # space,
+        # self.grounding = {
+        #     'normal' : Vec2d.zero(),
+        #     'penetration' : Vec2d.zero(),
+        #     'impulse' : Vec2d.zero(),
+        #     'position' : Vec2d.zero(),
+        #     'body' : None
+        # }
 
-        def f(arbiter):
-            n = -arbiter.contacts[0].normal
-            if n.y > self.grounding['normal'].y:
-                self.grounding['normal'] = n
-                self.grounding['penetration'] = -arbiter.contacts[0].distance
-                self.grounding['body'] = arbiter.shapes[1].body
-                self.grounding['impulse'] = arbiter.total_impulse
-                self.grounding['position'] = arbiter.contacts[0].position
-        self.body.each_arbiter(f)
+        # def f(arbiter):
+        #     n = -arbiter.contacts[0].normal
+        #     if n.y > self.grounding['normal'].y:
+        #         self.grounding['normal'] = n
+        #         self.grounding['penetration'] = -arbiter.contacts[0].distance
+        #         self.grounding['body'] = arbiter.shapes[1].body
+        #         self.grounding['impulse'] = arbiter.total_impulse
+        #         self.grounding['position'] = arbiter.contacts[0].position
+        # self.body.each_arbiter(f)
             
-        self.well_grounded = False
-        if self.grounding['body'] != None: #and abs(self.grounding['normal'].x/self.grounding['normal'].y) < self.hitbox.friction:
-            self.well_grounded = True
+        # self.well_grounded = False
+        # if self.grounding['body'] != None: #and abs(self.grounding['normal'].x/self.grounding['normal'].y) < self.hitbox.friction:
+        #     self.well_grounded = True
 
-        self.ground_velocity = Vec2d.zero()
-        if self.well_grounded:
-            self.ground_velocity = self.grounding['body'].velocity
+        print self.rect.topleft
+
+        # keyboard handling
+        self.handleKeyboardEvents(events,  color_dict,lightFill) #space,
+
+        self.ground_velocity = (0,0)
+        # if self.well_grounded:
+        #     self.ground_velocity = self.grounding['body'].velocity
 
         
-        if self.grounding['body'] != None:
-            self.hitbox.friction = -self.PLAYER_GROUND_ACCEL/space.gravity.y
-        else:
-            self.hitbox.friction = 0
+        # if self.grounding['body'] != None:
+        #     self.hitbox.friction = -self.PLAYER_GROUND_ACCEL/space.gravity.y
+        # else:
+        #     self.hitbox.friction = 0
         
-        # Air control
-        if self.grounding['body'] == None:
-            self.body.velocity.x = self.cpflerpconst(self.body.velocity.x, self.target_vx + self.ground_velocity.x, self.PLAYER_AIR_ACCEL*dt)
-        
-        self.body.velocity.y = max(self.body.velocity.y, -self.FALL_VELOCITY) # clamp upwards as well?
-        self.positionX, self.positionY = self.body.position
-     
         if self.positionY < 40:
-            self.body.position = self.positionX, 40
+            self.position = self.positionX, 40
         if self.positionX < 0:
-            self.body.position = 0, self.positionY
+            self.position = 0, self.positionY
         if self.positionX > 770:
-            self.body.position = 770, self.positionY
+            self.position = 770, self.positionY
+
+        # # Air control
+        # if self.grounding['body'] == None:
+        velocityX = self.cpflerpconst(self.velocity[0], self.target_vx + self.ground_velocity[0], self.PLAYER_AIR_ACCEL*dt)
+        
+        velocityY = max(self.velocity[1], -self.FALL_VELOCITY) # clamp upwards as well?
+        self.velocity = (velocityX,velocityY)
+
+        self.position = (self.positionX + velocityX, self.positionY + velocityY)
+
+        self.positionX, self.positionY = self.position
+     
+        
         
         #self.hitbox.update(self.body.position,(0,0))
 
-        # keyboard handling
-        self.handleKeyboardEvents(events, space, color_dict,lightFill)
+        self.rect = Rect(self.positionX,self.positionY,64,64)
 
 
         # powerups update
@@ -245,15 +266,6 @@ class Player(object):
 
 
 
-        if abs(self.grounding['impulse'].y) / self.body.mass > 200 and not self.landed_previous:
-            #sound.play()
-            self.landing = {'p':self.grounding['position'],'n':5}
-            self.landed_previous = True
-        else:
-            self.landed_previous = False
-        if self.landing['n'] > 0:
-            pygame.draw.circle(backgroundScreen, pygame.color.THECOLORS['yellow'], to_pygame(self.landing['p'], backgroundScreen), 5)
-            self.landing['n'] -= 1
 
 
 
@@ -287,8 +299,8 @@ class Player(object):
         direction_offset = 64+(self.direction+1) / 2 * 64
         if abs(self.target_vx) > 1:
             animation_offset = 64 *(frame_number / 8 % 4)
-        elif self.grounding['body'] is None:
-            animation_offset = 128
+        # elif self.grounding['body'] is None:
+        #     animation_offset = 128
         else:
             animation_offset = 0
         

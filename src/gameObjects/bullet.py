@@ -6,8 +6,8 @@ Created on Aug 9, 2013
 
 import pygame
 
-import pymunk
-from pymunk.vec2d import Vec2d
+# import pymunk
+# from pymunk.vec2d import Vec2d
 
 class Bullet(object):
 

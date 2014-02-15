@@ -12,16 +12,17 @@ from pygame.color import *
 sys.path.append('../lib/pyganim')
 import pyganim
 
+import utils
 import mainMenuScreen
 
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    titleFont = pygame.font.SysFont("SigmarOne", 150)
-    enterFont = pygame.font.SysFont("SigmarOne", 40)
-    noteFont = pygame.font.SysFont("SigmarOne", 18)
+    titleFont = utils.getFont('SigmarOne',150)
+    enterFont = utils.getFont('SigmarOne', 40)
+    noteFont = utils.getFont('SigmarOne', 18)
 
     background = pygame.image.load("../img/backgrounds/startScreenBGBW.png")
 
@@ -64,7 +65,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key != K_ESCAPE and enter:
-                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                     running = False
                 elif event.key == K_ESCAPE:
                     running = False
