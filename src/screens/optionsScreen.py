@@ -12,6 +12,7 @@ sys.path.append('../lib/')
 import pyganim
 
 sys.path.append('../')
+import utils
 from utils import cycle
 
 import mainMenuScreen
@@ -21,9 +22,9 @@ from saveUtil import save,load,exist
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    font = pygame.font.SysFont("SigmarOne", 44)
+    font = utils.getFont('SigmarOne', 44)
     background = pygame.image.load("../img/backgrounds/bgOptions.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
@@ -72,12 +73,12 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
                 if event.key == K_ESCAPE:
                     save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
                     running = False
-                    mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                 if event.key == K_RETURN:
                     if menuChoice == 3:
                         save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
                         running = False
-                        mainMenuScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                 if event.key == K_UP:
                     menuChoice = cycle("up",menuColors,menuChoice)
                 if event.key == K_DOWN:

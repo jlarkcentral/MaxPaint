@@ -8,14 +8,15 @@ import pygame
 from pygame.locals import *
 from pygame.color import *
 
-import pymunk
-from pymunk.vec2d import Vec2d
-from pymunk.pygame_util import from_pygame, to_pygame
+# import pymunk
+# from pymunk.vec2d import Vec2d
+# from pymunk.pygame_util import from_pygame, to_pygame
 
 sys.path.append('../lib/')
 import pyganim
 
 sys.path.append('../')
+import utils
 from utils import cycle
 
 import optionsScreen
@@ -25,11 +26,11 @@ import startGameScreen
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    sectionFont = pygame.font.SysFont("SigmarOne", 44)
-    font = pygame.font.SysFont("SigmarOne", 34)
-    fontDesc = pygame.font.SysFont("SigmarOne", 24)
+    sectionFont = utils.getFont('SigmarOne', 44)
+    font = utils.getFont('SigmarOne', 34)
+    fontDesc = utils.getFont('SigmarOne', 24)
     background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
     shopBar = pygame.image.load("../img/hud/shopBar.png")
@@ -94,7 +95,7 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                     running = False
                 if event.key == K_UP:
                     choice = (choice - 1) % len(shopItems[currentSection])

@@ -12,15 +12,16 @@ sys.path.append('../lib/')
 import pyganim
 
 sys.path.append('../')
+import utils
 from utils import cycle
 
 import game
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    font = pygame.font.SysFont("SigmarOne", 24)
+    font = utils.getFont('SigmarOne', 24)
     background = pygame.image.load("../img/backgrounds/pauseBG.png").convert()
     scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 

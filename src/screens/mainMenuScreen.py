@@ -11,9 +11,10 @@ from pygame.color import *
 sys.path.append('../lib/')
 import pyganim
 
-import pgext
+#import pgext
 
 sys.path.append('../')
+import utils
 from utils import cycle
 
 import optionsScreen
@@ -23,10 +24,10 @@ import startScreen
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
-    font = pygame.font.SysFont("SigmarOne", 44)
-    infofont = pygame.font.SysFont("SigmarOne", 18)
+    font = utils.getFont('SigmarOne', 44)
+    infofont = utils.getFont('SigmarOne', 18)
     background = pygame.image.load("../img/backgrounds/bgMainMenuBW.png")
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -58,14 +59,14 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    startScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    startScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #,space
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice == 0:
-                        startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                         running = False
                     if menuChoice == 1:
-                        optionsScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        optionsScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                         running = False
                     if menuChoice == 2:
                         running = False

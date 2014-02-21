@@ -13,6 +13,7 @@ sys.path.append('../../lib/')
 import pyganim
 
 sys.path.append('../')
+import utils
 from utils import cycle
 import game
 
@@ -24,9 +25,9 @@ import startGameScreen
 
 
 
-def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
+def show(width,height,backgroundScreen,dt,screen,clock,fps): # space,
     
-    font = pygame.font.SysFont("SigmarOne", 44)
+    font = utils.getFont('SigmarOne', 44)
     background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
@@ -61,14 +62,14 @@ def show(width,height,space,backgroundScreen,dt,screen,clock,fps):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                    startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                     running = False
                 if event.key == K_RETURN:
                     if menuChoice < 3:
-                        game.launchGame(width,height,space,backgroundScreen,dt,screen,clock,fps,currentLevel*3 + (menuChoice + 1))
+                        game.launchGame(width,height,backgroundScreen,dt,screen,clock,fps,currentLevel*3 + (menuChoice + 1)) # space,
                         #running = False
                     elif menuChoice == 3:
-                        startGameScreen.show(width,height,space,backgroundScreen,dt,screen,clock,fps)
+                        startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) # space,
                         running = False
                 if event.key == K_UP:
                     menuChoice = cycle("up",menuColors,menuChoice)
