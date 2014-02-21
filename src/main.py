@@ -12,7 +12,6 @@ import pymunk
 sys.path.append('screens/')
 import startScreen
 
-
 # Initialization
 def gameGlobalInit():
     global width, height
