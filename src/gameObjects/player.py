@@ -23,7 +23,7 @@ class Player(object):
         self.x_vel = self.y_vel = self.y_vel_i = 0
         self.grav = 20
         self.fall = False
-        self.time = None
+        self.time = 0 # None
         self.image = pygame.image.load("../img/player/kube.png")
         self.speed = 10
         self.jump_power = 10
@@ -32,36 +32,38 @@ class Player(object):
 
         self.collide_ls = [] #what obstacles does the player collide with
 
+        self.landedOnMoving = False
         # powers
         self.sunPowering = False
 
-    def phys_update(self):
+    def phys_update(self,frame_number):
         if self.fall:
-            if not self.time:
-                self.time = pygame.time.get_ticks()
-            self.y_vel = self.grav*((pygame.time.get_ticks()-self.time)/1000.0) + self.y_vel_i
+            # if not self.time:
+            self.time += 2 # frame_number # pygame.time.get_ticks()
+            self.y_vel = self.grav*((self.time)/100.0) + self.y_vel_i
 
         else:
-            self.time = None
+            # self.time = None
+            self.time = 0
             self.y_vel = 0
 
-    def get_pos(self,Obstacles):
+    def get_pos(self,blocks):
         """Calculate where our player will end up this frame including collissions."""
         #Has the player walked off an edge?
-        if not self.fall and not self.collide_with(Obstacles,[0,1]):
+        if not self.fall and not self.collide_with(blocks,[0,1]):
             self.fall = True
         #Has the player landed from a fall or jumped into an object above them?
-        elif self.fall and self.collide_with(Obstacles,[0,int(self.y_vel)]):
+        elif self.fall and self.collide_with(blocks,[0,int(self.y_vel)]):
             self.y_vel = self.adjust_pos(self.collide_ls,[0,int(self.y_vel)],1)
             self.y_vel_i = 0
             self.fall = False
         self.rect.y += int(self.y_vel) #Update y position before testing x.
         #Is the player running into a wall?.
-        if self.collide_with(Obstacles,(int(self.x_vel),0)):
+        if self.collide_with(blocks,(int(self.x_vel),0)):
             self.x_vel = self.adjust_pos(self.collide_ls,[int(self.x_vel),0],0)
         self.rect.x += int(self.x_vel)
     
-    def adjust_pos(self,Obstacles,offset,off_ind):
+    def adjust_pos(self,blocks,offset,off_ind):
         offset[off_ind] += (1 if offset[off_ind]<0 else -1)
         while 1:
             if any(self.collide_with(self.collide_ls,offset)):
@@ -69,21 +71,26 @@ class Player(object):
             else:
                 return offset[off_ind]
 
-    def collide_with(self,Obstacles,offset):
+    def collide_with(self,blocks,offset):
         test = ((self.rect.x+offset[0],self.rect.y+offset[1]),self.rect.size)
         self.collide_ls = []
-        for Obs in Obstacles:
-            if pygame.Rect(test).colliderect(Obs.rect):
-                self.collide_ls.append(Obs)
+        for block in blocks:
+            if pygame.Rect(test).colliderect(block.rect):
+                # if not block.moving:
+                self.collide_ls.append(block)
+                # else :
+                if block.moving:
+                    if block.moving == 1:
+                        self.rect.y = block.rect.y - 60
+                    # if block.moving == -1:
+                        # self.rect.x = block.rect.x
+                    # self.fall = False
         return self.collide_ls
 
-    def update(self,Surf,Obstacles,camera):
+    def update(self,Surf,blocks,camera,frame_number):
         self.controls()
-        self.get_pos(Obstacles)
-        self.phys_update()
-        # Surf.blit(self.image,self.rect,(0,0,64,64))
-        # Surf.blit(self.image, to_pygame(camera.apply(self.rect), Surf) , (0, 0, 64, 64))
-
+        self.get_pos(blocks)
+        self.phys_update(frame_number)
         Surf.blit(self.image, camera.apply(self.rect) , (0, 0, 64, 64))
 
     def controls(self):

@@ -18,7 +18,8 @@ class Level(object):
 		self.enemies = []
 		self.exitPosDict = dict({1:(50,1200),2:(700,1200),3:(400,1250)})
 		self.exitPos = self.exitPosDict[index]
-		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
+		self.background_img = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
+		self.background = pygame.transform.scale(self.background_img, (800, 3200))
 		self.loadLevel(backgroundScreen)
 
 
@@ -52,4 +53,5 @@ class Level(object):
 				for i in range(0,len(mvBlocksTemp)-1,2):
 					path.append((int(mvBlocksTemp[i])*100,int(mvBlocksTemp[i+1])*100))
 				#print(path)
-				self.blocks.append(Block(backgroundScreen,int(mvBlocksTemp[0])*100,int(mvBlocksTemp[1])*100,True,path))
+				moving = 1 if mvBlocksTemp[0] == mvBlocksTemp[2] else -1
+				self.blocks.append(Block(backgroundScreen,int(mvBlocksTemp[0])*100,int(mvBlocksTemp[1])*100,moving,path))

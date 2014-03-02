@@ -17,6 +17,7 @@ def main():
     width, height = 800,640
     fps = 50
     dt = 1./fps
+    
     pygame.init()
     pygame.mixer.init()
     screen = pygame.display.set_mode((width,height))

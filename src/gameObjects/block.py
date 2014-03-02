@@ -15,13 +15,13 @@ import pyganim
 
 class Block(object):
 
-    def __init__(self,  backgroundScreen, startX, startY, moving=False, path=[]):
+    def __init__(self,  backgroundScreen, startX, startY, moving=0, path=[]):
         # self.position = (startX,startY)
         # self.positionX,self.positionY = (startX,startY)
         self.rect = Rect(startX,startY,100,40)
         self.active = False
         self.speed = 1
-        self.moving = moving
+        self.moving = moving # -1 : horizontal , 1 : vertical
         self.path = path
         self.path_index = 0
 

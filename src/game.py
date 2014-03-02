@@ -159,11 +159,11 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             # for e in enemies:
             #     e.update(dt, backgroundScreen, camera, player,False)
             # Shadow
-            updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
+            #updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
             
             # player update
             #player.update(dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill,level.blocks) #space, 
-            player.update(backgroundScreen,level.blocks,camera)
+            player.update(backgroundScreen,level.blocks,camera,frame_number)
             
             # TODO manage death
             # if player.lives == 0:
