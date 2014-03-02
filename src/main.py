@@ -1,6 +1,6 @@
 """
 
-PyGame & PyMunk game test
+PyGame game test
 
 modified code from platformer example
 
@@ -8,20 +8,12 @@ modified code from platformer example
 
 import sys
 import pygame
-#import pymunk
 sys.path.append('screens/')
 import startScreen
 
-# Initialization
-def gameGlobalInit():
-    global width, height
-    global screen
-    global fps
-    global dt
-    global backgroundScreen
-    global clock
-    global space
-    
+
+def main():
+    # init
     width, height = 800,640
     fps = 50
     dt = 1./fps
@@ -30,16 +22,9 @@ def gameGlobalInit():
     screen = pygame.display.set_mode((width,height))
     backgroundScreen = pygame.Surface(screen.get_size())
     clock = pygame.time.Clock()
-    #space = pymunk.Space()
-    #space.gravity = 0,-1000
 
-
-#################################################
-
-
-def main():
-    gameGlobalInit()
-    startScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #,space
+    # start
+    startScreen.show(width,height,backgroundScreen,dt,screen,clock,fps)
     
 
 

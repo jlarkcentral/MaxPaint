@@ -3,6 +3,7 @@ Utils
 '''
 
 import pygame
+import math
 from pygame.locals import *
 
 # cycle through an array, return the new position : should be used in menus
@@ -34,4 +35,7 @@ def to_pygame(p, surface):
     return int(p[0]), surface.get_height()-int(p[1])
 
 def distance(v1,v2):
-    return ((v2[0]-v1[0]),(v2[1]-v1[1]))
+    return math.sqrt( math.pow(v2[0]-v1[0],2) + math.pow(v2[1]-v1[1],2) )
+
+def interpolate(v1, v2, r):
+        return (v1[0] + (v2[0] - v1[0])*r, v1[1] + (v2[1] - v1[1])*r)

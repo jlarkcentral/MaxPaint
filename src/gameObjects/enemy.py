@@ -5,16 +5,9 @@ Created on Aug 8, 2013
 '''
 import sys
 import random
-
 import pygame
 from pygame.locals import *
-
 import pyganim
-
-# import pymunk
-# from pymunk.vec2d import Vec2d
-# from pymunk.pygame_util import from_pygame, to_pygame
-
 from bullet import Bullet
 
 
@@ -28,20 +21,12 @@ class Enemy(object):
         self.body = pymunk.Body(pymunk.inf, pymunk.inf)
         self.body.position = self.path[0]
         self.positionX, self.positionY = self.body.position
-        # self.hitbox = pymunk.Circle(self.body, 20, offset=(0,0))#[(0,0),(0,30),(70,160),(130,160),(30,0),(0,0)])
-        # self.hitbox.ignore_draw = False
-        # self.hitbox.group = 1
-        # self.hitbox.friction = 100
-        # self.hitbox.layers = 0b1000
-        # self.hitbox.collision_type = 1
         self.img = pygame.image.load("../img/enemies/enemy3.png")
         self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
         self.waitDelay = 0
         self.lives = 1
-        #self.killAnim = pyganim.loadAnim('../img/anims/enemyKill',0.05)
-
         
 
     def shootAtTarget(self,targetPosition):
