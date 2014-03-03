@@ -28,7 +28,7 @@ import startGameScreen
 def show(width,height,backgroundScreen,dt,screen,clock,fps): # space,
     
     font = utils.getFont('SigmarOne', 44)
-    background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
+    background = pygame.image.load("../img/backgrounds/transition.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     levelTitles = ["Tutorial","Green Machine", "Strange Orange", "Purple Trouble"]

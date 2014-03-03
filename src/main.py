@@ -11,6 +11,7 @@ import pygame
 sys.path.append('screens/')
 import startScreen
 
+# 10, 17, 23, 30, 37, 43
 
 def main():
     # init
@@ -20,6 +21,8 @@ def main():
     
     pygame.init()
     pygame.mixer.init()
+
+    
     screen = pygame.display.set_mode((width,height))
     backgroundScreen = pygame.Surface(screen.get_size())
     clock = pygame.time.Clock()

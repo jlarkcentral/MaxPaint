@@ -67,7 +67,7 @@ def randomColor():
 
 def updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill):
     # shad.set_light_position(to_pygame(camera.apply(Rect(player.positionX + 32, player.positionY, 0, 0)), backgroundScreen))
-    shad.set_light_position(camera.apply(Rect(player.rect.x + 32, player.rect.y, 0, 0)))
+    shad.set_light_position(camera.apply(Rect(player.rect.x + 30, player.rect.y + 30, 0, 0)))
     mask,draw_pos = shad.get_mask_and_position(False)
     mask.blit(surf_falloff,(0,0),special_flags=BLEND_MULT)
     if frame_number % 10 == 0 and lightFill['fill'] > 0 and not player.sunPowering:
@@ -126,8 +126,8 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
     blocksPos = level.blocks
     
     # Spawning enemies
-    # enemies = level.enemies
-    enemies = []
+    enemies = level.enemies
+    # enemies = []
     
 
 
@@ -136,15 +136,15 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
     while running:
         if not retry:
             # keyboard events
-            events = pygame.event.get()
+            events = pygame.event.get() # try to change to getkeys (-> faster ?)
             for event in events:
                 if event.type == QUIT: 
                     #running = False
                     exit()
                 elif event.type == KEYDOWN:
-                    if event.key in [K_p,K_ESCAPE]:    
-                        pauseScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
-                    elif event.key == K_TAB:
+                    # if event.key in [K_p,K_ESCAPE]:    
+                    #     pauseScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
+                    if event.key == K_TAB:
                         retry = True
             
             # draw background
@@ -156,14 +156,14 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             for b in level.blocks:
                 b.update(player,color_dict,plusOneAnim_dict,backgroundScreen,camera,dt)#,blockimg,False)
             # Update enemies
-            # for e in enemies:
-            #     e.update(dt, backgroundScreen, camera, player,False)
+            for e in enemies:
+                e.update(dt, backgroundScreen, camera, player,False)
             # Shadow
-            #updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
+            # updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
             
             # player update
             #player.update(dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill,level.blocks) #space, 
-            player.update(backgroundScreen,level.blocks,camera,frame_number)
+            player.update(backgroundScreen,level.blocks,camera,dt,enemies,color_dict,frame_number)
             
             # TODO manage death
             # if player.lives == 0:

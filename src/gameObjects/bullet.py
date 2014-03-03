@@ -5,6 +5,7 @@ Created on Aug 9, 2013
 '''
 
 import pygame
+from pygame.locals import *
 from utils import distance,interpolate
 
 class Bullet(object):
@@ -15,14 +16,14 @@ class Bullet(object):
         self.color = color
         self.path = path
         self.path_index = 0
-        self.position = self.path[0]
+        self.rect = Rect(self.path[0],(5,5))
         self.img = pygame.image.load("../img/bullets/bullet_"+color+".png")
         
         
     def update(self, dt):
 
         destination = self.path[self.path_index]
-        current = self.position
+        current = self.rect.topleft
         distance_ = distance(current,destination)
         if distance_ < self.speed:
             self.path_index += 1
@@ -30,7 +31,6 @@ class Bullet(object):
             t = 1        
         else:
             t = self.speed / distance_
-        self.positionX, self.positionY = interpolate(current, destination, t)
-        self.position = self.positionX, self.positionY
-        self.velocity = ((self.position[0] - current[0])/dt, (self.position[1] - current[1])/dt)   
+        self.rect.topleft = interpolate(current, destination, t)
+        self.velocity = ((self.rect.x - current[0])/dt, (self.rect.y - current[1])/dt)   
         

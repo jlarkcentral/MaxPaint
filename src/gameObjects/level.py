@@ -11,7 +11,7 @@ from enemy import Enemy
 
 class Level(object):
 
-	def __init__(self,backgroundScreen,index): #space,
+	def __init__(self,backgroundScreen,index):
 		
 		self.index = index
 		self.blocks = []
@@ -33,18 +33,18 @@ class Level(object):
 				for elem in blocksTemp:
 					currentX = j * 100
 					if elem[0] == '1':
-						self.blocks.append(Block(backgroundScreen,currentX,currentY)) #space,
+						self.blocks.append(Block(backgroundScreen,currentX,currentY))
 					j += 1
 				i -= 1
 
-		# with open('gameObjects/levels/'+str(self.index)+'/enemies') as f:
-		# 	for line in f:
-		# 		enemyTemp = line.split(',')
-		# 		enemyPath = []
-		# 		for i in range(0,len(enemyTemp)-1,2):
-		# 			enemyPath.append((int(enemyTemp[i+1])*100,int(enemyTemp[i])*100 + 40))
-		# 			enemyPath.append((int(enemyTemp[i+1])*100 + 60,int(enemyTemp[i])*100 + 40))
-		# 		self.enemies.append(Enemy([enemyPath[0],enemyPath[-1]],int(enemyTemp[-1])))
+		with open('gameObjects/levels/'+str(self.index)+'/enemies') as f:
+			for line in f:
+				enemyTemp = line.split(',')
+				enemyPath = []
+				for i in range(0,len(enemyTemp)-1,2):
+					enemyPath.append((int(enemyTemp[i+1])*100,int(enemyTemp[i])*100+36))
+					enemyPath.append((int(enemyTemp[i+1])*100 + 60,int(enemyTemp[i])*100+36))
+				self.enemies.append(Enemy([enemyPath[0],enemyPath[-1]],int(enemyTemp[-1])))
 
 		with open('gameObjects/levels/'+str(self.index)+'/movingBlocks') as f:
 			for line in f:

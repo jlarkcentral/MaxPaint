@@ -28,7 +28,7 @@ def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
     font = utils.getFont('SigmarOne', 44)
     namefont = utils.getFont('SigmarOne', 24)
-    background = pygame.image.load("../img/backgrounds/BWbg.png").convert()
+    background = pygame.image.load("../img/backgrounds/transition.png").convert()
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     profileBackground = pygame.image.load("../img/backgrounds/gameMenuSelect.png")

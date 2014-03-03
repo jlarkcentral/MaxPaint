@@ -28,7 +28,7 @@ def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
     
     font = utils.getFont('SigmarOne', 44)
     infofont = utils.getFont('SigmarOne', 18)
-    background = pygame.image.load("../img/backgrounds/bgMainMenuBW.png")
+    background = pygame.image.load("../img/backgrounds/mainMenu.png")
     infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
     menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen

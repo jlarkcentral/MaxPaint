@@ -39,3 +39,12 @@ def distance(v1,v2):
 
 def interpolate(v1, v2, r):
         return (v1[0] + (v2[0] - v1[0])*r, v1[1] + (v2[1] - v1[1])*r)
+
+def vect_add(v1,v2):
+    return (v1[0]+v2[0],v1[1]+v2[1])
+
+def vect_sub(v1,v2):
+    return (v1[0]-v2[0],v1[1]-v2[1])
+
+def vect_mul(v,coeff):
+    return (v[0]*coeff,v[1]*coeff)
