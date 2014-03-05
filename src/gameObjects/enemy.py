@@ -20,7 +20,7 @@ class Enemy(object):
         self.path = path
         self.path_index = 0
         self.rect = Rect(self.path[0],(64,64))
-        self.img = pygame.image.load("../img/enemies/enemy2.png")
+        self.img = pygame.image.load("../img/enemies/enemy.png")
         # self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
@@ -29,23 +29,23 @@ class Enemy(object):
         
 
     def shootAtTarget(self,targetPosition):
-        path = [self.rect.topleft, vect_add(targetPosition,vect_mul(vect_sub(targetPosition, self.rect.topleft),10))]    
-        b = Bullet(path, 5, random.choice(["blue","red","yellow"]))
+        # path = [(self.rect.x+20,self.rect.y+20), vect_add(targetPosition,vect_mul(vect_sub(targetPosition, self.rect.topleft),10))]    
+        direction_raw = vect_sub(targetPosition,self.rect.topleft)
+        direction = vect_mul(direction_raw,1.0/(vect_norm(direction_raw)))
+        b = Bullet((self.rect.x+20,self.rect.y+20),direction, 5, random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
 
 
     def updateBullets(self,dt, backgroundScreen, camera, player):
         for b in self.bullets:
             b.update(dt)
-            if b.rect.x < 0 or b.rect.x > 800 or b.rect.y < 0 or b.rect.y > camera.maxH:
+            if b.outOfScreen:
                 self.bullets.remove(b)
             else:
-                # if distance((player.rect.x + 32,player.rect.y - 32),(b.rect.x + 20,b.rect.y-20)) < 40 :
                 if b.rect.colliderect(player.rect):
                     if player.shieldDelay == 0:
                         # self.hitSound.play()
-                        player.lives -= 1
-                        # player.changeColor(b.color)
+                        player.hitWithColor(b.color)
                     self.bullets.remove(b)
             backgroundScreen.blit(b.img, camera.apply(Rect(b.rect.x, b.rect.y, 0, 0)))
 
@@ -73,9 +73,9 @@ class Enemy(object):
         
 
         # shooting
-        if distance((player.rect.x + 32,player.rect.y - 32),(self.rect.x + 20,self.rect.y-20)) < 300 \
+        if distance(player.rect.center,self.rect.center ) < 300 \
             and self.shootingDelay == 0:
-            self.shootAtTarget((player.rect.x + 32,player.rect.y - 32))
+            self.shootAtTarget(player.rect.center)
             self.shootingDelay = 30
         if self.shootingDelay > 0:
             self.shootingDelay -= 1

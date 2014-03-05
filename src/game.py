@@ -148,10 +148,8 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
                         retry = True
             
             # draw background
-            # backgroundScreen.blit(level.background,to_pygame(camera.apply(Rect(0, level.background.get_size()[1], 0, 0)), backgroundScreen))
             backgroundScreen.blit(level.background,camera.apply(Rect(0, 0, 0, 0)))
-            # backgroundScreen.fill(THECOLORS["white"]) #blit(level.background,(Rect(0, level.background.get_size()[1],800,1280)))
-
+            
             # Update blocks
             for b in level.blocks:
                 b.update(player,color_dict,plusOneAnim_dict,backgroundScreen,camera,dt)#,blockimg,False)
@@ -162,12 +160,11 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             # updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
             
             # player update
-            #player.update(dt, events, color_dict, backgroundScreen, camera, enemies,frame_number,lightFill,level.blocks) #space, 
             player.update(backgroundScreen,level.blocks,camera,dt,enemies,color_dict,frame_number)
             
             # TODO manage death
-            # if player.lives == 0:
-            #     retry = True
+            if player.lives == 0:
+                retry = True
             # level end
             # if distance((player.positionX + 32,player.positionY - 32),(level.exitPos[0] + 20,level.exitPos[1]-20)) < 50:
             #     retry = True
@@ -176,7 +173,7 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
 
 
             # exit anim
-            #exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
+            # exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
             
             # Display bottom bar
             backgroundScreen.blit(scoreBar, (0,600))
@@ -186,8 +183,8 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             backgroundScreen.blit(nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 90, 50, 30))
             backgroundScreen.blit(font.render(str(color_dict["red"]), 1, THECOLORS["white"]), (185,605))
             backgroundScreen.blit(nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 120, 50, 30))
-            # for i in range(player.lives):
-            #     backgroundScreen.blit(lifeHud, (385+i*40,605))
+            for i in range(player.lives):
+                backgroundScreen.blit(lifeHud, (385+i*40,605))
 
             # update camera
             camera.update((player.rect.x, player.rect.y, 0, 0))
@@ -204,7 +201,7 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
         
         # Update game mechanics
         frame_number += 1
-        #space.step(dt)
+        # space.step(dt)
         clock.tick(fps)
 
         # quit level ## TODO quit screen, fading...
@@ -213,7 +210,7 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             # backgroundScreen.blit(level.background,to_pygame(camera.apply(Rect(0, level.background.get_size()[1], 0, 0)), backgroundScreen))
             backgroundScreen.blit(level.background,camera.apply(Rect(0, level.background.get_size()[1], 0, 0)))
             # backgroundScreen.blit(level.background,(Rect(0, level.background.get_size()[1],0,0)))
-            #pygame.mixer.music.stop()
+            # pygame.mixer.music.stop()
 
             time.sleep(1)
             running = False

@@ -11,7 +11,7 @@ import pygame
 sys.path.append('screens/')
 import startScreen
 
-# 10, 17, 23, 30, 37, 43
+
 
 def main():
     # init

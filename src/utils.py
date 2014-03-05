@@ -48,3 +48,6 @@ def vect_sub(v1,v2):
 
 def vect_mul(v,coeff):
     return (v[0]*coeff,v[1]*coeff)
+
+def vect_norm(v):
+    return math.sqrt( math.pow(v[0],2) + math.pow(v[1],2) )
