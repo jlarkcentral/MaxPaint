@@ -7,9 +7,11 @@ import sys
 import random
 import pygame
 from pygame.locals import *
+from pygame.color import *
 import pyganim
 from bullet import Bullet
 from utils import *
+from bulletFragment import *
 
 
 class Enemy(object):
@@ -26,6 +28,8 @@ class Enemy(object):
         self.shootingDelay = 0
         self.waitDelay = 0
         self.lives = 1
+
+        self.bulletFragments = []
         
 
     def shootAtTarget(self,targetPosition):
@@ -36,9 +40,9 @@ class Enemy(object):
         self.bullets.append(b)
 
 
-    def updateBullets(self,dt, backgroundScreen, camera, player):
+    def updateBullets(self,dt, backgroundScreen, camera, player,blocks):
         for b in self.bullets:
-            b.update(dt)
+            b.update(dt,backgroundScreen, camera)
             if b.outOfScreen:
                 self.bullets.remove(b)
             else:
@@ -46,10 +50,22 @@ class Enemy(object):
                     if player.shieldDelay == 0:
                         # self.hitSound.play()
                         player.hitWithColor(b.color)
+                    for _ in range(random.randint(3,15)):
+                        self.bulletFragments.append(BulletFragment(b.rect.center,THECOLORS[b.color]))
                     self.bullets.remove(b)
-            backgroundScreen.blit(b.img, camera.apply(Rect(b.rect.x, b.rect.y, 0, 0)))
+                else:
+                    for block in blocks:
+                        if b.rect.colliderect(block.rect):
+                            for _ in range(random.randint(3,15)):
+                                self.bulletFragments.append(BulletFragment(b.rect.center,THECOLORS[b.color]))
+                            self.bullets.remove(b)
+                            break
+        for bf in self.bulletFragments:
+            bf.update(backgroundScreen, camera)
+            if bf.kill:
+                self.bulletFragments.remove(bf)
 
-    def update(self, dt, backgroundScreen, camera, player, isNight):
+    def update(self, dt, backgroundScreen, camera, player, blocks):
         # movement
         destination = self.path[self.path_index]
         current = self.rect.topleft
@@ -80,9 +96,13 @@ class Enemy(object):
         if self.shootingDelay > 0:
             self.shootingDelay -= 1
 
+
+
+        # bullets
+        self.updateBullets(dt, backgroundScreen, camera, player,blocks)
+
+
         # display
         backgroundScreen.blit(self.img, camera.apply(Rect(self.rect.x, self.rect.y, 0, 0)), (0, 64*0*(3-self.lives), 64, 64))
         
-        # bullets
-        self.updateBullets(dt, backgroundScreen, camera, player)
 

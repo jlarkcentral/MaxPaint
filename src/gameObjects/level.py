@@ -25,7 +25,7 @@ class Level(object):
 
 	def loadLevel(self,backgroundScreen):
 		with open('gameObjects/levels/'+str(self.index)+'/staticblocks') as f:
-			i = 31
+			i = 1
 			for line in f:
 				blocksTemp = line.split(',')
 				currentY = i * 100
@@ -35,7 +35,7 @@ class Level(object):
 					if elem[0] == '1':
 						self.blocks.append(Block(backgroundScreen,currentX,currentY))
 					j += 1
-				i -= 1
+				i += 1
 
 		with open('gameObjects/levels/'+str(self.index)+'/enemies') as f:
 			for line in f:

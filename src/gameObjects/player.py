@@ -33,7 +33,7 @@ class Player(object):
         self.speed = 10
         self.jump_power = 10
         self.rect = Rect(0, 0, 60, 60)
-        self.rect.topleft = (150,350)
+        self.rect.topleft = (150,3000)
         self.collide_ls = [] #what obstacles does the player collide with
         self.direction = 1
         self.direction_offset = 0
@@ -55,6 +55,7 @@ class Player(object):
         self.sunPowering = False
         self.originalLight = 0
 
+
         # pics, anims and sound
         self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.25)
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
@@ -65,6 +66,8 @@ class Player(object):
         self.imgHitY = pygame.image.load("../img/player/kubeY.png")
         self.imgHitB = pygame.image.load("../img/player/kubeB.png")
         self.imgHitR = pygame.image.load("../img/player/kubeR.png")
+
+        self.bulletFragments = []
 
 
 
@@ -165,9 +168,10 @@ class Player(object):
         self.shields = color_dict["blue"]
         self.sunPower = color_dict["yellow"]
 
-    def bulletsUpdate(self,dt, backgroundScreen, camera, enemies):
+    def bulletsUpdate(self,dt, backgroundScreen, camera, enemies, blocks):
         for b in self.bullets:
-            b.update(dt)
+            b_hit = False
+            b.update(dt,backgroundScreen, camera)
             if b.outOfScreen:
                 self.bullets.remove(b)
             else:
@@ -179,7 +183,13 @@ class Player(object):
                             e.lives -= 1
                         self.bullets.remove(b)
                         # self.hitSound.play()
-            backgroundScreen.blit(b.img, camera.apply(Rect(b.rect.x, b.rect.y, 0, 0)))
+                        b_hit = True
+                        break
+                if not b_hit:
+                    for block in blocks:
+                        if b.rect.colliderect(block.rect):
+                            self.bullets.remove(b)
+                            break
     
     
     def shoot(self):
@@ -246,7 +256,7 @@ class Player(object):
         self.positionUpdate(blocks)
         self.physicsUpdate()
         self.powerUpsUpdate(color_dict)
-        self.bulletsUpdate(dt, Surf, camera, enemies)
+        self.bulletsUpdate(dt, Surf, camera, enemies, blocks)
         self.shieldUpdate(Surf,camera)
         self.colorUpdate()
         self.animationUpdate(frame_number)

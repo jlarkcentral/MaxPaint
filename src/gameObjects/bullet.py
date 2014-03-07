@@ -15,12 +15,14 @@ class Bullet(object):
         self.speed = speed
         self.color = color
         self.direction = direction
-        self.rect = Rect(startPosition,(5,5))
+        self.rect = Rect(startPosition,(30,30))
         self.img = pygame.image.load("../img/bullets/bullet_"+color+".png")
         self.outOfScreen = False
+
+
         
-        
-    def update(self, dt):
+    def update(self, dt, backgroundScreen, camera):
         self.rect.topleft = vect_add(self.rect.topleft,vect_mul(self.direction,self.speed))
         if self.rect.x < 0 or self.rect.x > 800 or self.rect.y < 0 or self.rect.y > 3200:
             self.outOfScreen = True
+        backgroundScreen.blit(self.img, camera.apply(Rect(self.rect.x, self.rect.y, 0, 0)))

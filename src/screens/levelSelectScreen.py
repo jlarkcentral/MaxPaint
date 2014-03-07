@@ -71,18 +71,18 @@ def show(width,height,backgroundScreen,dt,screen,clock,fps): # space,
                     elif menuChoice == 3:
                         startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) # space,
                         running = False
-                if event.key == K_UP:
-                    menuChoice = cycle("up",menuColors,menuChoice)
-                if event.key == K_DOWN:
-                    menuChoice = cycle("down",menuColors,menuChoice)
-                if event.key == K_LEFT:
-                    currentLevel = (currentLevel - 1) % len(levelTitles)
-                    menuChoice = 0
-                    menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
-                if event.key == K_RIGHT:
-                    currentLevel = (currentLevel + 1) % len(levelTitles)
-                    menuChoice = 0
-                    menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
+                # if event.key == K_UP:
+                #     menuChoice = cycle("up",menuColors,menuChoice)
+                # if event.key == K_DOWN:
+                #     menuChoice = cycle("down",menuColors,menuChoice)
+                # if event.key == K_LEFT:
+                #     currentLevel = (currentLevel - 1) % len(levelTitles)
+                #     menuChoice = 0
+                #     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
+                # if event.key == K_RIGHT:
+                #     currentLevel = (currentLevel + 1) % len(levelTitles)
+                #     menuChoice = 0
+                #     menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
             if event.type == QUIT:
                 running = False
 

@@ -131,7 +131,6 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
     
 
 
-
     # GAME LOOP
     while running:
         if not retry:
@@ -155,7 +154,7 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
                 b.update(player,color_dict,plusOneAnim_dict,backgroundScreen,camera,dt)#,blockimg,False)
             # Update enemies
             for e in enemies:
-                e.update(dt, backgroundScreen, camera, player,False)
+                e.update(dt, backgroundScreen, camera, player, level.blocks)
             # Shadow
             # updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
             
@@ -175,6 +174,10 @@ def launchGame(width,height,backgroundScreen,dt,screen,clock,fps,levelInd):
             # exit anim
             # exitAnim.blit(backgroundScreen,to_pygame(camera.apply(Rect(level.exitPos[0], level.exitPos[1], 0, 0)), backgroundScreen))
             
+
+
+
+
             # Display bottom bar
             backgroundScreen.blit(scoreBar, (0,600))
             backgroundScreen.blit(font.render(str(color_dict["blue"]), 1, THECOLORS["white"]), (15,605))
