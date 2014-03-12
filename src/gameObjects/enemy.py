@@ -3,21 +3,21 @@ Created on Aug 8, 2013
 
 @author: primo
 '''
-import sys
+
 import random
 import pygame
-from pygame.locals import *
-from pygame.color import *
-import pyganim
+from pygame.locals import Rect
+from pygame.color import THECOLORS
 from bullet import Bullet
-from utils import *
-from bulletFragment import *
+from utils import vect_sub,vect_mul,vect_norm, distance, interpolate
+from fragment import Fragment
+from gameObject_ import GameObject_
 
 
-class Enemy(object):
+class Enemy(GameObject_):
 
     def __init__(self, path, speed):
-                
+        super(Enemy, self).__init__()
         self.speed = speed
         self.path = path
         self.path_index = 0
@@ -40,9 +40,9 @@ class Enemy(object):
         self.bullets.append(b)
 
 
-    def updateBullets(self,dt, backgroundScreen, camera, player,blocks):
+    def updateBullets(self, player,blocks):
         for b in self.bullets:
-            b.update(dt,backgroundScreen, camera)
+            b.update()
             if b.outOfScreen:
                 self.bullets.remove(b)
             else:
@@ -51,21 +51,31 @@ class Enemy(object):
                         # self.hitSound.play()
                         player.hitWithColor(b.color)
                     for _ in range(random.randint(3,15)):
-                        self.bulletFragments.append(BulletFragment(b.rect.center,THECOLORS[b.color]))
+                        self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                     self.bullets.remove(b)
                 else:
                     for block in blocks:
                         if b.rect.colliderect(block.rect):
                             for _ in range(random.randint(3,15)):
-                                self.bulletFragments.append(BulletFragment(b.rect.center,THECOLORS[b.color]))
+                                self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                             self.bullets.remove(b)
                             break
+    
+    def bulletFragmentsUpdate(self):
         for bf in self.bulletFragments:
-            bf.update(backgroundScreen, camera)
+            bf.update()
             if bf.kill:
                 self.bulletFragments.remove(bf)
 
-    def update(self, dt, backgroundScreen, camera, player, blocks):
+    def renderBullets(self, displaySurface, camera):
+        for b in self.bullets:
+            b.render(displaySurface, camera)
+
+    def renderBulletFragments(self, displaySurface, camera):
+        for bf in self.bulletFragments:
+            bf.render(displaySurface,camera)
+
+    def update(self, player, blocks):
         # movement
         destination = self.path[self.path_index]
         current = self.rect.topleft
@@ -99,10 +109,13 @@ class Enemy(object):
 
 
         # bullets
-        self.updateBullets(dt, backgroundScreen, camera, player,blocks)
+        self.updateBullets( player,blocks)
+
+        self.bulletFragmentsUpdate()
 
 
-        # display
-        backgroundScreen.blit(self.img, camera.apply(Rect(self.rect.x, self.rect.y, 0, 0)), (0, 64*0*(3-self.lives), 64, 64))
-        
+    def render(self, displaySurface,camera):
+        displaySurface.blit(self.img, camera.apply(Rect(self.rect.x, self.rect.y, 0, 0)), (0, 64*0*(3-self.lives), 64, 64))
+        self.renderBullets(displaySurface,camera)
+        self.renderBulletFragments(displaySurface, camera)
 

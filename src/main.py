@@ -9,27 +9,27 @@ modified code from platformer example
 import sys
 import pygame
 sys.path.append('screens/')
-import startScreen
-
+from screenManager import ScreenManager
 
 
 def main():
-    # init
     width, height = 800,640
     fps = 50
-    dt = 1./fps
-    
     pygame.init()
     pygame.mixer.init()
-
-    
-    screen = pygame.display.set_mode((width,height))
-    backgroundScreen = pygame.Surface(screen.get_size())
+    display = pygame.display.set_mode((width,height))
     clock = pygame.time.Clock()
+    manager = ScreenManager()
+    running = True
 
-    # start
-    startScreen.show(width,height,backgroundScreen,dt,screen,clock,fps)
-    
+    while running:
+        if pygame.event.get(pygame.QUIT):
+            running = False
+        manager.screen.handle_events(pygame.event.get())
+        manager.screen.update()
+        manager.screen.render(display)
+        pygame.display.flip()
+        clock.tick(fps)
 
 
 if __name__ == '__main__':

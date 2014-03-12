@@ -3,52 +3,38 @@ StartScreen
 '''
 
 import sys
-import random
-
 import pygame
-from pygame.locals import *
-from pygame.color import *
-    
-sys.path.append('../lib/pyganim')
-import pyganim
-
+from pygame import KEYDOWN,K_ESCAPE
+sys.path.append('../')
 import utils
-import mainMenuScreen
+from screen_ import Screen_
 
+class StartScreen(Screen_):
 
+    def __init__(self):
+        super(StartScreen, self).__init__()
+        self.enterFont = utils.getFont('SigmarOne', 40)
+        self.background = pygame.image.load("../img/backgrounds/title.png").convert()
+        self.running = True
+        self.enterColors = (235,246,242)
+        self.frameNumber = 0
+        self.fade = 1
 
-
-def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
-    enterFont = utils.getFont('SigmarOne', 40)
-    background = pygame.image.load("../img/backgrounds/title.png").convert()
-    running = True
-    enterColors = (235,246,242)
-    frameNumber = 0
-    fade = 1
-    
-
-    while running:
-        
-        backgroundScreen.blit(background, (0,0))
-
-        backgroundScreen.blit(enterFont.render("Press any key",1,enterColors),(200,400))           
-        if frameNumber % 200 != 0:
-            enterColors = tuple(map(sum, zip((fade, fade, fade), enterColors)))
+    def update(self):        
+        if self.frameNumber % 200 != 0:
+            self.enterColors = tuple(map(sum, zip((self.fade, self.fade, self.fade), self.enterColors)))
         else:
-            fade *= -1
+            self.fade *= -1
+            self.frameNumber = 0
+        self.frameNumber += 1
+        
 
-        events = pygame.event.get()
+    def render(self,displaySurface):
+        displaySurface.blit(self.background, (0,0))
+        displaySurface.blit(self.enterFont.render("Press any key",1,self.enterColors),(200,400))
+
+    def handle_events(self, events):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key != K_ESCAPE:
-                    mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
-                    running = False
-                elif event.key == K_ESCAPE:
-                    running = False
-            if event.type == QUIT:
-                running = False
-
-        screen.blit(backgroundScreen,(0,0))
-        pygame.display.flip()
-        clock.tick(fps)
-        frameNumber += 1
+                    self.manager.go_to('mainMenuScreen')

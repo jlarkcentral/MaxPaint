@@ -11,20 +11,21 @@ python-forum.org/viewtopic.php?f=26&t=1889
 '''
 
 import sys
-import math
+import random
 import pygame
-from pygame.locals import *
-sys.path.append('../')
-from utils import to_pygame
+from pygame.locals import Rect
+from pygame.color import THECOLORS
 sys.path.append('../../lib/pyganim/')
 import pyganim
 from bullet import Bullet
+from gameObject_ import GameObject_
+from fragment import Fragment
 
     
 
-class Player(object):
-    """Class representing our player."""
+class Player(GameObject_):
     def __init__(self):
+        super(Player, self).__init__()
         # physics properties
         self.x_vel = self.y_vel = self.y_vel_i = 0
         self.grav = 20
@@ -66,7 +67,6 @@ class Player(object):
         self.imgHitY = pygame.image.load("../img/player/kubeY.png")
         self.imgHitB = pygame.image.load("../img/player/kubeB.png")
         self.imgHitR = pygame.image.load("../img/player/kubeR.png")
-
         self.bulletFragments = []
 
 
@@ -144,34 +144,38 @@ class Player(object):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.x_vel -= self.speed
             self.direction = -1
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.x_vel += self.speed
             self.direction = 1
         if keys[pygame.K_SPACE]:
             self.y_vel_i = -self.jump_power
             self.fall = True
-        if keys[pygame.K_LCTRL]:
-            if not self.shooting:
+        elif keys[pygame.K_LCTRL]:
+            if not self.shooting and self.shots > 0:
+                self.shots -= 1
                 self.shoot()
                 self.shooting = True
+            # else shoot icon blink; warn sound
         elif not keys[pygame.K_LCTRL]:
             self.shooting = False
         if keys[pygame.K_LSHIFT]:
-            if self.shieldDelay == 0:
+            if self.shieldDelay == 0 and self.shields > 4:
+                self.shields -= 5
                 self.shieldAnim.play()
                 self.shieldDelay = 120
 
+    def addPowerUp(self,color):
+        if color == "red":
+            self.shots += 1
+        if color == "blue":
+            self.shields += 1
+        if color == "yellow":
+            self.sunPower += 1
 
-
-    def powerUpsUpdate(self,color_dict):
-        self.shots = color_dict["red"]
-        self.shields = color_dict["blue"]
-        self.sunPower = color_dict["yellow"]
-
-    def bulletsUpdate(self,dt, backgroundScreen, camera, enemies, blocks):
+    def bulletsUpdate(self, enemies, blocks):
         for b in self.bullets:
             b_hit = False
-            b.update(dt,backgroundScreen, camera)
+            b.update()
             if b.outOfScreen:
                 self.bullets.remove(b)
             else:
@@ -188,10 +192,17 @@ class Player(object):
                 if not b_hit:
                     for block in blocks:
                         if b.rect.colliderect(block.rect):
+                            for _ in range(random.randint(3,15)):
+                                self.bulletFragments.append(Fragment(b.rect.center,THECOLORS['red']))
                             self.bullets.remove(b)
                             break
     
-    
+    def bulletFragmentsUpdate(self):
+        for bf in self.bulletFragments:
+            bf.update()
+            if bf.kill:
+                self.bulletFragments.remove(bf)
+
     def shoot(self):
         startpos = (self.rect.x, self.rect.y + 20)
         direction = (-1, 0)
@@ -202,13 +213,9 @@ class Player(object):
         self.bullets.append(b)
         # self.shootSound.play()
 
-    def shield(self, backgroundScreen, camera):
-        self.shieldAnim.blit(backgroundScreen, camera.apply(Rect(self.rect.x -20, self.rect.y-15, 0, 0)))
-        self.shieldDelay -= 1
-
-    def shieldUpdate(self, backgroundScreen, camera):
+    def shieldUpdate(self):
         if self.shieldDelay > 0:
-            self.shield(backgroundScreen, camera)
+            self.shieldDelay -= 1
 
     def changeColor(self,color):
         if color == 'yellow':
@@ -236,36 +243,30 @@ class Player(object):
         self.direction_offset = self.spidering*128 + (self.direction==-1) * 64
         if abs(self.x_vel) > 1:
             self.animation_offset = 64 *int(self.animationTicks / 8 % 4)
-        elif self.fall:
+        elif self.fall and not self.spidering:
             self.animation_offset = 128
         else:
             self.animation_offset = 0
         if self.animationTicks == 32:
             self.animationTicks = 0
         else:
-            self.animationTicks += 1 
+            self.animationTicks += 1
 
-
-
-
-
-
-
-    def update(self,Surf,blocks,camera,dt,enemies, color_dict,frame_number):
+    def update(self, blocks,enemies,frame_number):
         self.controlsUpdate()
         self.positionUpdate(blocks)
         self.physicsUpdate()
-        self.powerUpsUpdate(color_dict)
-        self.bulletsUpdate(dt, Surf, camera, enemies, blocks)
-        self.shieldUpdate(Surf,camera)
+        self.bulletsUpdate(enemies, blocks)
+        self.bulletFragmentsUpdate()
+        self.shieldUpdate()
         self.colorUpdate()
         self.animationUpdate(frame_number)
 
-        Surf.blit(self.img, camera.apply(self.rect) , (self.animation_offset, self.direction_offset, 64, 64))
-
-
-
-#         if self.sunPowering and lightFill['fill'] > self.originalLight:
-#             lightFill['fill'] = max(0,lightFill['fill'] - 1)
-#         else:
-#             self.sunPowering = False
+    def render(self, displaySurface,camera):
+        displaySurface.blit(self.img, camera.apply(self.rect) , (self.animation_offset, self.direction_offset, 64, 64))
+        if self.shieldDelay > 0:
+            self.shieldAnim.blit(displaySurface, camera.apply(Rect(self.rect.x -20, self.rect.y-15, 0, 0)))
+        for b in self.bullets:
+            b.render(displaySurface,camera)
+        for bf in self.bulletFragments:
+            bf.render(displaySurface,camera)

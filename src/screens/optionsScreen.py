@@ -7,102 +7,87 @@ import sys
 import pygame
 from pygame.locals import *
 from pygame.color import *
+from screen_ import Screen_
     
 sys.path.append('../lib/')
 import pyganim
 
 sys.path.append('../')
 import utils
-from utils import cycle
-
-import mainMenuScreen
-from saveUtil import save,load,exist
+from utils import cycle,save,load,exist
 
 
-
-
-
-def show(width,height,backgroundScreen,dt,screen,clock,fps): #space,
+class OptionsScreen(Screen_):
+    def __init__(self):
+        super(OptionsScreen, self).__init__()
     
-    font = utils.getFont('SigmarOne', 44)
-    background = pygame.image.load("../img/backgrounds/options.png").convert()
-    infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
-    soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
-    musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
-    
-    volumeTest = pygame.mixer.Sound("../sounds/volumeTest.wav")
+        self.font = utils.getFont('SigmarOne', 44)
+        self.background = pygame.image.load("../img/backgrounds/options.png").convert()
+        self.infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
+        self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
+        self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
+        self.volumeTest = pygame.mixer.Sound("../sounds/volumeTest.wav")
+        self.menuEntries = ["Music","Sound","Controls","Back"]
+        self.menuChoice = 0
+        self.activeColor = THECOLORS["black"]
+        self.inactiveColor = THECOLORS["grey29"]
+        self.menuColors = [self.activeColor,self.inactiveColor,self.inactiveColor,self.inactiveColor]
+        self.soundLevel = 0
+        if exist('soundLevel'):
+            self.soundLevel = load('soundLevel')
+        self.musicLevel = 0
+        if exist('musicLevel'):
+           self.musicLevel = load('musicLevel')
 
 
-    menuEntries = ["Music","Sound","Controls","Back"]
-    menuChoice = 0
-    activeColor = THECOLORS["black"]
-    inactiveColor = THECOLORS["grey29"]
-    menuColors = [activeColor,inactiveColor,inactiveColor,inactiveColor]
 
-    
-    soundLevel = 0
-    if exist('soundLevel'):
-        soundLevel = load('soundLevel')
-    
-    musicLevel = 0
-    if exist('musicLevel'):
-        musicLevel = load('musicLevel')
+    def render(self, backgroundScreen):
+        backgroundScreen.blit(self.background, (0,0))
+        backgroundScreen.blit(self.infoBar, (0,600))
+        backgroundScreen.blit(self.font.render(self.menuEntries[0], 1, self.menuColors[0]), (200,100))
+        backgroundScreen.blit(self.font.render(self.menuEntries[1], 1, self.menuColors[1]), (200,200))
+        backgroundScreen.blit(self.font.render(self.menuEntries[2], 1, self.menuColors[2]), (200,300))
+        backgroundScreen.blit(self.font.render(self.menuEntries[3], 1, self.menuColors[3]), (200,500))
+        backgroundScreen.blit(self.soundBar, (400,120), (0, self.soundLevel*30, 190, 30))
+        backgroundScreen.blit(self.musicBar, (400,220), (0, self.musicLevel*30, 190, 30))        
 
-    running = True
-    frame_number = 0
-    while running:
-        backgroundScreen.blit(background, (0,0))
-        backgroundScreen.blit(infoBar, (0,600))
 
-        backgroundScreen.blit(font.render(menuEntries[0], 1, menuColors[0]), (200,100))
-        backgroundScreen.blit(font.render(menuEntries[1], 1, menuColors[1]), (200,200))
-        backgroundScreen.blit(font.render(menuEntries[2], 1, menuColors[2]), (200,300))
-        backgroundScreen.blit(font.render(menuEntries[3], 1, menuColors[3]), (200,500))
-        
-        backgroundScreen.blit(soundBar, (400,120), (0, soundLevel*30, 190, 30))
-        backgroundScreen.blit(musicBar, (400,220), (0, musicLevel*30, 190, 30))        
-
-        screen.blit(backgroundScreen,(0,0))
-        pygame.display.flip()
-        clock.tick(fps)
-        frame_number += 1
-
-        events = pygame.event.get()
+      
+    def handle_events(self, events):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
-                    running = False
-                    mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
+                    save([('soundLevel',self.soundLevel),('musicLevel',self.musicLevel)])
+                    # mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
+                    self.manager.go_to('mainMenuScreen')
                 if event.key == K_RETURN:
-                    if menuChoice == 3:
-                        save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
-                        running = False
-                        mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
+                    if self.menuChoice == 3:
+                        save([('soundLevel',self.soundLevel),('musicLevel',self.musicLevel)])
+                        self.manager.go_to('mainMenuScreen')
+                        # mainMenuScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                 if event.key == K_UP:
-                    menuChoice = cycle("up",menuColors,menuChoice)
+                    self.menuChoice = cycle("up",self.menuColors,self.menuChoice)
                 if event.key == K_DOWN:
-                    menuChoice = cycle("down",menuColors,menuChoice)
+                    self.menuChoice = cycle("down",self.menuColors,self.menuChoice)
                 if event.key == K_LEFT:
-                    if menuChoice == 0:
-                        soundLevel = max(0,soundLevel-1)
-                        volumeTest.set_volume(soundLevel*0.2)
-                        volumeTest.play()
-                    if menuChoice == 1:
-                        musicLevel = max(0,musicLevel-1)
-                        pygame.mixer.music.set_volume(musicLevel*0.2)
-                        volumeTest.set_volume(musicLevel*0.2)
-                        volumeTest.play()
+                    if self.menuChoice == 0:
+                        self.soundLevel = max(0,self.soundLevel-1)
+                        self.volumeTest.set_volume(self.soundLevel*0.2)
+                        self.volumeTest.play()
+                    if self.menuChoice == 1:
+                        self.musicLevel = max(0,self.musicLevel-1)
+                        pygame.mixer.music.set_volume(self.musicLevel*0.2)
+                        self.volumeTest.set_volume(self.musicLevel*0.2)
+                        self.volumeTest.play()
                 if event.key == K_RIGHT:
-                    if menuChoice == 0:
-                        soundLevel = min(5,soundLevel+1)
-                        volumeTest.set_volume(soundLevel*0.2)
-                        volumeTest.play()
-                    if menuChoice == 1:
-                        musicLevel = min(5,musicLevel+1)
-                        pygame.mixer.music.set_volume(musicLevel*0.2)
-                        volumeTest.set_volume(musicLevel*0.2)
-                        volumeTest.play()
+                    if self.menuChoice == 0:
+                        self.soundLevel = min(5,self.soundLevel+1)
+                        self.volumeTest.set_volume(self.soundLevel*0.2)
+                        self.volumeTest.play()
+                    if self.menuChoice == 1:
+                        self.musicLevel = min(5,self.musicLevel+1)
+                        pygame.mixer.music.set_volume(self.musicLevel*0.2)
+                        self.volumeTest.set_volume(self.musicLevel*0.2)
+                        self.volumeTest.play()
             if event.type == QUIT:
-                save([('soundLevel',soundLevel),('musicLevel',musicLevel)])
-                running = False
+                save([('soundLevel',self.soundLevel),('musicLevel',self.musicLevel)])

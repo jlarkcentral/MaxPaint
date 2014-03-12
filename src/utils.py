@@ -1,10 +1,35 @@
 '''
 Utils
 '''
-
+import sys
 import pygame
 import math
-from pygame.locals import *
+import random
+import shelve
+sys.path.append('../lib/pyganim/')
+import pyganim
+
+
+plusOneAnimBlue = pyganim.loadAnim('../img/anims/plusOne/blue',0.05)
+plusOneAnimYellow = pyganim.loadAnim('../img/anims/plusOne/yellow',0.05)
+plusOneAnimRed = pyganim.loadAnim('../img/anims/plusOne/red',0.05)
+
+def save(objectList):
+    shelfFile = shelve.open('savegame')
+    for name,obj in objectList:
+        shelfFile[name] = obj
+    shelfFile.close()
+
+def exist(name):
+    shelfFile = shelve.open('savegame')
+    return (name in shelfFile)
+
+def load(name):
+    shelfFile = shelve.open('savegame')
+    obj = shelfFile[name]
+    shelfFile.close()
+    return obj
+
 
 # cycle through an array, return the new position : should be used in menus
 def cycle(direc,menu,choice):
@@ -21,8 +46,6 @@ def cycle(direc,menu,choice):
         menu[0] = temp
         choice = (choice + 1) % len(menu)
     return choice
-
-letterKeys = [K_a,K_b,K_c,K_d,K_e,K_f,K_g,K_h,K_i,K_j,K_k,K_l,K_m,K_n,K_o,K_p,K_q,K_r,K_s,K_t,K_u,K_v,K_w,K_x,K_y,K_z]
 
 def getFont(fontName, fontSize):
     return pygame.font.Font('../fonts/'+fontName+'.otf', fontSize)
@@ -51,3 +74,14 @@ def vect_mul(v,coeff):
 
 def vect_norm(v):
     return math.sqrt( math.pow(v[0],2) + math.pow(v[1],2) )
+
+def randomColor():
+    return random.choice(["blue","red","yellow"])
+
+def blockPlusOneAnim(color):
+    if color == "blue":
+        return plusOneAnimBlue.getCopy()
+    elif color == "red":
+        return plusOneAnimRed.getCopy()
+    elif color == "yellow":
+        return plusOneAnimYellow.getCopy()
