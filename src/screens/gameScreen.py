@@ -30,9 +30,9 @@ class GameScreen(Screen_):
     
     def __init__(self,levelInd):
         super(GameScreen, self).__init__()
-        self.font = pygame.font.SysFont("Impact", 24)
-        self.scoreBar = pygame.image.load("../img/hud/scoreBar.png").convert()
-        self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert()
+        self.font = pygame.font.SysFont("Impact", 20)
+        self.scoreBar = pygame.image.load("../img/hud/scoreBar.png")
+        self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png")
         self.lifeHud = pygame.image.load("../img/hud/life.png") 
         self.exitAnim = pyganim.loadAnim('../img/anims/exit', 0.1,True)
         self.exitAnim.play()
@@ -100,12 +100,12 @@ class GameScreen(Screen_):
 
         # Display bottom bar
         backgroundScreen.blit(self.scoreBar, (0,600))
-        backgroundScreen.blit(self.font.render(str(self.player.shields), 1, THECOLORS["white"]), (15,605))
-        backgroundScreen.blit(self.nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 30, 50, 30))
-        backgroundScreen.blit(self.font.render(str(self.player.sunPower), 1, THECOLORS["white"]), (100,605))
-        backgroundScreen.blit(self.nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 90, 50, 30))
-        backgroundScreen.blit(self.font.render(str(self.player.shots), 1, THECOLORS["white"]), (185,605))
-        backgroundScreen.blit(self.nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 120, 50, 30))
+        backgroundScreen.blit(self.nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 0, 50, 30))
+        backgroundScreen.blit(self.font.render(str(self.player.shields), 1, (8,108,110)), (50,606))
+        backgroundScreen.blit(self.nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 30, 50, 30))
+        backgroundScreen.blit(self.font.render(str(self.player.sunPower), 1, (170,174,48)), (135,606))
+        backgroundScreen.blit(self.nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 60, 50, 30))
+        backgroundScreen.blit(self.font.render(str(self.player.shots), 1, (131,43,93)), (220,606))
         for i in range(self.player.lives):
             backgroundScreen.blit(self.lifeHud, (385+i*40,605))
         

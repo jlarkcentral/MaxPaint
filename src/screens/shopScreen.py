@@ -8,10 +8,10 @@ from pygame.locals import *
 from pygame.color import THECOLORS
 sys.path.append('../')
 import utils
+from screen_ import Screen_
 
 
-
-class ShopScreen(object):
+class ShopScreen(Screen_):
     """docstring for ShopScreen"""
     def __init__(self):
         super(ShopScreen, self).__init__()
@@ -77,7 +77,6 @@ class ShopScreen(object):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    # startGameScreen.show(width,height,backgroundScreen,dt,screen,clock,fps) #space,
                     self.screenManager.go_to('startGameScreen')
                 if event.key == K_UP:
                     self.choice = (self.choice - 1) % len(self.shopItems[self.currentSection])

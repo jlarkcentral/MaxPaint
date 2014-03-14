@@ -45,7 +45,7 @@ class Player(GameObject_):
         
         # game properties
         self.bullets = []
-        self.shooting = True # weird shoot at startup TOFIX
+        self.shooting = False # weird shoot at startup TOFIX
         self.shots = 100
         self.shields = 0
         self.shieldDelay = 0
@@ -77,7 +77,6 @@ class Player(GameObject_):
         if self.fall:
             self.time += 2 # frame_number # pygame.time.get_ticks()
             self.y_vel = self.grav*((self.time)/100.0) + self.y_vel_i
-
         else:
             self.time = 0
             self.y_vel = 0

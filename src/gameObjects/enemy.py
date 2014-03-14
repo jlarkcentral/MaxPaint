@@ -36,7 +36,7 @@ class Enemy(GameObject_):
         # path = [(self.rect.x+20,self.rect.y+20), vect_add(targetPosition,vect_mul(vect_sub(targetPosition, self.rect.topleft),10))]    
         direction_raw = vect_sub(targetPosition,self.rect.topleft)
         direction = vect_mul(direction_raw,1.0/(vect_norm(direction_raw)))
-        b = Bullet((self.rect.x+20,self.rect.y+20),direction, 5, random.choice(["blue","red","yellow"]))
+        b = Bullet((self.rect.x+20,self.rect.y+20),direction, 5, 'grey')# random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
 
 

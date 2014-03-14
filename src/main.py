@@ -21,7 +21,6 @@ def main():
     clock = pygame.time.Clock()
     manager = ScreenManager()
     running = True
-
     while running:
         if pygame.event.get(pygame.QUIT):
             running = False
