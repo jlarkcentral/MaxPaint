@@ -20,6 +20,7 @@ import pyganim
 from bullet import Bullet
 from gameObject_ import GameObject_
 from fragment import Fragment
+import utils
 
     
 
@@ -41,20 +42,26 @@ class Player(GameObject_):
         self.animation_offset = 0
         self.animationTicks = 0
         self.spidering = False
+        self.onBlock = None
         
         
         # game properties
         self.bullets = []
-        self.shooting = False # weird shoot at startup TOFIX
-        self.shots = 100
+        # self.shooting = False # weird shoot at startup TOFIX
+        # self.shots = 100 # self.mines ?
         self.shields = 0
         self.shieldDelay = 0
-        self.lives = 3
+        # self.lives = 3
+        self.life = 100
         self.hit = False
         self.hitColorDelay = 0
         self.sunPower = 0
         self.sunPowering = False
         self.originalLight = 0
+        self.damage = 0
+        self.damageDisplayMaxDelay = 10
+        self.damageInfos = []
+        self.damageInfosDelays = []
 
 
         # pics, anims and sound
@@ -68,6 +75,9 @@ class Player(GameObject_):
         self.imgHitB = pygame.image.load("../img/player/kubeB.png")
         self.imgHitR = pygame.image.load("../img/player/kubeR.png")
         self.bulletFragments = []
+
+        self.damageFont = utils.getFont('SigmarOne', 30)
+        self.damageFontColor = THECOLORS['red']
 
 
 
@@ -135,34 +145,6 @@ class Player(GameObject_):
                     # self.fall = False
         return self.collide_ls
 
-    
-
-    def controlsUpdate(self):
-        keys = pygame.key.get_pressed()
-        self.x_vel = 0
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.x_vel -= self.speed
-            self.direction = -1
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.x_vel += self.speed
-            self.direction = 1
-        if keys[pygame.K_SPACE]:
-            self.y_vel_i = -self.jump_power
-            self.fall = True
-        elif keys[pygame.K_LCTRL]:
-            if not self.shooting and self.shots > 0:
-                self.shots -= 1
-                self.shoot()
-                self.shooting = True
-            # else shoot icon blink; warn sound
-        elif not keys[pygame.K_LCTRL]:
-            self.shooting = False
-        if keys[pygame.K_LSHIFT]:
-            if self.shieldDelay == 0 and self.shields > 4:
-                self.shields -= 5
-                self.shieldAnim.play()
-                self.shieldDelay = 120
-
     def addPowerUp(self,color):
         if color == "red":
             self.shots += 1
@@ -225,10 +207,15 @@ class Player(GameObject_):
             self.img = self.imgHitR
         self.hitColorDelay = 5
 
-    def hitWithColor(self,color):
+    def hitWithColor(self,color,position):
         self.hit = True
-        self.lives -= 1
+        # self.lives -= 1
+        damage = random.randint(1,10)
+        self.damageInfos.append((damage,position))
+        self.damageInfosDelays.append(self.damageDisplayMaxDelay)
+        self.life -= min(self.life,damage)
         self.changeColor(color)
+
 
     def colorUpdate(self):
         if self.hit:
@@ -251,12 +238,41 @@ class Player(GameObject_):
         else:
             self.animationTicks += 1
 
+    def controlsUpdate(self):
+        keys = pygame.key.get_pressed()
+        self.x_vel = 0
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.x_vel -= self.speed
+            self.direction = -1
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.x_vel += self.speed
+            self.direction = 1
+        if keys[pygame.K_SPACE]:
+            self.y_vel_i = -self.jump_power
+            self.fall = True
+        elif keys[pygame.K_LALT]:
+            if self.onBlock and self.onBlock.active:
+                self.onBlock.selected = True
+        # elif keys[pygame.K_LCTRL]:
+        #     if not self.shooting and self.shots > 0:
+        #         self.shots -= 1
+        #         self.shoot()
+        #         self.shooting = True
+        #     # else shoot icon blink; warn sound
+        # elif not keys[pygame.K_LCTRL]:
+        #     self.shooting = False
+        if keys[pygame.K_LSHIFT]:
+            if self.shieldDelay == 0 and self.shields > 4:
+                self.shields -= 5
+                self.shieldAnim.play()
+                self.shieldDelay = 120
+
     def update(self, blocks,enemies,frame_number):
         self.controlsUpdate()
         self.positionUpdate(blocks)
         self.physicsUpdate()
-        self.bulletsUpdate(enemies, blocks)
-        self.bulletFragmentsUpdate()
+        # self.bulletsUpdate(enemies, blocks)
+        # self.bulletFragmentsUpdate()
         self.shieldUpdate()
         self.colorUpdate()
         self.animationUpdate(frame_number)
@@ -265,7 +281,27 @@ class Player(GameObject_):
         displaySurface.blit(self.img, camera.apply(self.rect) , (self.animation_offset, self.direction_offset, 64, 64))
         if self.shieldDelay > 0:
             self.shieldAnim.blit(displaySurface, camera.apply(Rect(self.rect.x -20, self.rect.y-15, 0, 0)))
-        for b in self.bullets:
-            b.render(displaySurface,camera)
-        for bf in self.bulletFragments:
-            bf.render(displaySurface,camera)
+        # for b in self.bullets:
+        #     b.render(displaySurface,camera)
+        # for bf in self.bulletFragments:
+        #     bf.render(displaySurface,camera)
+        i = 0
+        for di,delay in zip(self.damageInfos,self.damageInfosDelays):
+            dmg, pos = di
+            if delay > 0:
+                displaySurface.blit(self.damageFont.render('-'+str(dmg), 1, self.damageFontColor),camera.apply(Rect(pos,(0,0))))
+                self.damageInfosDelays[i] -= 1
+            else:
+                self.damageInfos.remove(di)
+                self.damageInfosDelays.remove(self.damageInfosDelays[i])
+                i -= 1
+            i += 1
+
+
+
+
+
+
+
+
+

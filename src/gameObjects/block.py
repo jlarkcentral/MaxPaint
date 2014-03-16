@@ -4,8 +4,11 @@ Created on 1 aout 2013
 @author: feral
 '''
 
+import sys
 import random
 import pygame
+sys.path.append('../../lib/pyganim/')
+import pyganim
 from pygame.locals import Rect
 from utils import distance, interpolate, blockPlusOneAnim
 from gameObject_ import GameObject_
@@ -16,6 +19,7 @@ class Block(GameObject_):
         super(Block, self).__init__()
         self.rect = Rect(startX,startY,100,40)
         self.active = False
+        self.selected = False
         self.speed = 1
         self.moving = moving # -1 : horizontal , 1 : vertical
         self.path = path
@@ -25,6 +29,9 @@ class Block(GameObject_):
         self.color = color
         self.img = pygame.image.load("../img/blocks/block_"+color+".png")
         self.anim = blockPlusOneAnim(self.color)
+        # self.selectAnim = pyganim.loadAnim('../img/anims/selectedBlock', 0.1,True)
+        self.selectedImg = pygame.image.load("../img/blocks/block_selected.png")
+        self.tralala = False
 
     def update(self,player):
 
@@ -33,7 +40,10 @@ class Block(GameObject_):
             if not self.active:
                 self.active = True
                 player.addPowerUp(self.color)
-        
+            player.onBlock = self
+        if self.selected and not self.tralala:
+            self.img = self.selectedImg
+            self.tralala = True
         if self.moving:
             destination = self.path[self.path_index]
             current = self.rect.topleft
@@ -54,3 +64,8 @@ class Block(GameObject_):
         if self.active and not self.anim.isFinished():
             self.anim.play()
             self.anim.blit(displaySurface, camera.apply(Rect(self.rect.x+25, self.rect.y, 0, 0)))
+        # if self.selected:
+            # self.selectAnim.play()
+            # self.selectAnim.blit(displaySurface, camera.apply(Rect(self.rect.x-10, self.rect.y-10, 0, 0)))
+
+

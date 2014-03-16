@@ -26,8 +26,10 @@ class Enemy(GameObject_):
         # self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0
+        self.shootingDelayMax = 10
         self.waitDelay = 0
         self.lives = 1
+        self.hit = False
 
         self.bulletFragments = []
         
@@ -38,6 +40,7 @@ class Enemy(GameObject_):
         direction = vect_mul(direction_raw,1.0/(vect_norm(direction_raw)))
         b = Bullet((self.rect.x+20,self.rect.y+20),direction, 5, 'grey')# random.choice(["blue","red","yellow"]))
         self.bullets.append(b)
+        self.shootingDelay = self.shootingDelayMax
 
 
     def updateBullets(self, player,blocks):
@@ -49,7 +52,7 @@ class Enemy(GameObject_):
                 if b.rect.colliderect(player.rect):
                     if player.shieldDelay == 0:
                         # self.hitSound.play()
-                        player.hitWithColor(b.color)
+                        player.hitWithColor(b.color,b.rect.center)
                     for _ in range(random.randint(3,15)):
                         self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                     self.bullets.remove(b)
@@ -59,6 +62,10 @@ class Enemy(GameObject_):
                             for _ in range(random.randint(3,15)):
                                 self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                             self.bullets.remove(b)
+
+                            if block.selected:
+                                blocks.remove(block)
+                                self.hit = True
                             break
     
     def bulletFragmentsUpdate(self):
@@ -102,7 +109,6 @@ class Enemy(GameObject_):
         if distance(player.rect.center,self.rect.center ) < 300 \
             and self.shootingDelay == 0:
             self.shootAtTarget(player.rect.center)
-            self.shootingDelay = 30
         if self.shootingDelay > 0:
             self.shootingDelay -= 1
 

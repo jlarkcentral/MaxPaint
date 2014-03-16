@@ -33,11 +33,12 @@ class GameScreen(Screen_):
         self.font = pygame.font.SysFont("Impact", 20)
         self.scoreBar = pygame.image.load("../img/hud/scoreBar.png")
         self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png")
-        self.lifeHud = pygame.image.load("../img/hud/life.png") 
+        # self.lifeHud = pygame.image.load("../img/hud/life.png")
+        self.lifebar = pygame.image.load("../img/hud/lifebar.png")
+        self.lifebar_ = pygame.image.load("../img/hud/lifebar_.png")
         self.exitAnim = pyganim.loadAnim('../img/anims/exit', 0.1,True)
         self.exitAnim.play()
         self.lightFill = {'fill':255}
-
 
         self.level = Level(levelInd)
         self.camera = Camera(640, 800, self.level.background.get_size()[1])
@@ -90,13 +91,13 @@ class GameScreen(Screen_):
         # draw background
         backgroundScreen.blit(self.level.background,self.camera.apply(Rect(0, 0, 0, 0)))
 
-        self.player.render(backgroundScreen, self.camera)
-        
         for b in self.level.blocks:
             b.render(backgroundScreen,self.camera)
 
         for e in self.level.enemies:
             e.render(backgroundScreen, self.camera)
+
+        self.player.render(backgroundScreen, self.camera)
 
         # Display bottom bar
         backgroundScreen.blit(self.scoreBar, (0,600))
@@ -106,8 +107,11 @@ class GameScreen(Screen_):
         backgroundScreen.blit(self.font.render(str(self.player.sunPower), 1, (170,174,48)), (135,606))
         backgroundScreen.blit(self.nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 60, 50, 30))
         backgroundScreen.blit(self.font.render(str(self.player.shots), 1, (131,43,93)), (220,606))
-        for i in range(self.player.lives):
-            backgroundScreen.blit(self.lifeHud, (385+i*40,605))
+        # for i in range(self.player.lives):
+        #     backgroundScreen.blit(self.lifeHud, (385+i*40,605))
+        backgroundScreen.blit(self.lifebar_, to_pygame((400,40), backgroundScreen))
+        backgroundScreen.blit(self.lifebar, to_pygame((404,31), backgroundScreen), (0, 0, self.player.life*2, 22))
+        
         
 
     def handle_events(self,events):
@@ -126,6 +130,8 @@ class GameScreen(Screen_):
         # Update enemies
         for e in self.level.enemies:
             e.update( self.player, self.level.blocks)
+            if e.hit:
+                self.level.enemies.remove(e)
         # Shadow
         # updateShadow(shad,player,surf_lighting,frame_number,backgroundScreen,surf_falloff,camera,lightFill)
 
@@ -133,6 +139,6 @@ class GameScreen(Screen_):
         self.player.update(self.level.blocks,self.level.enemies,self.frame_number)
 
         # TODO manage death
-        if self.player.lives == 0:
+        if self.player.life == 0:
             self.manager.go_to('levelSelectScreen')
         self.camera.update((self.player.rect.x, self.player.rect.y, 0, 0))
