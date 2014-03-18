@@ -4,9 +4,13 @@ MaxPaint
 game test with Pygame and pyganim
 
 
+[arrows] to move, [space] to jump, [l_alt] to mine a block 
+
 # todo
 
-- moving platforms collision - check meks example
-- shooting at startup mystery
-- add levels
+- create game class > called on game screen
+- nice display for damage points
+- animation on enemy kill
+
+- tutorial with instructions 
 - enemies design...

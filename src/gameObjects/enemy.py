@@ -22,7 +22,7 @@ class Enemy(GameObject_):
         self.path = path
         self.path_index = 0
         self.rect = Rect(self.path[0],(64,64))
-        self.img = pygame.image.load("../img/enemies/enemy.png")
+        self.img = pygame.image.load("../img/enemies/enemy.png").convert_alpha()
         # self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
         self.bullets = []
         self.shootingDelay = 0

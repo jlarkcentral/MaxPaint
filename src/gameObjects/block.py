@@ -27,10 +27,10 @@ class Block(GameObject_):
 
         color = random.choice(["blue","red","yellow"])
         self.color = color
-        self.img = pygame.image.load("../img/blocks/block_"+color+".png")
+        self.img = pygame.image.load("../img/blocks/block_"+color+".png").convert_alpha()
         self.anim = blockPlusOneAnim(self.color)
         # self.selectAnim = pyganim.loadAnim('../img/anims/selectedBlock', 0.1,True)
-        self.selectedImg = pygame.image.load("../img/blocks/block_selected.png")
+        self.selectedImg = pygame.image.load("../img/blocks/block_selected.png").convert_alpha()
         self.tralala = False
 
     def update(self,player):

@@ -62,9 +62,13 @@ class GameScreen(Screen_):
         # Player
         self.player = Player()
 
+
+        self.background_alpha = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1_alpha_2.png").convert_alpha()
+        self.background_deg = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1_trees.png").convert()
+
         if exist('coins'):
             self.coins = load('coins')
-            self.player.shots = self.coins[0]
+            self.player.mines = self.coins[0]
             self.player.shields = self.coins[1]
             self.player.sunPower = self.coins[2]
 
@@ -89,7 +93,9 @@ class GameScreen(Screen_):
 
     def render(self, backgroundScreen):
         # draw background
-        backgroundScreen.blit(self.level.background,self.camera.apply(Rect(0, 0, 0, 0)))
+        # backgroundScreen.blit(self.level.background,self.camera.apply(Rect(0, 0, 0, 0)))
+        backgroundScreen.blit(self.background_deg,(0, 0))
+        backgroundScreen.blit(self.background_alpha,(0,self.camera.apply(Rect(0, 0, 0, 0))[1]/2))
 
         for b in self.level.blocks:
             b.render(backgroundScreen,self.camera)
@@ -106,7 +112,7 @@ class GameScreen(Screen_):
         backgroundScreen.blit(self.nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 30, 50, 30))
         backgroundScreen.blit(self.font.render(str(self.player.sunPower), 1, (170,174,48)), (135,606))
         backgroundScreen.blit(self.nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 60, 50, 30))
-        backgroundScreen.blit(self.font.render(str(self.player.shots), 1, (131,43,93)), (220,606))
+        backgroundScreen.blit(self.font.render(str(self.player.mines), 1, (131,43,93)), (220,606))
         # for i in range(self.player.lives):
         #     backgroundScreen.blit(self.lifeHud, (385+i*40,605))
         backgroundScreen.blit(self.lifebar_, to_pygame((400,40), backgroundScreen))
@@ -120,6 +126,7 @@ class GameScreen(Screen_):
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
+                    save(self.coins)
                     self.manager.go_to('levelSelectScreen')
 
 

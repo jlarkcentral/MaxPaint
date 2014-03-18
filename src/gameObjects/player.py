@@ -47,11 +47,10 @@ class Player(GameObject_):
         
         # game properties
         self.bullets = []
-        # self.shooting = False # weird shoot at startup TOFIX
-        # self.shots = 100 # self.mines ?
+        self.mines = 0
+        self.mining = False
         self.shields = 0
         self.shieldDelay = 0
-        # self.lives = 3
         self.life = 100
         self.hit = False
         self.hitColorDelay = 0
@@ -69,7 +68,7 @@ class Player(GameObject_):
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
-        self.imgNormal = pygame.image.load("../img/player/kube.png")
+        self.imgNormal = pygame.image.load("../img/player/kube.png").convert_alpha()
         self.img = self.imgNormal
         self.imgHitY = pygame.image.load("../img/player/kubeY.png")
         self.imgHitB = pygame.image.load("../img/player/kubeB.png")
@@ -134,65 +133,15 @@ class Player(GameObject_):
                     self.spidering = False
                 if not block.moving:
                     self.collide_ls.append(block)
-                # else :
-                # # if block.moving:
-                #     if block.moving == 1:
-                #         self.rect.y = block.rect.y - 60
-                #         self.fall = False
-                #     if block.moving == -1:
-                #         self.rect.x = block.rect.x
-                #         self.rect.y = block.rect.y - 60
-                    # self.fall = False
         return self.collide_ls
 
     def addPowerUp(self,color):
         if color == "red":
-            self.shots += 1
+            self.mines += 1
         if color == "blue":
             self.shields += 1
         if color == "yellow":
             self.sunPower += 1
-
-    def bulletsUpdate(self, enemies, blocks):
-        for b in self.bullets:
-            b_hit = False
-            b.update()
-            if b.outOfScreen:
-                self.bullets.remove(b)
-            else:
-                for e in enemies:
-                    if b.rect.colliderect(e.rect):    
-                        if e.lives == 1:
-                            enemies.remove(e)
-                        else:
-                            e.lives -= 1
-                        self.bullets.remove(b)
-                        # self.hitSound.play()
-                        b_hit = True
-                        break
-                if not b_hit:
-                    for block in blocks:
-                        if b.rect.colliderect(block.rect):
-                            for _ in range(random.randint(3,15)):
-                                self.bulletFragments.append(Fragment(b.rect.center,THECOLORS['red']))
-                            self.bullets.remove(b)
-                            break
-    
-    def bulletFragmentsUpdate(self):
-        for bf in self.bulletFragments:
-            bf.update()
-            if bf.kill:
-                self.bulletFragments.remove(bf)
-
-    def shoot(self):
-        startpos = (self.rect.x, self.rect.y + 20)
-        direction = (-1, 0)
-        if self.direction == 1:
-            startpos = (self.rect.x + 60, self.rect.y + 20)    
-            direction = (1, 0)
-        b = Bullet(startpos, direction, 15, 'red')
-        self.bullets.append(b)
-        # self.shootSound.play()
 
     def shieldUpdate(self):
         if self.shieldDelay > 0:
@@ -251,16 +200,12 @@ class Player(GameObject_):
             self.y_vel_i = -self.jump_power
             self.fall = True
         elif keys[pygame.K_LALT]:
-            if self.onBlock and self.onBlock.active:
+            if self.onBlock and self.onBlock.active and not self.mining and self.mines > 0:
                 self.onBlock.selected = True
-        # elif keys[pygame.K_LCTRL]:
-        #     if not self.shooting and self.shots > 0:
-        #         self.shots -= 1
-        #         self.shoot()
-        #         self.shooting = True
-        #     # else shoot icon blink; warn sound
-        # elif not keys[pygame.K_LCTRL]:
-        #     self.shooting = False
+                self.mines -= 1
+                self.mining = True
+        elif not keys[pygame.K_LALT]:
+            self.mining = False
         if keys[pygame.K_LSHIFT]:
             if self.shieldDelay == 0 and self.shields > 4:
                 self.shields -= 5
@@ -271,8 +216,6 @@ class Player(GameObject_):
         self.controlsUpdate()
         self.positionUpdate(blocks)
         self.physicsUpdate()
-        # self.bulletsUpdate(enemies, blocks)
-        # self.bulletFragmentsUpdate()
         self.shieldUpdate()
         self.colorUpdate()
         self.animationUpdate(frame_number)

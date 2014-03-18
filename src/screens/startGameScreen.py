@@ -23,7 +23,7 @@ class StartGameScreen(Screen_):
         self.background = pygame.image.load("../img/backgrounds/transition.png").convert()
         self.infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
 
-        self.profileBackground = pygame.image.load("../img/backgrounds/gameMenuSelect.png")
+        self.profileBackground = pygame.image.load("../img/backgrounds/gameMenuSelect.png").convert_alpha()
 
         self.profileName = 'New'
         if exist('profileName'):
@@ -57,8 +57,8 @@ class StartGameScreen(Screen_):
                 if event.key == K_RETURN:
                     if self.menuChoice == 0:
                         self.manager.go_to('mainMenuScreen')
-                    if self.menuChoice == 1:
-                        self.manager.go_to('shopScreen')
+                    # if self.menuChoice == 1:
+                        # self.manager.go_to('shopScreen')
                     if self.menuChoice == 2:
                         self.manager.go_to('levelSelectScreen')
 

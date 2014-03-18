@@ -1,5 +1,4 @@
 *.pyc
 .project
 .pydevproject
-img/backgrounds/levelBackgrounds/*.png
 savegame*
