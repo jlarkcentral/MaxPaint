@@ -19,9 +19,12 @@ class OptionsScreen(Screen_):
         super(OptionsScreen, self).__init__()
     
         self.font = utils.getFont('Handy00', 44)
+        self.infofont = utils.getFont('Handy00', 18)
+        self.keyfont = utils.getFont('Handy00', 24)
         self.background = pygame.image.load("../img/backgrounds/options.png").convert()
         self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
         self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
+        self.keyImg = pygame.image.load("../img/backgrounds/key.png")
         self.volumeTest = pygame.mixer.Sound("../sounds/volumeTest.wav")
         self.menuEntries = ["Music","Sound","Controls","Back"]
         self.menuPositions = [(200,100),(200,200),(200,300),(200,500)]
@@ -34,6 +37,10 @@ class OptionsScreen(Screen_):
         self.musicLevel = 0
         if exist('musicLevel'):
            self.musicLevel = load('musicLevel')
+        self.actionKeys = ['slow time','shield','trap','left','jump','right']
+        self.keys = ['w','x','c','<','^','>']
+        self.actionKeysPos = [(200,450),(330,450),(430,450),(530,450),(630,450),(730,450)]
+
 
 
 
@@ -44,11 +51,13 @@ class OptionsScreen(Screen_):
                 backgroundScreen.blit(self.font.render(self.menuEntries[i], 1, self.activeColor), self.menuPositions[i])
             else:
                 backgroundScreen.blit(self.font.render(self.menuEntries[i], 1, self.inactiveColor), self.menuPositions[i])
+        for i in range(len(self.actionKeys)):
+            backgroundScreen.blit(self.infofont.render(self.actionKeys[i],1,self.inactiveColor),(200+(i>0)*(i*100+30),450))
+            backgroundScreen.blit(self.keyImg,(200+(i>0)*(i*100+30),380))
+            backgroundScreen.blit(self.keyfont.render(self.keys[i],1,self.inactiveColor),(200+(i>0)*(i*100+30)+20,390))
         for i in range(5):
             backgroundScreen.blit(self.soundBar, (400+i*40,120), (0, (self.soundLevel > i)*30, 30, 30))
-            backgroundScreen.blit(self.musicBar, (400+i*40,220), (0, (self.musicLevel > i)*30, 30, 30))        
-        print(self.soundLevel)
-        print(self.musicLevel)
+            backgroundScreen.blit(self.musicBar, (400+i*40,220), (0, (self.musicLevel > i)*30, 30, 30))
 
       
     def handle_events(self, events):
