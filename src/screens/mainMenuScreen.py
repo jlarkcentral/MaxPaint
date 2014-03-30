@@ -17,10 +17,9 @@ import utils
 class MainMenuScreen(Screen_):
     def __init__(self):
         super(MainMenuScreen, self).__init__()
-        self.font = utils.getFont('SigmarOne', 44)
-        self.infofont = utils.getFont('SigmarOne', 18)
+        self.font = utils.getFont('Handy00', 44)
+        self.infofont = utils.getFont('Handy00', 18)
         self.background = pygame.image.load("../img/backgrounds/mainMenu.png")
-        self.infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
         self.menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen
         self.menuPositions = [(200,100),(200,300),(200,500)]
         self.menuInfo = ["Start or continue your adventure","Change game and user settings","Exit the game. Goodbye!"]
@@ -30,10 +29,7 @@ class MainMenuScreen(Screen_):
 
 
     def render(self,backgroundScreen):
-    
-        backgroundScreen.fill((56,56,56))
         backgroundScreen.blit(self.background, (0,0))
-        backgroundScreen.blit(self.infoBar, (0,600))
         backgroundScreen.blit(self.infofont.render(self.menuInfo[self.menuChoice], 1, THECOLORS["white"]),(200,605))
         for i in range(len(self.menuEntries)):
             if i == self.menuChoice:
@@ -49,11 +45,11 @@ class MainMenuScreen(Screen_):
                     self.manager.go_to('startScreen')
                 elif event.key == K_RETURN:
                     if self.menuChoice == 0:
-                        self.manager.go_to('startGameScreen')
+                        self.manager.go_to('levelSelectScreen')
                     elif self.menuChoice == 1:
                         self.manager.go_to('optionsScreen')
                     elif self.menuChoice == 2:
-                        self.manager.go_to('startScreen')
+                        exit()
                 elif event.key == K_UP:
                     self.menuChoice = (self.menuChoice - 1) % len(self.menuEntries)
                 elif event.key == K_DOWN:

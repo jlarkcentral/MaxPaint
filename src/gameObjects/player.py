@@ -49,36 +49,20 @@ class Player(GameObject_):
         self.bullets = []
         self.mines = 0
         self.mining = False
+        self.slomoDelay = 0
         self.shields = 0
         self.shieldDelay = 0
-        self.life = 100
-        self.hit = False
-        self.hitColorDelay = 0
-        self.sunPower = 0
-        self.sunPowering = False
-        self.originalLight = 0
-        self.damage = 0
-        self.damageDisplayMaxDelay = 10
-        self.damageInfos = []
-        self.damageInfosDelays = []
+        self.killed = False
+        self.timePower = 0
 
 
         # pics, anims and sound
-        self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.25)
+        self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.1,True)
+        self.timeAnim = pyganim.loadAnim('../img/anims/time',0.1,True)
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
         self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
-        self.imgNormal = pygame.image.load("../img/player/kube.png").convert_alpha()
-        self.img = self.imgNormal
-        self.imgHitY = pygame.image.load("../img/player/kubeY.png")
-        self.imgHitB = pygame.image.load("../img/player/kubeB.png")
-        self.imgHitR = pygame.image.load("../img/player/kubeR.png")
-        self.bulletFragments = []
-
-        self.damageFont = utils.getFont('SigmarOne', 30)
-        self.damageFontColor = THECOLORS['red']
-
-
+        self.img = pygame.image.load("../img/player/kube_new_pix.png").convert_alpha()
 
 
 
@@ -111,8 +95,10 @@ class Player(GameObject_):
             self.rect.x = 740
         if self.rect.y < 40:
             self.rect.y = 40
-        elif self.rect.y > 3200:
-            self.rect.y = 0
+        elif self.rect.y > 3160:
+            self.rect.y = 3200
+        # if not self.collide_ls:
+        #     self.onBlock = None
     
     def adjust_pos(self,blocks,offset,off_ind):
         offset[off_ind] += (1 if offset[off_ind]<0 else -1)
@@ -131,8 +117,11 @@ class Player(GameObject_):
                     self.spidering = True
                 elif self.rect.y < block.rect.y:
                     self.spidering = False
-                if not block.moving:
-                    self.collide_ls.append(block)
+                self.collide_ls.append(block)
+                self.onBlock = block
+                if not block.active:
+                    block.active = True
+                    self.addPowerUp(block.color)
         return self.collide_ls
 
     def addPowerUp(self,color):
@@ -141,38 +130,15 @@ class Player(GameObject_):
         if color == "blue":
             self.shields += 1
         if color == "yellow":
-            self.sunPower += 1
+            self.timePower += 1
 
     def shieldUpdate(self):
         if self.shieldDelay > 0:
             self.shieldDelay -= 1
 
-    def changeColor(self,color):
-        if color == 'yellow':
-            self.img = self.imgHitY
-        if color == 'blue':
-            self.img = self.imgHitB
-        if color == 'red':
-            self.img = self.imgHitR
-        self.hitColorDelay = 5
-
-    def hitWithColor(self,color,position):
-        self.hit = True
-        # self.lives -= 1
-        damage = random.randint(1,10)
-        self.damageInfos.append((damage,position))
-        self.damageInfosDelays.append(self.damageDisplayMaxDelay)
-        self.life -= min(self.life,damage)
-        self.changeColor(color)
-
-
-    def colorUpdate(self):
-        if self.hit:
-            if self.hitColorDelay == 0:
-                self.img = self.imgNormal
-                self.hit = False
-            else:
-                self.hitColorDelay -= 1
+    def slomoUpdate(self):
+        if self.slomoDelay > 0:
+            self.slomoDelay -= 1
 
     def animationUpdate(self,frame_number):
         self.direction_offset = self.spidering*128 + (self.direction==-1) * 64
@@ -190,55 +156,51 @@ class Player(GameObject_):
     def controlsUpdate(self):
         keys = pygame.key.get_pressed()
         self.x_vel = 0
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_LEFT]:
             self.x_vel -= self.speed
             self.direction = -1
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        if keys[pygame.K_RIGHT]:
             self.x_vel += self.speed
             self.direction = 1
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_UP]:
             self.y_vel_i = -self.jump_power
             self.fall = True
-        elif keys[pygame.K_LALT]:
-            if self.onBlock and self.onBlock.active and not self.mining and self.mines > 0:
+        if keys[pygame.K_x]:
+            if self.onBlock and self.onBlock.active and not self.onBlock.selected \
+            and not self.mining and self.mines > 0:
                 self.onBlock.selected = True
                 self.mines -= 1
                 self.mining = True
-        elif not keys[pygame.K_LALT]:
+        elif not keys[pygame.K_x]:
             self.mining = False
-        if keys[pygame.K_LSHIFT]:
-            if self.shieldDelay == 0 and self.shields > 4:
-                self.shields -= 5
+        if keys[pygame.K_z]:
+            if self.slomoDelay == 0 and self.timePower > 0 and self.shieldDelay == 0:
+                self.timePower -= 1
+                self.timeAnim.play()
+                self.slomoDelay = 100
+        if keys[pygame.K_c]:
+            if self.shieldDelay == 0 and self.shields > 0 and self.slomoDelay == 0:
+                self.shields -= 1
                 self.shieldAnim.play()
-                self.shieldDelay = 120
+                self.shieldDelay = 100
+
+
 
     def update(self, blocks,enemies,frame_number):
         self.controlsUpdate()
         self.positionUpdate(blocks)
         self.physicsUpdate()
         self.shieldUpdate()
-        self.colorUpdate()
+        self.slomoUpdate()
         self.animationUpdate(frame_number)
 
     def render(self, displaySurface,camera):
         displaySurface.blit(self.img, camera.apply(self.rect) , (self.animation_offset, self.direction_offset, 64, 64))
         if self.shieldDelay > 0:
             self.shieldAnim.blit(displaySurface, camera.apply(Rect(self.rect.x -20, self.rect.y-15, 0, 0)))
-        # for b in self.bullets:
-        #     b.render(displaySurface,camera)
-        # for bf in self.bulletFragments:
-        #     bf.render(displaySurface,camera)
-        i = 0
-        for di,delay in zip(self.damageInfos,self.damageInfosDelays):
-            dmg, pos = di
-            if delay > 0:
-                displaySurface.blit(self.damageFont.render('-'+str(dmg), 1, self.damageFontColor),camera.apply(Rect(pos,(0,0))))
-                self.damageInfosDelays[i] -= 1
-            else:
-                self.damageInfos.remove(di)
-                self.damageInfosDelays.remove(self.damageInfosDelays[i])
-                i -= 1
-            i += 1
+        if self.slomoDelay > 0:
+            self.timeAnim.blit(displaySurface, camera.apply(Rect(self.rect.x +16+16*(self.direction == 1), self.rect.y+16+16*self.spidering, 0, 0)))
+
 
 
 

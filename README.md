@@ -4,13 +4,13 @@ MaxPaint
 game test with Pygame and pyganim
 
 
-[arrows] to move, [space] to jump, [l_alt] to mine a block 
+[arrows] to move, [w] to freeze time, [x] to shield, [c] to mine block 
 
 # todo
 
-- create game class > called on game screen
-- nice display for damage points
-- animation on enemy kill
+- graphics for level 2 and 3
+- animation on enemy kill, + minedblock
+- transition screen // retry - win
 
-- tutorial with instructions 
-- enemies design...
+- create game class > called on game screen
+- tutorial with instructions

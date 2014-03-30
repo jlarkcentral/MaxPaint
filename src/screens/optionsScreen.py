@@ -18,9 +18,8 @@ class OptionsScreen(Screen_):
     def __init__(self):
         super(OptionsScreen, self).__init__()
     
-        self.font = utils.getFont('SigmarOne', 44)
+        self.font = utils.getFont('Handy00', 44)
         self.background = pygame.image.load("../img/backgrounds/options.png").convert()
-        self.infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
         self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
         self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
         self.volumeTest = pygame.mixer.Sound("../sounds/volumeTest.wav")
@@ -40,15 +39,16 @@ class OptionsScreen(Screen_):
 
     def render(self, backgroundScreen):
         backgroundScreen.blit(self.background, (0,0))
-        backgroundScreen.blit(self.infoBar, (0,600))
         for i in range(len(self.menuEntries)):
             if i == self.menuChoice:
                 backgroundScreen.blit(self.font.render(self.menuEntries[i], 1, self.activeColor), self.menuPositions[i])
             else:
                 backgroundScreen.blit(self.font.render(self.menuEntries[i], 1, self.inactiveColor), self.menuPositions[i])
-        backgroundScreen.blit(self.soundBar, (400,120), (0, self.soundLevel*30, 190, 30))
-        backgroundScreen.blit(self.musicBar, (400,220), (0, self.musicLevel*30, 190, 30))        
-
+        for i in range(5):
+            backgroundScreen.blit(self.soundBar, (400+i*40,120), (0, (self.soundLevel > i)*30, 30, 30))
+            backgroundScreen.blit(self.musicBar, (400+i*40,220), (0, (self.musicLevel > i)*30, 30, 30))        
+        print(self.soundLevel)
+        print(self.musicLevel)
 
       
     def handle_events(self, events):

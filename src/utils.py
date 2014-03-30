@@ -33,7 +33,7 @@ def load(name):
 
 
 def getFont(fontName, fontSize):
-    return pygame.font.Font('../fonts/'+fontName+'.otf', fontSize)
+    return pygame.font.Font('../fonts/'+fontName+'.ttf', fontSize)
 
 # copied from pymunk
 def to_pygame(p, surface):

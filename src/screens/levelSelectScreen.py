@@ -15,9 +15,8 @@ class LevelSelectScreen(Screen_):
 
     def __init__(self):
         super(LevelSelectScreen, self).__init__()
-        self.font = utils.getFont('SigmarOne', 44)
-        self.background = pygame.image.load("../img/backgrounds/transition.png").convert()
-        self.infoBar = pygame.image.load("../img/hud/scoreBar.png").convert()
+        self.font = utils.getFont('Handy00', 44)
+        self.background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
         self.levelTitles = ["Tutorial","Green Machine", "Strange Orange", "Purple Trouble"]
         self.levelBackgrounds = []
         self.lvlbgsNames = []
@@ -35,12 +34,12 @@ class LevelSelectScreen(Screen_):
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    self.manager.go_to('startGameScreen')
+                    self.manager.go_to('mainMenuScreen')
                 if event.key == K_RETURN:
                     if self.menuChoice < 3:
-                        self.manager.go_to_game(1) # self.currentLevel*3 + (self.menuChoice + 1)
+                        self.manager.go_to_game(self.menuChoice) # self.currentLevel*3 + (self.menuChoice + 1)
                     elif self.menuChoice == 3:
-                        self.manager.go_to('startGameScreen')
+                        self.manager.go_to('mainMenuScreen')
                 if event.key == K_UP:
                     self.menuChoice = (self.menuChoice - 1) % len(self.menuEntries)
                 if event.key == K_DOWN:
@@ -56,7 +55,6 @@ class LevelSelectScreen(Screen_):
 
     def render(self, backgroundScreen):
         backgroundScreen.blit(self.background, (0,0))
-        backgroundScreen.blit(self.infoBar, (0,600))
         backgroundScreen.blit(self.font.render(self.levelTitles[self.currentLevel], 1, self.activeColor), (100,50))
         for i in range(len(self.menuEntries)):
             if i == self.menuChoice:
