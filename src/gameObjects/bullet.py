@@ -18,7 +18,7 @@ class Bullet(GameObject_):
         self.color = color
         self.direction = direction
         self.rect = Rect(startPosition,(30,30))
-        self.img = pygame.image.load("../img/bullets/bullet_"+color+"_pix.png")
+        self.img = pygame.image.load("../img/bullets/bullet_"+color+"_pix.png").convert_alpha()
         self.outOfScreen = False
         self.nbCollide = 0
 

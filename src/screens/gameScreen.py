@@ -2,8 +2,6 @@
 
 PyGame game test
 
-modified code from platformer example
-
 Game launcher
 
 """
@@ -17,8 +15,6 @@ from pygame.color import *
 from pygame import K_ESCAPE
 sys.path.append('../lib/pyganim/')
 import pyganim
-sys.path.append('../lib/')
-import PAdLib.shadow as shadow
 
 sys.path.append('gameObjects/')
 from player import Player
@@ -34,11 +30,12 @@ class GameScreen(Screen_):
     def __init__(self,levelInd):
         super(GameScreen, self).__init__()
         self.font = pygame.font.SysFont("Handy00", 20)
-        self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png")
+        self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert_alpha()
+        self.progressIcon = pygame.image.load("../img/hud/progress.png").convert_alpha()
         # self.lifeHud = pygame.image.load("../img/hud/life.png")
-        self.timebar = pygame.image.load("../img/hud/timebar.png")
-        self.shieldbar = pygame.image.load("../img/hud/shieldbar.png")
-        self.lifebar_ = pygame.image.load("../img/hud/lifebar_.png")
+        self.timebar = pygame.image.load("../img/hud/timebar.png").convert_alpha()
+        self.shieldbar = pygame.image.load("../img/hud/shieldbar.png").convert_alpha()
+        self.lifebar_ = pygame.image.load("../img/hud/lifebar_.png").convert()
         self.exitAnim = pyganim.loadAnim('../img/anims/exit', 0.1,True)
         self.exitAnim.play()
         self.lightFill = {'fill':255}
@@ -54,6 +51,7 @@ class GameScreen(Screen_):
         self.stopped = False
 
         self.killFragments = []
+        self.dust = []
 
         # self.surf_lighting = pygame.Surface(screen.get_size())
         # self.shad = shadow.Shadow()
@@ -62,8 +60,8 @@ class GameScreen(Screen_):
 
 
         # Music load
-        #pygame.mixer.music.load("../sounds/music.mp3")
-        #pygame.mixer.music.play(-1)
+        pygame.mixer.music.load("../sounds/piano.wav")
+        pygame.mixer.music.play(-1)
 
         # Player
         self.player = Player()
@@ -72,8 +70,8 @@ class GameScreen(Screen_):
         self.background_alpha = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1_alpha_pix.png").convert_alpha()
         self.background_deg = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl1_1_bw.jpg").convert()
 
-        if exist('coins'):
-            self.player.mines,self.player.shields,self.player.sunPower = load('coins')
+        # if exist('coins'):
+        #     self.player.mines,self.player.shields,self.player.timePower = load('coins')
 
         # # Level blocks constrution
         # self.blocks = level.blocks
@@ -83,9 +81,11 @@ class GameScreen(Screen_):
 
         self.fire = Rect((0,3200),(800,5))
 
+        self.playerDown = False
+
         # self.blocks = [x for x in self.level.blocks if x.color == self.player.phase]
 
-
+        
 
 
     def killFragmentsUpdate(self):
@@ -98,24 +98,32 @@ class GameScreen(Screen_):
     def render(self, backgroundScreen):
         # draw background
         backgroundScreen.blit(self.background_deg,(0, 0))
+        for d in self.dust:
+            backgroundScreen.fill(d.color,d.rect)
         backgroundScreen.blit(self.background_alpha,(0,self.camera.apply(Rect(0, 0, 0, 0))[1]/2))
-
-        for b in self.level.blocks:
-            b.render(backgroundScreen,self.camera)
 
         for e in self.level.enemies:
             e.render(backgroundScreen, self.camera)
         if not self.player.killed:
             self.player.render(backgroundScreen, self.camera)
 
+        for b in self.level.blocks:
+            b.render(backgroundScreen,self.camera)
+
         # Display bottom bar
         backgroundScreen.fill(THECOLORS['black'],Rect((0,600),(800,40)))
-        backgroundScreen.blit(self.nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 0, 50, 30))
-        backgroundScreen.blit(self.font.render(str(self.player.shields), 1, (8,108,110)), (50,607))
         backgroundScreen.blit(self.nextColorIcon, to_pygame((120,35), backgroundScreen), (0, 30, 50, 30))
         backgroundScreen.blit(self.font.render(str(self.player.timePower), 1, (170,174,48)), (135,607))
+        backgroundScreen.blit(self.progressIcon, to_pygame((120,5), backgroundScreen), (0, 10, self.player.timePowerCount*10, 10))
+
         backgroundScreen.blit(self.nextColorIcon, to_pygame((205,35), backgroundScreen), (0, 60, 50, 30))
         backgroundScreen.blit(self.font.render(str(self.player.mines), 1, (131,43,93)), (220,607))
+        backgroundScreen.blit(self.progressIcon, to_pygame((205,5), backgroundScreen), (0, 20, self.player.minesCount*10, 10))        
+
+        backgroundScreen.blit(self.nextColorIcon, to_pygame((35,35), backgroundScreen), (0, 0, 50, 30))
+        backgroundScreen.blit(self.font.render(str(self.player.shields), 1, (8,108,110)), (50,607))
+        backgroundScreen.blit(self.progressIcon, to_pygame((35,5), backgroundScreen), (0, 0, self.player.shieldsCount*10, 10))
+        
         backgroundScreen.blit(self.lifebar_, to_pygame((400,40), backgroundScreen))
         if self.player.slomoDelay > 0:
             backgroundScreen.blit(self.timebar, to_pygame((404,31), backgroundScreen), (0, 0, (math.ceil(self.player.slomoDelay*2/20)*20), 22))
@@ -136,7 +144,6 @@ class GameScreen(Screen_):
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    # save([('coins',[self.player.mines,self.player.shields,self.player.timePower])])
                     self.manager.go_to('levelSelectScreen')
 
 
@@ -163,7 +170,8 @@ class GameScreen(Screen_):
             else:
                 self.stopDelay -= 1
                 if self.stopDelay == 0:
-                    self.manager.go_to('levelSelectScreen')
+                    # save([('coins',[self.player.mines,self.player.shields,self.player.timePower])])
+                    self.manager.go_to_game(self.level.index)
         
         self.camera.update((self.player.rect.x, self.player.rect.y, 0, 0))
         self.killFragmentsUpdate()
@@ -171,5 +179,26 @@ class GameScreen(Screen_):
 
         if self.player.rect.y + 64 > abs(self.camera.state.y-600):
             self.player.killed = True
+        if self.player.killed and not self.playerDown:
+            # self.player.hitSound.play()
+            self.playerDown = True
+
+        if random.randint(0,10) == 5:
+            s = random.randint(2,10)
+            self.dust.append(Dust(Rect(random.randint(200,600),700,s,s),THECOLORS[random.choice(['grey75','grey59','grey42'])],random.randint(1,5)))
+        if self.player.slomoDelay > 0:
+            for d in self.dust:
+                d.update(d.speed/5)
+        else:
+            for d in self.dust:
+               d.update(d.speed)
 
 
+
+class Dust(object):
+    def __init__(self,rect,color,speed):
+        self.rect = rect
+        self.color = color
+        self.speed = speed
+    def update(self, speed):
+        self.rect.y -= speed

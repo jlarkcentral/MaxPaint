@@ -19,7 +19,7 @@ class MainMenuScreen(Screen_):
         super(MainMenuScreen, self).__init__()
         self.font = utils.getFont('Handy00', 44)
         self.infofont = utils.getFont('Handy00', 18)
-        self.background = pygame.image.load("../img/backgrounds/mainMenu.png")
+        self.background = pygame.image.load("../img/backgrounds/mainMenu.png").convert()
         self.menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen
         self.menuPositions = [(200,100),(200,300),(200,500)]
         self.menuInfo = ["Start or continue your adventure","Change game and user settings","Exit the game. Goodbye!"]

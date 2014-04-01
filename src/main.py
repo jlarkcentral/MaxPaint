@@ -2,7 +2,6 @@
 
 PyGame game test
 
-modified code from platformer example
 
 """
 
@@ -15,6 +14,7 @@ from screenManager import ScreenManager
 def main():
     width, height = 800,640
     fps = 50
+    pygame.mixer.pre_init(44100, -16, 1, 300)
     pygame.init()
     pygame.mixer.init()
     display = pygame.display.set_mode((width,height))

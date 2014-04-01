@@ -19,13 +19,16 @@ class Level(object):
 		self.background_img = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
 
 		self.background = pygame.transform.scale(self.background_img, (800, 3200))
+		
+
+
+
 		self.loadLevel()
 
 	def loadLevel(self):
 		with open('../levels/'+str(self.index)+'/levelmatrix') as f:
 			i = 1
 			for line in f:
-				enemyPath = []
 				blocksTemp = line.split(',')
 				currentY = i * 100
 				j = 0
@@ -35,9 +38,6 @@ class Level(object):
 						self.blocks.append(Block(currentX,currentY))
 					elif elem == '2':
 						self.blocks.append(Block(currentX,currentY))
-						enemyPath.append((currentX+18,currentY+40))
-						# enemyPath.append((currentX+36,currentY+40))
+						self.enemies.append(Enemy([(currentX+18,currentY+40)],random.randint(2,5)))
 					j += 1
-				i += 1 
-				if enemyPath:
-					self.enemies.append(Enemy([enemyPath[0],enemyPath[-1]],random.randint(2,5)))
+				i += 1

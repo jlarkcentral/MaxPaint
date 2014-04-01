@@ -22,9 +22,9 @@ class OptionsScreen(Screen_):
         self.infofont = utils.getFont('Handy00', 18)
         self.keyfont = utils.getFont('Handy00', 24)
         self.background = pygame.image.load("../img/backgrounds/options.png").convert()
-        self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png")
-        self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png")
-        self.keyImg = pygame.image.load("../img/backgrounds/key.png")
+        self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png").convert_alpha()
+        self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png").convert_alpha()
+        self.keyImg = pygame.image.load("../img/backgrounds/key.png").convert_alpha()
         self.volumeTest = pygame.mixer.Sound("../sounds/volumeTest.wav")
         self.menuEntries = ["Music","Sound","Controls","Back"]
         self.menuPositions = [(200,100),(200,200),(200,300),(200,500)]

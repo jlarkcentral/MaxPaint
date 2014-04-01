@@ -48,12 +48,15 @@ class Player(GameObject_):
         # game properties
         self.bullets = []
         self.mines = 0
+        self.minesCount = 0
         self.mining = False
         self.slomoDelay = 0
         self.shields = 0
+        self.shieldsCount = 0
         self.shieldDelay = 0
         self.killed = False
         self.timePower = 0
+        self.timePowerCount = 0
 
 
         # pics, anims and sound
@@ -61,7 +64,12 @@ class Player(GameObject_):
         self.timeAnim = pyganim.loadAnim('../img/anims/time',0.1,True)
         self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
-        self.hitSound = pygame.mixer.Sound("../sounds/enemyHit.wav")
+        self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
+        self.noteRed = pygame.mixer.Sound('../sounds/notes/plouit_red.wav')
+        self.noteBlue = pygame.mixer.Sound('../sounds/notes/plouit_blue.wav')
+        self.noteYellow = pygame.mixer.Sound('../sounds/notes/plouit_yellow.wav')
+
+
         self.img = pygame.image.load("../img/player/kube_new_pix.png").convert_alpha()
 
 
@@ -121,16 +129,31 @@ class Player(GameObject_):
                 self.onBlock = block
                 if not block.active:
                     block.active = True
-                    self.addPowerUp(block.color)
+                    self.addPowerUp(block)
         return self.collide_ls
 
-    def addPowerUp(self,color):
-        if color == "red":
-            self.mines += 1
-        if color == "blue":
-            self.shields += 1
-        if color == "yellow":
-            self.timePower += 1
+    def addPowerUp(self,block):
+        if block.color == "red":
+            self.minesCount += 1
+            if self.minesCount == 5:
+                self.minesCount = 0
+                self.mines += 1
+                self.noteRed.play()
+                block.addingPower = True
+        if block.color == "blue":
+            self.shieldsCount += 1
+            if self.shieldsCount == 5:
+                self.shieldsCount = 0
+                self.shields += 1
+                self.noteBlue.play()
+                block.addingPower = True
+        if block.color == "yellow":
+            self.timePowerCount += 1
+            if self.timePowerCount == 5:
+                self.timePowerCount = 0
+                self.timePower += 1
+                self.noteYellow.play()
+                block.addingPower = True
 
     def shieldUpdate(self):
         if self.shieldDelay > 0:
