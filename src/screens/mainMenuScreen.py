@@ -8,6 +8,7 @@ import pygame
 from pygame.locals import *
 from pygame.color import THECOLORS
 from screen_ import Screen_
+from utils import save
 
 #import pgext
 
@@ -17,15 +18,15 @@ import utils
 class MainMenuScreen(Screen_):
     def __init__(self):
         super(MainMenuScreen, self).__init__()
-        self.font = utils.getFont('Handy00', 44)
-        self.infofont = utils.getFont('Handy00', 18)
+        self.font = utils.getFont('VolterGoldfish', 44)
+        self.infofont = utils.getFont('VolterGoldfish', 18)
         self.background = pygame.image.load("../img/backgrounds/mainMenu.png").convert()
         self.menuEntries = ["Start Game","Options","Quit"] ## add continue -> levelMenuScreen
         self.menuPositions = [(200,100),(200,300),(200,500)]
         self.menuInfo = ["Start or continue your adventure","Change game and user settings","Exit the game. Goodbye!"]
         self.menuChoice = 0
         self.activeColor = THECOLORS["black"]
-        self.inactiveColor = THECOLORS["grey29"]
+        self.inactiveColor = THECOLORS["grey64"]
 
 
     def render(self,backgroundScreen):
@@ -45,8 +46,9 @@ class MainMenuScreen(Screen_):
                     self.manager.go_to('startScreen')
                 elif event.key == K_RETURN:
                     if self.menuChoice == 0:
-                        self.manager.go_to('levelSelectScreen')
-                        # self.manager.go_to_game(0)
+                        # self.manager.go_to('levelSelectScreen')
+                        save([('powers',[0,0,0])])
+                        self.manager.go_to_game(0)
                     elif self.menuChoice == 1:
                         self.manager.go_to('optionsScreen')
                     elif self.menuChoice == 2:

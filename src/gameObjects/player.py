@@ -107,8 +107,6 @@ class Player(GameObject_):
             self.rect.y = 3200
         # if not self.collide_ls:
         #     self.onBlock = None
-        if self.rect.y < 300:
-            self.finished = True
     
     def adjust_pos(self,blocks,offset,off_ind):
         offset[off_ind] += (1 if offset[off_ind]<0 else -1)
@@ -209,6 +207,9 @@ class Player(GameObject_):
                     self.shields -= 1
                     self.shieldAnim.play()
                     self.shieldDelay = 100
+
+        if self.rect.y < 100 and keys[pygame.K_UP]:
+            self.finished = True
 
 
 

@@ -15,7 +15,7 @@ class LevelSelectScreen(Screen_):
 
     def __init__(self):
         super(LevelSelectScreen, self).__init__()
-        self.font = utils.getFont('Handy00', 44)
+        self.font = utils.getFont('VolterGoldfish', 44)
         self.background = pygame.image.load("../img/backgrounds/levelSelect.png").convert()
         self.levelTitles = ["Tutorial","Green Machine", "Strange Orange", "Purple Trouble"]
         self.levelBackgrounds = []

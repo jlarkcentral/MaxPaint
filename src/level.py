@@ -7,6 +7,7 @@ import pygame
 import random
 from block import Block
 from enemy import Enemy
+import utils
 
 class Level(object):
 
@@ -14,7 +15,7 @@ class Level(object):
 		self.index = index
 		self.blocks = []
 		self.enemies = []
-		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
+		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl.jpg").convert()
 		self.background_alpha = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+"_alpha.png").convert_alpha()
 		self.loadLevel()
 
@@ -34,3 +35,5 @@ class Level(object):
 						self.enemies.append(Enemy([(currentX+18,currentY+40)],random.randint(2,5)))
 					j += 1
 				i += 1
+		self.question = utils.getQuestion(self.index)
+		self.answers = utils.getAnswers(self.index)

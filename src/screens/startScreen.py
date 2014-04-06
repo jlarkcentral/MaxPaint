@@ -14,8 +14,8 @@ class StartScreen(Screen_):
 
     def __init__(self):
         super(StartScreen, self).__init__()
-        self.enterFont = utils.getFont('Handy00', 40)
-        self.infoFont = utils.getFont('Handy00', 18)
+        self.enterFont = utils.getFont('VolterGoldfish', 40)
+        self.infoFont = utils.getFont('VolterGoldfish', 18)
         self.background = pygame.image.load("../img/backgrounds/title_pix.png").convert()
         self.running = True
         self.enterColors = (235,246,242)

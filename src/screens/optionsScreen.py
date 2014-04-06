@@ -18,9 +18,9 @@ class OptionsScreen(Screen_):
     def __init__(self):
         super(OptionsScreen, self).__init__()
     
-        self.font = utils.getFont('Handy00', 44)
-        self.infofont = utils.getFont('Handy00', 18)
-        self.keyfont = utils.getFont('Handy00', 24)
+        self.font = utils.getFont('VolterGoldfish', 44)
+        self.infofont = utils.getFont('VolterGoldfish', 18)
+        self.keyfont = utils.getFont('VolterGoldfish', 24)
         self.background = pygame.image.load("../img/backgrounds/options.png").convert()
         self.soundBar = pygame.image.load("../img/backgrounds/soundBar.png").convert_alpha()
         self.musicBar = pygame.image.load("../img/backgrounds/soundBar.png").convert_alpha()
