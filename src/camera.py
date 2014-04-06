@@ -34,7 +34,7 @@ class Camera(object):
         l = max(0, l)
         # stop scrolling at the bottom
         t = max(-(camera.height-self.screen_height), t)
-        t = self.maxH
+        # t = self.maxH
         # stop scrolling at the top
         t = min(0, t)
 
