@@ -14,15 +14,8 @@ class Level(object):
 		self.index = index
 		self.blocks = []
 		self.enemies = []
-		# self.exitPosDict = dict({1:(50,1200),2:(700,1200),3:(400,1250)})
-		# self.exitPos = self.exitPosDict[index]
-		self.background_img = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
-
-		self.background = pygame.transform.scale(self.background_img, (800, 3200))
-		
-
-
-
+		self.background = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+".jpg").convert()
+		self.background_alpha = pygame.image.load("../img/backgrounds/levelBackgrounds/lvl"+str(index)+"_alpha.png").convert_alpha()
 		self.loadLevel()
 
 	def loadLevel(self):

@@ -17,6 +17,8 @@ def main():
     pygame.mixer.pre_init(44100, -16, 1, 300)
     pygame.init()
     pygame.mixer.init()
+    pygame.mixer.music.load("../sounds/piano.wav")
+    # pygame.mixer.music.play(-1)
     display = pygame.display.set_mode((width,height))
     clock = pygame.time.Clock()
     manager = ScreenManager()

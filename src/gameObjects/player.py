@@ -43,7 +43,7 @@ class Player(GameObject_):
         self.animationTicks = 0
         self.spidering = False
         self.onBlock = None
-        
+        self.finished = False
         
         # game properties
         self.bullets = []
@@ -107,6 +107,8 @@ class Player(GameObject_):
             self.rect.y = 3200
         # if not self.collide_ls:
         #     self.onBlock = None
+        if self.rect.y < 300:
+            self.finished = True
     
     def adjust_pos(self,blocks,offset,off_ind):
         offset[off_ind] += (1 if offset[off_ind]<0 else -1)
@@ -179,33 +181,35 @@ class Player(GameObject_):
     def controlsUpdate(self):
         keys = pygame.key.get_pressed()
         self.x_vel = 0
-        if keys[pygame.K_LEFT]:
-            self.x_vel -= self.speed
-            self.direction = -1
-        if keys[pygame.K_RIGHT]:
-            self.x_vel += self.speed
-            self.direction = 1
-        if keys[pygame.K_UP]:
-            self.y_vel_i = -self.jump_power
-            self.fall = True
-        if keys[pygame.K_x]:
-            if self.onBlock and self.onBlock.active and not self.onBlock.selected \
-            and not self.mining and self.mines > 0:
-                self.onBlock.selected = True
-                self.mines -= 1
-                self.mining = True
-        elif not keys[pygame.K_x]:
-            self.mining = False
-        if keys[pygame.K_z]:
-            if self.slomoDelay == 0 and self.timePower > 0 and self.shieldDelay == 0:
-                self.timePower -= 1
-                self.timeAnim.play()
-                self.slomoDelay = 100
-        if keys[pygame.K_c]:
-            if self.shieldDelay == 0 and self.shields > 0 and self.slomoDelay == 0:
-                self.shields -= 1
-                self.shieldAnim.play()
-                self.shieldDelay = 100
+        if not self.finished:
+            if keys[pygame.K_LEFT]:
+                self.x_vel -= self.speed
+                self.direction = -1
+            if keys[pygame.K_RIGHT]:
+                self.x_vel += self.speed
+                self.direction = 1
+            if keys[pygame.K_UP]:
+                self.y_vel_i = -self.jump_power
+                self.fall = True
+            if keys[pygame.K_x]:
+                if self.onBlock and self.onBlock.active and not self.onBlock.selected \
+                and not self.mining and self.mines > 0:
+                    self.onBlock.selected = True
+                    self.mines -= 1
+                    self.mining = True
+            elif not keys[pygame.K_x]:
+                self.mining = False
+            if keys[pygame.K_z]:
+                if self.slomoDelay == 0 and self.timePower > 0 and self.shieldDelay == 0:
+                    self.timePower -= 1
+                    self.timeAnim.play()
+                    self.slomoDelay = 100
+            if keys[pygame.K_c]:
+                if self.shieldDelay == 0 and self.shields > 0 and self.slomoDelay == 0:
+                    self.shields -= 1
+                    self.shieldAnim.play()
+                    self.shieldDelay = 100
+
 
 
 

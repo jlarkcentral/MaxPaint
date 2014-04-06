@@ -4,7 +4,7 @@ MaxPaint
 game test with Pygame and pyganim
 
 
-[arrows] to move, [w] to freeze time, [x] to shield, [c] to mine block 
+[arrows] to move, [w] to freeze time, [x] to mine block , [c] to shield
 
 # todo
 
