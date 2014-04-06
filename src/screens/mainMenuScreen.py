@@ -46,7 +46,6 @@ class MainMenuScreen(Screen_):
                 elif event.key == K_RETURN:
                     if self.menuChoice == 0:
                         self.manager.go_to('levelSelectScreen')
-                        # self.manager.go_to_game(0)
                     elif self.menuChoice == 1:
                         self.manager.go_to('optionsScreen')
                     elif self.menuChoice == 2:

@@ -58,7 +58,7 @@ class Enemy(GameObject_):
             else:
                 if b.rect.colliderect(player.rect):
                     # if player.shieldDelay == 0:
-                    #     player.killed = True
+                        # player.killed = True
                     for _ in range(random.randint(3,15)):
                         self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                     self.bullets.remove(b)
