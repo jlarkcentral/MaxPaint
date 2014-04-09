@@ -24,7 +24,7 @@ class LevelSelectScreen(Screen_):
         self.menuEntries = ["Stage 1","Stage 2","Stage 3","Back"]
         self.menuPositions = [(200,100),(200,200),(200,300),(200,500)]
         self.activeColor = THECOLORS["black"]
-        self.inactiveColor = THECOLORS["grey29"]
+        self.inactiveColor = THECOLORS["grey64"]
         self.menuChoice = 0
         self.running = True
         self.frame_number = 0

@@ -30,7 +30,7 @@ class OptionsScreen(Screen_):
         self.menuPositions = [(200,100),(200,200),(200,300),(200,500)]
         self.menuChoice = 0
         self.activeColor = THECOLORS["black"]
-        self.inactiveColor = THECOLORS["grey29"]
+        self.inactiveColor = THECOLORS["grey64"]
         self.soundLevel = 0
         if exist('soundLevel'):
             self.soundLevel = load('soundLevel')

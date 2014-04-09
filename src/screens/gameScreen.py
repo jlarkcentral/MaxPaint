@@ -211,7 +211,9 @@ class GameScreen(Screen_):
                 d.update(d.speed/5)
         else:
             for d in self.dust:
-               d.update(d.speed)
+                d.update(d.speed)
+                if d.rect.y < 0:
+                    self.dust.remove(d)
 
 
 
