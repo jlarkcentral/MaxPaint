@@ -19,7 +19,7 @@ def main():
     pygame.mixer.init()
     pygame.mixer.music.load("../sounds/piano.wav")
     pygame.mixer.music.play(-1)
-    display = pygame.display.set_mode((width,height),pygame.FULLSCREEN)
+    display = pygame.display.set_mode((width,height)) #,pygame.FULLSCREEN)
     clock = pygame.time.Clock()
     manager = ScreenManager()
     running = True

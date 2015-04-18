@@ -25,46 +25,46 @@ class GameScreen(Screen_):
     
     def __init__(self, levelInd):
         super(GameScreen, self).__init__()
-        self.fadeScreen = pygame.image.load("../img/backgrounds/blackscreen.png").convert()
-        self.font = getFont("VolterGoldfish", 20)
+        self.fadeScreen    = pygame.image.load("../img/backgrounds/blackscreen.png").convert()
+        self.font          = getFont("VolterGoldfish", 20)
         self.nextColorIcon = pygame.image.load("../img/hud/nextColor23.png").convert_alpha()
-        self.progressIcon = pygame.image.load("../img/hud/progress.png").convert_alpha()
-        self.timebar = pygame.image.load("../img/hud/timebar.png").convert_alpha()
-        self.shieldbar = pygame.image.load("../img/hud/shieldbar.png").convert_alpha()
-        self.lifebar_ = pygame.image.load("../img/hud/lifebar_.png").convert()
-
-        self.level = Level(levelInd)
-        self.camera = Camera(640, 800, 3200)
-        # running = True
-        self.retry = False
-        self.frame_number = 0
-        self.anims = []
-
-        self.stopDelay = 0
-        self.stopped = False
-
+        self.progressIcon  = pygame.image.load("../img/hud/progress.png").convert_alpha()
+        self.timebar       = pygame.image.load("../img/hud/timebar.png").convert_alpha()
+        self.shieldbar     = pygame.image.load("../img/hud/shieldbar.png").convert_alpha()
+        self.lifebar_      = pygame.image.load("../img/hud/lifebar_.png").convert()
+        
+        self.level         = Level(levelInd)
+        self.camera        = Camera(640, 800, 3200)
+        # running          = True
+        self.retry         = False
+        self.frame_number  = 0
+        self.anims         = []
+        
+        self.stopDelay     = 0
+        self.stopped       = False
+        
         self.killFragments = []
-        self.dust = []
-
-        self.starting = True
-        self.ending = False
-        self.alpha = 255
-
-
+        self.dust          = []
+        
+        self.starting      = True
+        self.ending        = False
+        self.alpha         = 255
+        
+        
         # Music load
         # pygame.mixer.music.load("../sounds/piano.wav")
         # pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.5)
-
-        # Player
-        self.player = Player()
-        self.fire = Rect((0,3200),(800,5))
-        self.playerDown = False
-
         
-        self.answerPos = [(100,300),(100,400),(100,500)]
-        self.answerChoice = 0
-        self.activecolor = THECOLORS['white']
+        # Player
+        self.player        = Player()
+        self.fire          = Rect((0,3200),(800,5))
+        self.playerDown    = False
+        
+        
+        self.answerPos     = [(100,300),(100,400),(100,500)]
+        self.answerChoice  = 0
+        self.activecolor   = THECOLORS['white']
         self.inactivecolor = THECOLORS['grey21']
         
         if exist('powers'):
@@ -184,7 +184,7 @@ class GameScreen(Screen_):
         # Update player
         if not self.player.finished:
             if not self.player.killed:
-                self.player.update(self.level.blocks,self.level.enemies,self.frame_number)
+                self.player.update(self.level.blocks, self.frame_number)
             else:
                 if not self.stopped:
                     self.stopped = True

@@ -28,46 +28,49 @@ class Player(GameObject_):
     def __init__(self):
         super(Player, self).__init__()
         # physics properties
-        self.x_vel = self.y_vel = self.y_vel_i = 0
-        self.grav = 20
-        self.fall = False
-        self.time = 0 # None
-        self.speed = 10
-        self.jump_power = 10
-        self.rect = Rect(0, 0, 60, 60)
-        self.rect.topleft = (150,3000)
-        self.collide_ls = [] #what obstacles does the player collide with
-        self.direction = 1
+        self.x_vel            = self.y_vel = self.y_vel_i = 0
+        self.grav             = 20
+        self.fall             = False
+        self.time             = 0 # None
+        self.speed            = 10
+        self.jump_power       = 10
+        self.rect             = Rect(0, 0, 60, 60)
+        self.rect.topleft     = (150,3000)
+        self.collide_ls       = [] #what obstacles does the player collide with
+        self.direction        = 1
         self.direction_offset = 0
         self.animation_offset = 0
-        self.animationTicks = 0
-        self.spidering = False
-        self.onBlock = None
-        self.finished = False
+        self.animationTicks   = 0
+        self.spidering        = False
+        self.onBlock          = None
+        self.finished         = False
+        self.kup_pressed      = False
         
         # game properties
-        self.bullets = []
-        self.mines = 0
-        self.minesCount = 0
-        self.mining = False
-        self.slomoDelay = 0
-        self.shields = 0
-        self.shieldsCount = 0
-        self.shieldDelay = 0
-        self.killed = False
-        self.timePower = 0
-        self.timePowerCount = 0
+        self.bullets          = []
+        self.mines            = 0
+        self.minesCount       = 0
+        self.mining           = False
+        self.slomoDelay       = 0
+        self.shields          = 0
+        self.shieldsCount     = 0
+        self.shieldDelay      = 0
+        self.killed           = False
+        self.hit              = False
+        self.hitDelay         = 0
+        self.timePower        = 0
+        self.timePowerCount   = 0
 
 
         # pics, anims and sound
-        self.shieldAnim = pyganim.loadAnim('../img/anims/shield',0.1,True)
-        self.timeAnim = pyganim.loadAnim('../img/anims/time',0.1,True)
-        self.shootSound = pygame.mixer.Sound("../sounds/playerShoot.wav")
+        self.shieldAnim  = pyganim.loadAnim('../img/anims/shield',0.1,True)
+        self.timeAnim    = pyganim.loadAnim('../img/anims/time',0.1,True)
+        self.shootSound  = pygame.mixer.Sound("../sounds/playerShoot.wav")
         self.shieldSound = pygame.mixer.Sound("../sounds/playerShield.wav")
-        self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
-        self.noteRed = pygame.mixer.Sound('../sounds/notes/plouit_red.wav')
-        self.noteBlue = pygame.mixer.Sound('../sounds/notes/plouit_blue.wav')
-        self.noteYellow = pygame.mixer.Sound('../sounds/notes/plouit_yellow.wav')
+        self.hitSound    = pygame.mixer.Sound("../sounds/playerHit.wav")
+        self.noteRed     = pygame.mixer.Sound('../sounds/notes/plouit_red.wav')
+        self.noteBlue    = pygame.mixer.Sound('../sounds/notes/plouit_blue.wav')
+        self.noteYellow  = pygame.mixer.Sound('../sounds/notes/plouit_yellow.wav')
 
 
         self.img = pygame.image.load("../img/player/kube_new_pix.png").convert_alpha()
@@ -76,10 +79,10 @@ class Player(GameObject_):
 
     def physicsUpdate(self):
         if self.fall:
-            self.time += 2 # frame_number # pygame.time.get_ticks()
+            self.time  += 2 # frame_number # pygame.time.get_ticks()
             self.y_vel = self.grav*((self.time)/100.0) + self.y_vel_i
         else:
-            self.time = 0
+            self.time  = 0
             self.y_vel = 0
 
     def positionUpdate(self,blocks):
@@ -89,9 +92,9 @@ class Player(GameObject_):
             self.fall = True
         #Has the player landed from a fall or jumped into an object above them?
         elif self.fall and self.collide_with(blocks,[0,int(self.y_vel)]):
-            self.y_vel = self.adjust_pos(self.collide_ls,[0,int(self.y_vel)],1)
+            self.y_vel   = self.adjust_pos(self.collide_ls,[0,int(self.y_vel)],1)
             self.y_vel_i = 0
-            self.fall = False
+            self.fall    = False
         self.rect.y += int(self.y_vel) #Update y position before testing x.
         #Is the player running into a wall?.
         if self.collide_with(blocks,(int(self.x_vel),0)):
@@ -107,6 +110,15 @@ class Player(GameObject_):
             self.rect.y = 3200
         # if not self.collide_ls:
         #     self.onBlock = None
+
+    def hitUpdate(self):
+        if self.hit:
+            if not self.fall:
+                self.fall = True
+            self.y_vel_i = 2
+            self.hit = False
+
+
     
     def adjust_pos(self,blocks,offset,off_ind):
         offset[off_ind] += (1 if offset[off_ind]<0 else -1)
@@ -136,24 +148,24 @@ class Player(GameObject_):
         if block.color == "red":
             self.minesCount += 1
             if self.minesCount == 5:
-                self.minesCount = 0
-                self.mines += 1
+                self.minesCount   = 0
+                self.mines        += 1
                 self.noteRed.play()
                 block.addingPower = True
         if block.color == "blue":
             self.shieldsCount += 1
             if self.shieldsCount == 5:
                 self.shieldsCount = 0
-                self.shields += 1
+                self.shields      += 1
                 self.noteBlue.play()
                 block.addingPower = True
         if block.color == "yellow":
             self.timePowerCount += 1
             if self.timePowerCount == 5:
                 self.timePowerCount = 0
-                self.timePower += 1
+                self.timePower      += 1
                 self.noteYellow.play()
-                block.addingPower = True
+                block.addingPower   = True
 
     def shieldUpdate(self):
         if self.shieldDelay > 0:
@@ -181,30 +193,33 @@ class Player(GameObject_):
         self.x_vel = 0
         if not self.finished:
             if keys[pygame.K_LEFT]:
-                self.x_vel -= self.speed
+                self.x_vel     -= self.speed
                 self.direction = -1
             if keys[pygame.K_RIGHT]:
-                self.x_vel += self.speed
+                self.x_vel     += self.speed
                 self.direction = 1
-            if keys[pygame.K_UP]:
-                self.y_vel_i = -self.jump_power
-                self.fall = True
+            if keys[pygame.K_UP] and not self.kup_pressed:
+                self.kup_pressed = True
+                self.y_vel_i     = -self.jump_power
+                self.fall        = True
+            if not keys[pygame.K_UP]:
+                self.kup_pressed = False
             if keys[pygame.K_x]:
                 if self.onBlock and self.onBlock.active and not self.onBlock.selected \
                 and not self.mining and self.mines > 0:
                     self.onBlock.selected = True
-                    self.mines -= 1
-                    self.mining = True
+                    self.mines            -= 1
+                    self.mining           = True
             elif not keys[pygame.K_x]:
                 self.mining = False
-            if keys[pygame.K_z]:
+            if keys[pygame.K_w]:
                 if self.slomoDelay == 0 and self.timePower > 0 and self.shieldDelay == 0:
-                    self.timePower -= 1
+                    self.timePower  -= 1
                     self.timeAnim.play()
                     self.slomoDelay = 100
             if keys[pygame.K_c]:
                 if self.shieldDelay == 0 and self.shields > 0 and self.slomoDelay == 0:
-                    self.shields -= 1
+                    self.shields     -= 1
                     self.shieldAnim.play()
                     self.shieldDelay = 100
 
@@ -214,10 +229,11 @@ class Player(GameObject_):
 
 
 
-    def update(self, blocks,enemies,frame_number):
+    def update(self, blocks, frame_number):
         self.controlsUpdate()
         self.positionUpdate(blocks)
         self.physicsUpdate()
+        self.hitUpdate()
         self.shieldUpdate()
         self.slomoUpdate()
         self.animationUpdate(frame_number)

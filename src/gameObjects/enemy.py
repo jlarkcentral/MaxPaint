@@ -18,22 +18,22 @@ class Enemy(GameObject_):
 
     def __init__(self, path, speed):
         super(Enemy, self).__init__()
-        self.speed = speed
-        self.path = path
-        self.path_index = 0
-        self.rect = Rect(self.path[0],(64,32))
-        self.imgNormal = pygame.image.load("../img/enemies/enemy.png").convert_alpha()
-        self.imgRed = pygame.image.load("../img/enemies/enemyRed.png").convert_alpha()
-        self.img = self.imgNormal
-        # self.hitSound = pygame.mixer.Sound("../sounds/playerHit.wav")
-        self.bullets = []
-        self.bulletSpeed = 10
-        self.shootingDelay = 0
+        self.speed            = speed
+        self.path             = path
+        self.path_index       = 0
+        self.rect             = Rect(self.path[0],(64,32))
+        self.imgNormal        = pygame.image.load("../img/enemies/enemy.png").convert_alpha()
+        self.imgRed           = pygame.image.load("../img/enemies/enemyRed.png").convert_alpha()
+        self.img              = self.imgNormal
+        # self.hitSound       = pygame.mixer.Sound("../sounds/playerHit.wav")
+        self.bullets          = []
+        self.bulletSpeed      = 10
+        self.shootingDelay    = 0
         self.shootingDelayMax = 50
-        self.radius = 300
-        self.waitDelay = 0
-        self.lives = 1
-        self.hit = False
+        self.radius           = 300
+        self.waitDelay        = 0
+        self.lives            = 1
+        self.hit              = False
 
         self.bulletFragments = []
 
@@ -50,15 +50,16 @@ class Enemy(GameObject_):
         self.shootSound.play()
 
 
-    def updateBullets(self, player,blocks):
+    def updateBullets(self, player, blocks):
         for b in self.bullets:
             b.update(self.bulletSpeed)
             if b.outOfScreen:
                 self.bullets.remove(b)
             else:
                 if b.rect.colliderect(player.rect):
-                    # if player.shieldDelay == 0:
-                    #     player.killed = True
+                    if player.shieldDelay == 0:
+                        # player.killed = True
+                        player.hit = True
                     for _ in range(random.randint(3,15)):
                         self.bulletFragments.append(Fragment(b.rect.center,THECOLORS[b.color]))
                     self.bullets.remove(b)
